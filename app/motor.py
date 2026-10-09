@@ -435,8 +435,8 @@ def potrivire(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     poz = pozitii_medii(stare)
     clasament = []
     for a in c.arhetipuri:
-        if len(a["poz"]) < c.minim_teme:
-            continue
+        if len(a["poz"]) < c.minim_teme or not in_domeniu(stare, a):
+            continue   # arhetipurile cu domenii intră doar la firmele din domeniile lor
         diferente, la_fel = [], []
         for t, v in poz.items():
             if t in a["poz"]:

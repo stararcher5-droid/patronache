@@ -1,5 +1,5 @@
 {
-  "_nota": "Tipurile de patron cu care e comparat jucătorul. Pozițiile sunt pe scara -2..+2; o temă lipsă = fără date (contează ca diferență 1). Un arhetip intră în clasament doar cu date pe cel puțin 'minim_teme' teme.",
+  "_nota": "Tipurile de patron cu care e comparat jucătorul. Pozițiile sunt pe scara -2..+2; o temă lipsă = fără date (contează ca diferență 1). Un arhetip intră în clasament doar cu date pe cel puțin 'minim_teme' teme. 'domenii': arhetipul intră în comparație doar la firmele din domeniile listate; fără 'domenii', la toate.",
   "minim_teme": 5,
   "arhetipuri": [
     {
@@ -16,7 +16,10 @@
         "angajari": -2,
         "imagine": 0.5,
         "program": -2
-      }
+      },
+      "domenii": [
+        "it"
+      ]
     },
     {
       "id": "nea-gigi",
@@ -32,7 +35,12 @@
         "angajari": 1.5,
         "imagine": -1.5,
         "program": 1.5
-      }
+      },
+      "domenii": [
+        "constructii",
+        "transport",
+        "agricultura"
+      ]
     },
     {
       "id": "lamborghini",
@@ -48,7 +56,11 @@
         "angajari": 0,
         "imagine": 2,
         "program": 0
-      }
+      },
+      "domenii": [
+        "comert",
+        "it"
+      ]
     },
     {
       "id": "cumnatul-primarie",
@@ -96,7 +108,10 @@
         "angajari": 0.5,
         "imagine": 1,
         "program": 2
-      }
+      },
+      "domenii": [
+        "horeca"
+      ]
     },
     {
       "id": "fonduri-europene",
@@ -128,7 +143,10 @@
         "angajari": 1,
         "imagine": -1,
         "program": 2
-      }
+      },
+      "domenii": [
+        "agricultura"
+      ]
     },
     {
       "id": "founder",
@@ -144,7 +162,10 @@
         "angajari": -1.5,
         "imagine": 1,
         "program": -1.5
-      }
+      },
+      "domenii": [
+        "it"
+      ]
     },
     {
       "id": "patron-hala",
@@ -160,7 +181,10 @@
         "angajari": 1.5,
         "imagine": 0.5,
         "program": 2
-      }
+      },
+      "domenii": [
+        "comert"
+      ]
     },
     {
       "id": "patroana-salon",
@@ -176,7 +200,11 @@
         "angajari": 0,
         "imagine": 1.5,
         "program": 0.5
-      }
+      },
+      "domenii": [
+        "horeca",
+        "comert"
+      ]
     },
     {
       "id": "firma-de-familie",
@@ -208,7 +236,10 @@
         "angajari": 1,
         "imagine": 1.5,
         "program": 1.5
-      }
+      },
+      "domenii": [
+        "constructii"
+      ]
     },
     {
       "id": "corporatist",
@@ -240,7 +271,10 @@
         "angajari": -1,
         "imagine": -1,
         "program": -2
-      }
+      },
+      "domenii": [
+        "it"
+      ]
     },
     {
       "id": "patron-tiruri",
@@ -256,7 +290,10 @@
         "angajari": 1,
         "imagine": 0.5,
         "program": 2
-      }
+      },
+      "domenii": [
+        "transport"
+      ]
     }
   ]
 }

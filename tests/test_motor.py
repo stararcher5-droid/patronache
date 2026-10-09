@@ -249,6 +249,20 @@ class Domenii(unittest.TestCase):
         self.assertEqual(s2["carti"], ["vin"])
         self.assertIn(s2["pas_id"], {"b", "c", "d", "e", "f"})
 
+    def test_arhetipurile_respecta_domeniul(self):
+        c = continut_de_test()
+        c.config["domenii"] = [{"id": "it", "nume": "IT"}, {"id": "horeca", "nume": "Horeca"}]
+        c.arhetipuri[:] = [
+            {"id": "x", "nume": "General", "poz": {"fisc": -2, "salarii": 0, "control": 0, "risc": 0, "clienti": 0}},
+            {"id": "y", "nume": "Restaurant", "domenii": ["horeca"], "poz": {"fisc": -2, "salarii": 0, "control": 0, "risc": 0, "clienti": 0}},
+        ]
+        s = motor.stare_noua(c, {"domeniu": "it"}, seed=1)
+        motor.alege(c, s, 0)
+        self.assertEqual([x["id"] for x in motor.potrivire(c, s)["clasament"]], ["x"])
+        s2 = motor.stare_noua(c, {"domeniu": "horeca"}, seed=1)
+        motor.alege(c, s2, 0)
+        self.assertEqual(sorted(x["id"] for x in motor.potrivire(c, s2)["clasament"]), ["x", "y"])
+
     def test_domeniu_necunoscut_devine_primul(self):
         c = continut_de_test()
         c.config["domenii"] = [{"id": "it", "nume": "IT"}]

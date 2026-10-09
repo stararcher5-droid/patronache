@@ -217,7 +217,7 @@ def construieste(brut: dict[str, dict[str, Any]]) -> Continut:
     _valideaza_situatii(situatii, ids_carti, teme, len(niveluri), ids_domenii)
 
     arhetipuri = brut["arhetipuri.json"].get("arhetipuri", [])
-    _valideaza_arhetipuri(arhetipuri, teme)
+    _valideaza_arhetipuri(arhetipuri, teme, ids_domenii)
 
     return Continut(
         config=config, niveluri=niveluri, carti=carti, situatii=situatii, arhetipuri=arhetipuri,
@@ -395,7 +395,7 @@ def _valideaza_situatii(situatii: list[dict[str, Any]], ids_carti: set[str], tem
                 raise ContinutInvalid(f"situația {s['id']!r}: 'dupa' cere situația inexistentă {d!r}")
 
 
-def _valideaza_arhetipuri(arhetipuri: list[dict[str, Any]], teme: dict[str, Any]) -> None:
+def _valideaza_arhetipuri(arhetipuri: list[dict[str, Any]], teme: dict[str, Any], ids_domenii: set[str] = frozenset()) -> None:
     ids: set[str] = set()
     for a in arhetipuri:
         unde = f"arhetipul {a.get('id', '?')!r}"
@@ -404,6 +404,7 @@ def _valideaza_arhetipuri(arhetipuri: list[dict[str, Any]], teme: dict[str, Any]
         if a["id"] in ids:
             raise ContinutInvalid(f"{unde}: id duplicat")
         ids.add(a["id"])
+        _valideaza_domenii(a.get("domenii"), unde, ids_domenii)
         for t, v in a["poz"].items():
             if t not in teme or not _numar(v) or not -2 <= v <= 2:
                 raise ContinutInvalid(f"{unde}: poziția pe {t!r} trebuie să fie pe o temă existentă, în -2..+2")
