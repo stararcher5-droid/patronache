@@ -21,7 +21,9 @@
   .lista { background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
   .lista input[type=search] { width:100%; border:0; border-bottom:1px solid var(--line); padding:10px 12px; font-size:14px; }
   .lista ul { list-style:none; margin:0; padding:0; max-height:70vh; overflow:auto; }
-  .lista li { padding:8px 12px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .lista li { padding:8px 12px; border-bottom:1px solid var(--line); cursor:pointer; display:flex; align-items:center; gap:8px; }
+  .lista li > div { flex:1; min-width:0; }
+  .lista li .sterge { opacity:.5; } .lista li:hover .sterge { opacity:1; }
   .lista li:hover { background:#f0f3ff; }
   .lista li.activ { background:#e4ebff; }
   .lista li small { display:block; color:var(--muted); }
@@ -60,7 +62,18 @@
   #harta .nod rect { fill:#e4ebff; stroke:#b9c7f5; rx:6; }
   #harta .nod.legata rect { fill:#fff3d6; stroke:#f0d79a; }
   #harta .nod text { font-size:11px; }
-  #harta line { stroke:#8a97b8; stroke-width:1.4; marker-end:url(#sageata); }
+  #harta line, #harta path.leg { stroke:#8a97b8; stroke-width:1.4; marker-end:url(#sageata); fill:none; }
+  #harta .nod .maner { fill:#2f6fed; cursor:crosshair; }
+  #harta .nod .maner-text { fill:#fff; font-size:13px; font-weight:700; pointer-events:none; }
+  #harta .nod.tinta rect { stroke:#2f6fed; stroke-width:2.5; }
+  #harta .nod.sursa rect { stroke:#1f9d55; stroke-width:2.5; }
+  #harta .sterge-leg { cursor:pointer; }
+  #harta .sterge-leg circle { fill:#fff; stroke:#d64545; }
+  #harta .sterge-leg text { fill:#d64545; font-size:11px; font-weight:700; pointer-events:none; }
+  #harta .sterge-leg:hover circle { fill:#fdecec; }
+  #harta .temp { stroke:#2f6fed; stroke-width:2; stroke-dasharray:6 4; fill:none; pointer-events:none; }
+  #panou-legatura { position:fixed; z-index:20; background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; width:320px; box-shadow:0 8px 30px rgba(0,0,0,.15); }
+  #panou-legatura h4 { margin:0 0 8px; font-size:13px; }
   .nota { color:var(--muted); font-size:13px; }
   @media (max-width:900px) { .coloane { grid-template-columns:1fr; } .r4, .r6 { grid-template-columns:1fr 1fr; } }
 </style>
@@ -101,8 +114,11 @@
   <section id="tab-harta" class="ascuns">
     <div class="card">
       <h2>Harta legăturilor</h2>
-      <p class="nota">Coloanele sunt anii în care situația poate apărea prima dată (an_min). Săgețile sunt legăturile „urmatoare” din opțiuni. Galben = apare doar legată. Clic pe o situație o deschide în editor.</p>
+      <p class="nota">Coloanele sunt anii în care situația poate apărea prima dată (an_min). Săgețile sunt legăturile „urmatoare” din opțiuni. Galben = apare doar legată.
+        <b>Ca să legi:</b> trage din cerculețul albastru al unei situații peste altă situație, apoi alege opțiunea care o deschide. Clic pe × de pe săgeată o scoate. Clic pe o situație o deschide în editor.</p>
+      <div style="display:flex; gap:8px; margin-bottom:10px"><button class="primar" id="salveaza-harta">Salvează legăturile</button><span class="nota" id="harta-stare"></span></div>
       <div id="harta"></div>
+      <div id="panou-legatura" class="ascuns"></div>
     </div>
   </section>
 
@@ -238,8 +254,9 @@ function randeazaLista() {
     if (q && !(s.id + ' ' + s.titlu + ' ' + s.text).toLowerCase().includes(q)) continue;
     const li = document.createElement('li');
     li.className = s.id === curent ? 'activ' : '';
-    li.innerHTML = `<b>${esc(s.titlu)}</b><small>${esc(s.id)} · an ${s.an_min || 1}–${s.an_max || ani()}${s.doar_legata ? ' · doar legată' : ''} · ${s.optiuni.length} opțiuni</small>`;
+    li.innerHTML = `<div><b>${esc(s.titlu)}</b><small>${esc(s.id)} · an ${s.an_min || 1}–${s.an_max || ani()}${s.doar_legata ? ' · doar legată' : ''} · ${s.optiuni.length} opțiuni</small></div><button class="mic pericol sterge" title="Șterge situația">×</button>`;
     li.addEventListener('click', () => deschide(s.id));
+    $('.sterge', li).addEventListener('click', e => { e.stopPropagation(); stergeSituatie(s.id); });
     ul.appendChild(li);
   }
 }
@@ -319,15 +336,7 @@ function deschide(id) {
     while (sit().some(x => x.id === copie.id)) copie.id += '-2';
     sit().push(copie); marcheaza('situatii.json'); deschide(copie.id);
   });
-  $('#s-sterge', el).addEventListener('click', () => {
-    const inapoi = legaturiInapoi(s.id);
-    if (!confirm(`Ștergi situația „${s.titlu}”?` + (inapoi.length ? `\n\nAtenție: ${inapoi.length} opțiuni duc aici; legăturile vor fi scoase.` : ''))) return;
-    for (const l of inapoi) { const o = sit().find(x => x.id === l.id).optiuni[l.optiune]; o.urmatoare = o.urmatoare.filter(x => x !== s.id); }
-    for (const x of sit()) if (x.cerinte && x.cerinte.dupa) x.cerinte.dupa = x.cerinte.dupa.filter(d => d !== s.id);
-    C['situatii.json'].situatii = sit().filter(x => x.id !== s.id);
-    curent = null; marcheaza('situatii.json'); randeazaLista();
-    $('#editor-situatie').innerHTML = '<div class="card nota">Situația a fost ștearsă (nesalvat încă).</div>';
-  });
+  $('#s-sterge', el).addEventListener('click', () => stergeSituatie(s.id));
   // opțiuni: butoane
   $$('.optiune', el).forEach(div => {
     const i = +div.dataset.i;
@@ -376,6 +385,16 @@ function cartiBife(clasa, alese) {
 function eticheta(id, tip) {
   const s = sit().find(x => x.id === id);
   return `<span class="eticheta"><a data-sare="${esc(id)}" style="cursor:pointer">${esc(s ? s.titlu : id)}</a><button data-val="${esc(id)}" title="scoate">×</button></span>`;
+}
+function stergeSituatie(id) {
+  const s = sit().find(x => x.id === id); if (!s) return;
+  const inapoi = legaturiInapoi(id);
+  if (!confirm(`Ștergi situația „${s.titlu}”?` + (inapoi.length ? `\n\nAtenție: ${inapoi.length} opțiuni duc aici; legăturile vor fi scoase.` : ''))) return;
+  for (const l of inapoi) { const o = sit().find(x => x.id === l.id).optiuni[l.optiune]; o.urmatoare = o.urmatoare.filter(x => x !== id); if (!o.urmatoare.length) delete o.urmatoare; }
+  for (const x of sit()) if (x.cerinte && x.cerinte.dupa) x.cerinte.dupa = x.cerinte.dupa.filter(d => d !== id);
+  C['situatii.json'].situatii = sit().filter(x => x.id !== id);
+  if (curent === id) { curent = null; $('#editor-situatie').innerHTML = '<div class="card nota">Situația a fost ștearsă (nesalvat încă). Apasă „Salvează” ca să rămână așa.</div>'; }
+  marcheaza('situatii.json'); randeazaLista(); randeazaHarta();
 }
 function legaturiInapoi(id) {
   const out = [];
@@ -449,18 +468,108 @@ function randeazaHarta() {
   const latime = pad * 2 + ani() * (W + GX), inaltime = pad * 2 + 30 + maxRanduri * (H + GY);
   let svg = `<svg viewBox="0 0 ${latime} ${inaltime}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="sageata" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97b8"/></marker></defs>`;
   for (let a = 1; a <= ani(); a++) svg += `<text x="${pad + (a - 1) * (W + GX)}" y="${pad + 12}" font-size="13" fill="#6b7280">Anul ${a}</text>`;
-  for (const s of sit()) for (const o of s.optiuni) for (const u of o.urmatoare || []) {
+  // legăturile; butoanele × se adună separat și se desenează la urmă, peste căsuțe
+  let butoane = '';
+  for (const s of sit()) s.optiuni.forEach((o, oi) => { for (const u of o.urmatoare || []) {
     const A = poz[s.id], B = poz[u]; if (!A || !B) continue;
-    const x1 = A.x + W, y1 = A.y + H / 2, x2 = B.x, y2 = B.y + H / 2;
-    if (B.x <= A.x) svg += `<path d="M${A.x + W / 2},${A.y + H} C${A.x + W / 2},${A.y + H + 40} ${B.x + W / 2},${B.y - 40} ${B.x + W / 2},${B.y}" fill="none" stroke="#8a97b8" stroke-width="1.4" marker-end="url(#sageata)"/>`;
-    else svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
-  }
+    let mx, my;
+    if (B.x <= A.x) {
+      const x1 = A.x + W / 2, y1 = A.y + H, x2 = B.x + W / 2, y2 = B.y;
+      svg += `<path class="leg" d="M${x1},${y1} C${x1},${y1 + 40} ${x2},${y2 - 40} ${x2},${y2}"/>`;
+      mx = (x1 + x2) / 2 + 60; my = (y1 + y2) / 2;
+    } else {
+      const x1 = A.x + W, y1 = A.y + H / 2, x2 = B.x, y2 = B.y + H / 2;
+      svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+      mx = (x1 + x2) / 2; my = (y1 + y2) / 2;
+    }
+    butoane += `<g class="sterge-leg" data-sursa="${esc(s.id)}" data-opt="${oi}" data-tinta="${esc(u)}"><title>Opțiunea ${oi + 1}: „${esc(o.text)}” deschide „${esc(poz[u].s.titlu)}”. Clic ca să scoți legătura.</title><circle cx="${mx}" cy="${my}" r="8"/><text x="${mx}" y="${my + 4}" text-anchor="middle">×</text></g>`;
+  } });
   for (const { x, y, s } of Object.values(poz)) {
-    svg += `<g class="nod ${s.doar_legata ? 'legata' : ''}" data-id="${esc(s.id)}"><rect x="${x}" y="${y}" width="${W}" height="${H}"/><text x="${x + 8}" y="${y + 18}" font-weight="600">${esc(s.titlu.slice(0, 32))}</text><text x="${x + 8}" y="${y + 34}" fill="#6b7280">${esc(s.id)} · ${s.optiuni.length} opț.${s.cerinte && s.cerinte.nivel_min ? ' · nivel ' + s.cerinte.nivel_min + '+' : ''}</text></g>`;
+    svg += `<g class="nod ${s.doar_legata ? 'legata' : ''}" data-id="${esc(s.id)}"><rect x="${x}" y="${y}" width="${W}" height="${H}"/><text x="${x + 8}" y="${y + 18}" font-weight="600">${esc(s.titlu.slice(0, 30))}</text><text x="${x + 8}" y="${y + 34}" fill="#6b7280">${esc(s.id)} · ${s.optiuni.length} opț.${s.cerinte && s.cerinte.nivel_min ? ' · nivel ' + s.cerinte.nivel_min + '+' : ''}</text>
+      <circle class="maner" cx="${x + W - 12}" cy="${y + H / 2}" r="9"><title>Trage de aici peste altă situație ca să o legi</title></circle><text class="maner-text" x="${x + W - 12}" y="${y + H / 2 + 4.5}" text-anchor="middle">+</text></g>`;
   }
-  el.innerHTML = svg + '</svg>';
-  $$('.nod', el).forEach(n => n.addEventListener('click', () => deschide(n.dataset.id)));
+  el.innerHTML = svg + butoane + '</svg>';
+  const svgEl = $('svg', el);
+  $('#harta-stare').textContent = nesalvat.has('situatii.json') ? 'legături nesalvate' : '';
+
+  // clic pe situație = editor (dar nu când tragem)
+  let tragere = null, tocmaiTras = false;
+  $$('.nod', el).forEach(n => n.addEventListener('click', e => { if (e.target.classList.contains('maner') || tocmaiTras) return; deschide(n.dataset.id); }));
+
+  // × pe săgeată = scoate legătura
+  $$('.sterge-leg', el).forEach(g => g.addEventListener('click', e => {
+    e.stopPropagation();
+    const s = sit().find(x => x.id === g.dataset.sursa); const o = s.optiuni[+g.dataset.opt];
+    if (!confirm(`Scoți legătura: opțiunea ${+g.dataset.opt + 1} din „${s.titlu}” nu va mai deschide „${poz[g.dataset.tinta].s.titlu}”?`)) return;
+    o.urmatoare = (o.urmatoare || []).filter(u => u !== g.dataset.tinta); if (!o.urmatoare.length) delete o.urmatoare;
+    marcheaza('situatii.json'); randeazaHarta(); if (curent === s.id) deschide(s.id);
+  }));
+
+  // tragere din mâner peste altă situație
+  const punctSvg = e => { const pt = svgEl.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; return pt.matrixTransform(svgEl.getScreenCTM().inverse()); };
+  $$('.nod .maner', el).forEach(m => m.addEventListener('pointerdown', e => {
+    e.preventDefault(); e.stopPropagation();
+    const id = m.closest('.nod').dataset.id; const P = poz[id];
+    const linie = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    linie.setAttribute('class', 'temp'); linie.setAttribute('x1', P.x + W - 12); linie.setAttribute('y1', P.y + H / 2);
+    linie.setAttribute('x2', P.x + W - 12); linie.setAttribute('y2', P.y + H / 2); svgEl.appendChild(linie);
+    tragere = { id, linie };
+    m.closest('.nod').classList.add('sursa');
+    svgEl.setPointerCapture(e.pointerId);
+  }));
+  svgEl.addEventListener('pointermove', e => {
+    if (!tragere) return;
+    const p = punctSvg(e); tragere.linie.setAttribute('x2', p.x); tragere.linie.setAttribute('y2', p.y);
+    const sub = document.elementFromPoint(e.clientX, e.clientY)?.closest('.nod');
+    $$('.nod.tinta', el).forEach(n => n.classList.remove('tinta'));
+    if (sub && sub.dataset.id !== tragere.id) sub.classList.add('tinta');
+  });
+  svgEl.addEventListener('pointerup', e => {
+    if (!tragere) return;
+    const sub = document.elementFromPoint(e.clientX, e.clientY)?.closest('.nod');
+    const t = tragere; tragere = null; t.linie.remove();
+    $$('.nod.sursa, .nod.tinta', el).forEach(n => n.classList.remove('sursa', 'tinta'));
+    tocmaiTras = true; setTimeout(() => { tocmaiTras = false; }, 0);
+    if (sub && sub.dataset.id !== t.id) panouLegatura(t.id, sub.dataset.id, e.clientX, e.clientY);
+  });
+  // dacă pointerup nu ajunge la svg (ieșire din fereastră, clic scurt), curățăm oricum
+  const renunta = () => { if (tragere) { tragere.linie.remove(); tragere = null; } $$('.nod.sursa, .nod.tinta', el).forEach(n => n.classList.remove('sursa', 'tinta')); };
+  svgEl.addEventListener('pointercancel', renunta);
+  document.addEventListener('pointerup', e => { if (tragere && !svgEl.contains(e.target)) renunta(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') renunta(); });
 }
+
+// Panoul în care alegi ce opțiune a sursei deschide ținta.
+function panouLegatura(sursaId, tintaId, x, y) {
+  const s = sit().find(z => z.id === sursaId), t = sit().find(z => z.id === tintaId);
+  const p = $('#panou-legatura');
+  p.innerHTML = `<h4>„${esc(s.titlu)}” → „${esc(t.titlu)}”</h4>
+    <label>Care opțiune o deschide?</label>
+    ${s.optiuni.map((o, i) => { const are = (o.urmatoare || []).includes(tintaId); return `<div class="bifa"><input type="checkbox" data-i="${i}" ${are ? 'checked' : ''}> ${i + 1}. ${esc(o.text || '(fără text)')}</div>`; }).join('')}
+    <div class="bifa" style="margin-top:8px"><input type="checkbox" id="pl-doar-legata" ${t.doar_legata ? 'checked' : ''}> „${esc(t.titlu)}” apare doar legată (nu la întâmplare)</div>
+    <div style="display:flex; gap:8px; margin-top:10px"><button class="primar" id="pl-ok">Leagă</button><button id="pl-renunta">Renunță</button></div>`;
+  p.classList.remove('ascuns');
+  const w = 320, h = p.offsetHeight || 200;
+  p.style.left = Math.min(x + 10, window.innerWidth - w - 10) + 'px';
+  p.style.top = Math.min(y + 10, window.innerHeight - h - 10) + 'px';
+  const inchide = () => { p.classList.add('ascuns'); document.removeEventListener('keydown', laEscape); };
+  const laEscape = e => { if (e.key === 'Escape') inchide(); };
+  document.addEventListener('keydown', laEscape);
+  $('#pl-renunta', p).addEventListener('click', inchide);
+  $('#pl-ok', p).addEventListener('click', () => {
+    const bife = $$('input[data-i]', p);
+    if (!bife.some(b => b.checked)) return alert('Bifează cel puțin o opțiune.');
+    bife.forEach(b => {
+      const o = s.optiuni[+b.dataset.i]; const are = (o.urmatoare || []).includes(tintaId);
+      if (b.checked && !are) o.urmatoare = [...(o.urmatoare || []), tintaId];
+      if (!b.checked && are) { o.urmatoare = o.urmatoare.filter(u => u !== tintaId); if (!o.urmatoare.length) delete o.urmatoare; }
+    });
+    t.doar_legata = $('#pl-doar-legata', p).checked || undefined;
+    marcheaza('situatii.json'); inchide(); randeazaHarta(); randeazaLista();
+    if (curent === s.id || curent === t.id) deschide(curent);
+  });
+}
+$('#salveaza-harta').addEventListener('click', () => { citesteEditor(); salveaza('situatii.json'); });
 
 // ------------------------------------------------------------------ cărți
 function randeazaCarti() {
