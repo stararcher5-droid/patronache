@@ -69,6 +69,35 @@ ajunge nimeni, flaguri cerute pe care nu le pune nimeni).
 
 Situațiile din repo sunt **exemple** de structură, nu conținutul final.
 
+## Instalare pe TrueNAS SCALE (24.10+, Docker nativ)
+
+Imaginea e construită de GitHub Actions la fiecare push pe `main` și publicată
+la `ghcr.io/stararcher5-droid/patronache:latest`, deci NAS-ul nu are nevoie de
+git sau de build local.
+
+1. Creează datasetul `/mnt/PollaSSD/apps/patronache/data` (Datasets → Add).
+2. Apps → Discover Apps → Custom App → **Install via YAML**, lipește conținutul
+   din `truenas-app.yaml` (verifică portul 9090 și calea datasetului).
+3. Dacă vrei meniul de admin protejat, decomentează `PATRONACHE_ADMIN_PAROLA`
+   și pune o parolă.
+4. Deschide `http://IP-NAS:9090/admin`.
+
+Dacă NAS-ul nu poate trage imaginea (pachetul de pe ghcr.io e privat), rulează
+o singură dată în shell-ul TrueNAS `docker login ghcr.io -u stararcher5-droid`
+cu un token care are `read:packages`, sau fă pachetul public din GitHub:
+Packages → patronache → Package settings → Change visibility.
+
+**Update**: Apps → patronache → Stop, apoi Start; cu `pull_policy: always`
+trage imaginea nouă. Datele și conținutul editat din admin rămân în dataset.
+
+Alternativ, fără GitHub Actions, din shell-ul NAS:
+
+```bash
+git clone https://github.com/stararcher5-droid/patronache.git /mnt/PollaSSD/apps/patronache && cd /mnt/PollaSSD/apps/patronache && docker compose up -d --build
+```
+
+(în `docker-compose.yml` schimbă volumul `./data` în `/mnt/PollaSSD/apps/patronache/data`).
+
 ## Teste
 
 ```bash
