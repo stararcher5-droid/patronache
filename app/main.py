@@ -27,7 +27,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from . import admin, continut as modul_continut, db, motor
@@ -209,6 +209,12 @@ def rezultat(id_: str) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------- meniul de admin (pagina)
+
+@app.get("/", include_in_schema=False)
+def radacina() -> RedirectResponse:
+    # Până apare interfața jocului, rădăcina duce la meniul de admin.
+    return RedirectResponse("/admin")
+
 
 @app.get("/admin", include_in_schema=False)
 def pagina_admin() -> FileResponse:
