@@ -467,7 +467,9 @@ def verifica(c: Continut) -> list[dict[str, str]]:
         for niv in c.niveluri:
             n = sum(
                 1 for s in c.situatii
-                if not s.get("doar_legata") and not s.get("cerinte") and int(s.get("nivel", 1)) <= niv["nivel"]
+                if not s.get("doar_legata") and int(s.get("nivel", 1)) <= niv["nivel"]
+                and not {k for k in (s.get("cerinte") or {}) if k != "nivel_max"}          # doar „nivel maxim” nu e o condiție incertă
+                and niv["nivel"] <= (s.get("cerinte") or {}).get("nivel_max", 99)
                 and (not s.get("domenii") or dom["id"] in s["domenii"])
             )
             if n < total_necesar:
