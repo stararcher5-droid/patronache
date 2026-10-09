@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#1a1c22">
 <title>Patronache</title>
@@ -13,11 +13,11 @@
     --accent:#e0664a; --parteneri:#e2b23a; --bunastare:#ef7a5e; --legalitate:#4fb79b; --ok:#5fc9a8; --rau:#f08a76;
     --umbra:0 10px 30px rgba(0,0,0,.35);
   }
-  * { box-sizing:border-box; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html, body { margin:0; min-height:100%; }
   body { font:16px/1.5 Georgia, "Times New Roman", serif; color:var(--cerneala); background:var(--hartie);
     background-image:radial-gradient(circle at 20% 0%, #2a2520 0, transparent 50%), radial-gradient(circle at 100% 100%, #1f2430 0, transparent 45%); }
-  .pagina { max-width:760px; margin:0 auto; padding:16px 16px 60px; transition:max-width .2s; }
+  .pagina { max-width:760px; margin:0 auto; padding:16px 16px 60px; padding-left:max(16px, env(safe-area-inset-left)); padding-right:max(16px, env(safe-area-inset-right)); padding-bottom:max(60px, env(safe-area-inset-bottom)); transition:max-width .2s; }
   .pagina.larg { max-width:940px; }
   header.top { display:flex; align-items:center; gap:12px; padding:6px 0 14px; }
   header.top .sigla { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:24px; background:var(--accent); color:#fff; box-shadow:var(--umbra); }
@@ -49,10 +49,12 @@
   .text { font-size:17px; }
   .optiuni { display:grid; gap:10px; margin-top:16px; }
   .opt { text-align:left; font:inherit; font-size:16px; padding:14px 16px; border-radius:12px; border:1.5px solid var(--linie); background:var(--hartie2); color:var(--cerneala); cursor:pointer; transition:transform .12s, border-color .12s; position:relative; }
-  .opt:hover:not(:disabled) { border-color:var(--accent); transform:translateX(3px); }
+  @media (hover:hover) { .opt:hover:not(:disabled) { border-color:var(--accent); transform:translateX(3px); } }
+  .opt:active:not(:disabled) { border-color:var(--accent); }
   .opt:disabled { cursor:not-allowed; color:var(--mut); background:#1f2229; }
   .opt .blocat { display:block; font-family:system-ui, sans-serif; font-size:12px; color:var(--rau); margin-top:4px; }
   .opt .deblocat { display:block; font-family:system-ui, sans-serif; font-size:12px; color:var(--ok); margin-top:4px; }
+  .opt.cu-procent { padding-right:56px; }
   .opt .procent { position:absolute; right:12px; top:12px; font-family:system-ui, sans-serif; font-size:13px; color:var(--mut); }
   .opt.aleasa { border-color:var(--accent); background:#3a2a26; color:var(--cerneala); }
   .efecte { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px; font-family:system-ui, sans-serif; font-size:14px; }
@@ -61,7 +63,8 @@
   .scuturi { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; font-family:system-ui, sans-serif; font-size:13px; }
   .chip.plus { background:#1f3a31; color:#a8e3c8; } .chip.minus { background:#4a2622; color:#f5b2a4; } .chip.primita { background:#4a3c14; color:#f3d98a; }
   .actiuni { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; align-items:center; }
-  .btn { font:inherit; font-size:16px; padding:12px 20px; border-radius:12px; border:0; background:var(--accent); color:#fff; cursor:pointer; box-shadow:var(--umbra); }
+  .btn { font:inherit; font-size:16px; padding:12px 20px; min-height:48px; border-radius:12px; border:0; background:var(--accent); color:#fff; cursor:pointer; box-shadow:var(--umbra); }
+  .btn:active { transform:scale(.98); }
   .btn.secundar { background:var(--hartie2); color:var(--cerneala); border:1.5px solid var(--linie); box-shadow:none; }
   .btn:disabled { opacity:.5; cursor:default; }
   .inventar { margin-top:4px; }
@@ -71,7 +74,7 @@
   .carte { width:164px; min-height:236px; border-radius:14px; position:relative; font-family:system-ui, sans-serif; font-size:12px;
     background:linear-gradient(160deg, #fffaf0, #ffe8a3); border:1px solid #e3c977; box-shadow:0 6px 16px rgba(80,50,0,.18), inset 0 0 0 4px #fff, inset 0 0 0 5px #e8cf7a;
     display:flex; flex-direction:column; align-items:center; padding:14px 12px 12px; transition:transform .18s, box-shadow .18s; }
-  .carte:hover { transform:translateY(-6px) rotate(-1deg); box-shadow:0 14px 26px rgba(80,50,0,.25), inset 0 0 0 4px #fff, inset 0 0 0 5px #e8cf7a; }
+  @media (hover:hover) { .carte:hover { transform:translateY(-6px) rotate(-1deg); box-shadow:0 14px 26px rgba(80,50,0,.25), inset 0 0 0 4px #fff, inset 0 0 0 5px #e8cf7a; } }
   .carte .colt { position:absolute; font-size:13px; color:#8a6a1a; }
   .carte .colt.ss { top:8px; left:10px; } .carte .colt.dj { top:8px; right:10px; transform:scaleX(-1); }
   .carte .mare { font-size:42px; line-height:1; margin:10px 0 8px; filter:drop-shadow(0 3px 2px rgba(0,0,0,.15)); }
@@ -155,7 +158,24 @@
   .modal { position:fixed; inset:0; background:rgba(0,0,0,.6); display:grid; place-items:center; padding:16px; z-index:10; }
   .modal .card { max-width:560px; max-height:90vh; overflow:auto; }
   .ascuns { display:none !important; }
-  @media (max-width:520px) { .resurse { gap:6px; } .res { padding:6px 8px; } h1 { font-size:24px; } .card { padding:16px; } .carti { gap:10px; } .carte { width:calc(50% - 5px); min-height:0; } }
+  @media (max-width:520px) {
+    .resurse { gap:6px; } .res { padding:7px 8px; } .res .et { font-size:11px; } .res .et b { font-size:14px; }
+    h1 { font-size:24px; } .card { padding:16px; border-radius:14px; }
+    .text { font-size:16px; }
+    header.top .sigla { width:40px; height:40px; font-size:22px; } header.top .firma b { font-size:17px; } .nivel { font-size:11px; } .nivel b { font-size:13px; }
+    .profit .et { font-size:11px; }
+    .actiuni { gap:8px; } .actiuni .btn { width:100%; text-align:center; } .actiuni .gol { width:100%; }
+    .carti { gap:10px; } .carte { width:calc(50% - 5px); min-height:0; }
+    .dezvaluire .carte { width:200px; }
+    .mare { font-size:32px; }
+    .tabel td:last-child { white-space:nowrap; padding-left:8px; }
+    .clasament .rand span { flex:1 1 100%; order:-1; font-size:13px; } .clasament .rand { flex-wrap:wrap; row-gap:2px; }
+    .modal { padding:10px; align-items:end; } .modal .card { max-height:85vh; width:100%; }
+    footer { font-size:13px; gap:10px 16px; } footer a { padding:6px 0; }
+  }
+  @media (min-width:521px) and (max-width:900px) {
+    .pagina { max-width:680px; }
+  }
 </style>
 </head>
 <body>
@@ -338,7 +358,7 @@ function ecranDecizie() {
       <h1>${esc(pas.titlu)}</h1>
       <p class="text">${esc(pas.text)}</p>
       <div class="optiuni">
-        ${pas.optiuni.map((o, i) => `<button class="opt ${ef && ef.ales === i ? 'aleasa' : ''}" data-i="${i}" ${o.blocat || ef ? 'disabled' : ''}>${esc(o.text)}${o.blocat ? `<span class="blocat">🔒 ${esc(o.blocat)}</span>` : o.deblocat ? `<span class="deblocat">🔓 ${esc(o.deblocat)}</span>` : ''}${ef ? `<span class="procent">${ef.procente[i]}%</span>` : ''}</button>`).join('')}
+        ${pas.optiuni.map((o, i) => `<button class="opt ${ef && ef.ales === i ? 'aleasa' : ''} ${ef ? 'cu-procent' : ''}" data-i="${i}" ${o.blocat || ef ? 'disabled' : ''}>${esc(o.text)}${o.blocat ? `<span class="blocat">🔒 ${esc(o.blocat)}</span>` : o.deblocat ? `<span class="deblocat">🔓 ${esc(o.deblocat)}</span>` : ''}${ef ? `<span class="procent">${ef.procente[i]}%</span>` : ''}</button>`).join('')}
       </div>
       ${ef ? efecteHtml(ef) + `<div class="actiuni"><button class="btn" id="mai-departe">Mai departe</button><span class="gol">procentele: câți jucători au ales fiecare variantă</span></div>` : ''}
     </div>
