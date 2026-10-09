@@ -232,8 +232,11 @@ function tineApasat(btn, ms, cb) {
     btn.closest('.card').appendChild(st); requestAnimationFrame(() => st.classList.add('cade'));
     setTimeout(cb, 750);
   };
-  btn.addEventListener('pointerdown', e => { if (terminat) return; e.preventDefault(); btn.setPointerCapture(e.pointerId); btn.classList.add('apasat'); t0 = performance.now(); raf = requestAnimationFrame(tick); });
-  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) btn.addEventListener(ev, () => { if (t0) gata(false); });
+  btn.style.minWidth = btn.offsetWidth + 'px';   // textul se schimbă cât ții, butonul nu trebuie să-și schimbe lățimea
+  btn.addEventListener('pointerdown', e => { if (terminat || t0) return; e.preventDefault(); try { btn.setPointerCapture(e.pointerId); } catch (_) {} btn.classList.add('apasat'); t0 = performance.now(); raf = requestAnimationFrame(tick); });
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+  // doar ridicarea degetului sau anularea opresc; ieșirea de pe buton nu, că pointerul e capturat
+  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) btn.addEventListener(ev, () => { if (t0) gata(false); });
   btn.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !terminat) { e.preventDefault(); gata(true); } });
 }
 
