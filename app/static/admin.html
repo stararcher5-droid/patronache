@@ -379,6 +379,7 @@ function optiuneHtml(o, i, s) {
       <div><label>Profit (mii lei; banii, în plus sau în minus)</label><input type="number" class="o-profit" value="${o.profit || ''}" placeholder="0"></div>
       <div><label>Profit de bază pe an ± (permanent, până la final)</label><input type="number" class="o-profit-baza" value="${o.profit_baza || ''}" placeholder="0" title="Rar: schimbă venitul anual din activitatea firmei de la alegerea asta până la finalul jocului"></div>
       <div><label>Dă cartea</label><select class="o-carte"><option value="">—</option>${carti().map(c => `<option value="${esc(c.id)}" ${o.carte === c.id ? 'selected' : ''}>${esc(c.nume)}</option>`).join('')}</select></div>
+      <div><label>Ia din inventar</label><select class="o-ia-carte"><option value="">—</option><option value="oricare" ${o.ia_carte === 'oricare' ? 'selected' : ''}>oricare carte vizibilă</option>${carti().filter(c => !c.surpriza).map(c => `<option value="${esc(c.id)}" ${o.ia_carte === c.id ? 'selected' : ''}>${esc(c.nume)}</option>`).join('')}</select></div>
       <div><label>Pune flaguri (virgulă)</label><input type="text" class="o-flaguri" value="${esc((o.flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
     </div>
     <div class="rand"><div><label>Deschide situațiile (vin la rând imediat după, dacă îndeplinesc cerințele)</label>
@@ -462,6 +463,7 @@ function citesteEditor() {
     if (!o.profit) delete o.profit;
     const pb = numar($('.o-profit-baza', div).value); if (pb) o.profit_baza = pb;
     const carte = $('.o-carte', div).value; if (carte) o.carte = carte;
+    const ia = $('.o-ia-carte', div).value; if (ia) o.ia_carte = ia;
     const f = lista($('.o-flaguri', div).value); if (f.length) o.flaguri = f;
     if (vechi.urmatoare && vechi.urmatoare.length) o.urmatoare = vechi.urmatoare;
     const oc = {};

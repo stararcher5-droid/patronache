@@ -20,6 +20,8 @@ Regulile:
 - Următoarea situație: prima din coadă care îndeplinește cerințele; altfel una
   la întâmplare (ponderat cu `greutate`) dintre cele nejucate, de nivelul firmei
   sau mai mic, și nemarcate `doar_legata`.
+- Unele opțiuni iau o carte din inventar (`ia_carte`: un id sau "oricare"); doar
+  cărțile vizibile, niciodată surprizele.
 - Cărțile speciale intră în inventar când alegi opțiunea care le dă; le poți
   folosi oricând în timpul unei decizii, se consumă și aplică efectul pe loc.
   O carte poate avea și un „scut”: de la următoarea decizie (nu cea pe care o
@@ -230,6 +232,18 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     stare["profit_an"] += profit
 
     carte_noua = None
+    carte_luata = None
+    if o.get("ia_carte"):
+        # Ia o carte din inventar: una anume sau „oricare” vizibilă. Cărțile surpriză nu se iau niciodată.
+        vizibile = [x for x in stare["carti"] if not (c.carte(x) or {}).get("surpriza")]
+        tinta = o["ia_carte"]
+        if tinta == "oricare":
+            tinta = _rng(stare).choice(vizibile) if vizibile else None
+        elif tinta not in vizibile:
+            tinta = None
+        if tinta:
+            stare["carti"].remove(tinta)
+            carte_luata = c.carte(tinta) or {"id": tinta, "nume": tinta}
     if o.get("carte") and in_domeniu(stare, c.carte(o["carte"]) or {}):
         # Aceeași carte poate fi primită la mai multe alegeri; inventarul ține fiecare exemplar.
         stare["carti"].append(o["carte"])
@@ -250,7 +264,7 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
 
     efect = {
         "delta": delta, "profit": profit, "resurse": dict(stare["resurse"]),
-        "carte": carte_noua, "teme": dict(o.get("teme", {})), "scut_oprit": oprit,
+        "carte": carte_noua, "carte_luata": carte_luata, "teme": dict(o.get("teme", {})), "scut_oprit": oprit,
         "profit_baza": baza_delta, "profit_baza_total": int(c.config.get("profit_de_baza_pe_an", 0)) + int(stare.get("profit_baza_delta", 0)),
     }
     if _verifica_terminat(c, stare):

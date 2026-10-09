@@ -352,6 +352,8 @@ def _valideaza_situatii(situatii: list[dict[str, Any]], ids_carti: set[str], tem
                 raise ContinutInvalid(f"{u}: 'profit_baza' trebuie să fie număr")
             if "profit" in o and not _numar(o["profit"]):
                 raise ContinutInvalid(f"{u}: 'profit' trebuie să fie număr")
+            if o.get("ia_carte") and o["ia_carte"] != "oricare" and o["ia_carte"] not in ids_carti:
+                raise ContinutInvalid(f"{u}: 'ia_carte' trebuie să fie 'oricare' sau id-ul unei cărți existente, nu {o['ia_carte']!r}")
             if o.get("carte") and o["carte"] not in ids_carti:
                 raise ContinutInvalid(f"{u}: cartea necunoscută {o['carte']!r}")
             for k in ("flaguri", "urmatoare"):

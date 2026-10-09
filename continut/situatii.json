@@ -1,5 +1,5 @@
 {
-  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație are un 'nivel' (1..4) și apare de la nivelul ăla al firmei în sus (la nivelul 3 jucătorul primește situații de nivel 1, 2 și 3), dacă îi sunt îndeplinite și 'cerinte' (cărți, flaguri, situații jucate înainte, nivel maxim). O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe parteneri / bunastare / legalitate (doar ce se schimbă). 'profit' = banii, în plus sau în minus (mii lei), intră în bilanțul anual. 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație. 'domenii': ['it', 'horeca'] = situația apare doar la firmele din domeniile listate; fără 'domenii' apare la toate. 'profit_baza' pe o opțiune (rar): schimbă permanent profitul de bază anual al firmei, de la alegerea asta până la finalul jocului.",
+  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație are un 'nivel' (1..4) și apare de la nivelul ăla al firmei în sus (la nivelul 3 jucătorul primește situații de nivel 1, 2 și 3), dacă îi sunt îndeplinite și 'cerinte' (cărți, flaguri, situații jucate înainte, nivel maxim). O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe parteneri / bunastare / legalitate (doar ce se schimbă). 'profit' = banii, în plus sau în minus (mii lei), intră în bilanțul anual. 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație. 'domenii': ['it', 'horeca'] = situația apare doar la firmele din domeniile listate; fără 'domenii' apare la toate. 'profit_baza' pe o opțiune (rar): schimbă permanent profitul de bază anual al firmei, de la alegerea asta până la finalul jocului. 'ia_carte' pe o opțiune: ia o carte din inventar ('oricare' sau un id); doar cărțile vizibile, niciodată surprizele.",
   "situatii": [
     {
       "id": "primul-angajat",
@@ -1762,7 +1762,8 @@
           "teme": {
             "program": 2,
             "salarii": -2
-          }
+          },
+          "ia_carte": "oricare"
         },
         {
           "text": "Cine vrea, plătit dublu.",
@@ -1973,7 +1974,8 @@
           "profit": 10,
           "teme": {
             "fisc": 2
-          }
+          },
+          "ia_carte": "team-building"
         },
         {
           "text": "Le faci contracte „de ieri”, cu o semnătură de la contabil.",
@@ -2085,7 +2087,8 @@
             "salarii": -2,
             "risc": -2
           },
-          "profit_baza": -15
+          "profit_baza": -15,
+          "ia_carte": "oricare"
         },
         {
           "text": "Tai din salariul tău și ții toți oamenii.",
@@ -2692,7 +2695,8 @@
           },
           "teme": {
             "control": 1
-          }
+          },
+          "ia_carte": "petrecere-concert"
         },
         {
           "text": "Îi faci un „contract de consultanță” de 500 de lei pe lună. Tace.",
@@ -2786,7 +2790,8 @@
           "teme": {
             "imagine": -2,
             "salarii": -1
-          }
+          },
+          "ia_carte": "petrecere-cu-pizza"
         }
       ]
     },
@@ -2995,7 +3000,8 @@
           "teme": {
             "salarii": -2,
             "control": -1
-          }
+          },
+          "ia_carte": "oricare"
         }
       ]
     },
