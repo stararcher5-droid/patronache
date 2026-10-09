@@ -1,5 +1,5 @@
 {
-  "_nota": "EXEMPLE, de completat. Tipurile de patron cu care e comparat jucătorul. Pozițiile sunt pe scara -2..+2; o temă lipsă = fără date (contează ca diferență 1). Un arhetip intră în clasament doar cu date pe cel puțin 'minim_teme' teme.",
+  "_nota": "Tipurile de patron cu care e comparat jucătorul. Pozițiile sunt pe scara -2..+2; o temă lipsă = fără date (contează ca diferență 1). Un arhetip intră în clasament doar cu date pe cel puțin 'minim_teme' teme.",
   "minim_teme": 5,
   "arhetipuri": [
     {
@@ -64,6 +64,198 @@
         "angajari": 2,
         "imagine": 1,
         "program": 1
+      }
+    },
+    {
+      "id": "mirela-contabil",
+      "nume": "Doamna Mirela, expert contabil",
+      "desc": "Totul pe factură, totul la zi, totul într-un biblioraft. N-a luat niciodată credit și n-a plătit niciodată amendă.",
+      "poz": {
+        "salarii": 0,
+        "fisc": -2,
+        "control": 1.5,
+        "risc": -2,
+        "clienti": -1.5,
+        "stat": 0,
+        "angajari": -0.5,
+        "imagine": -2,
+        "program": 0.5
+      }
+    },
+    {
+      "id": "patron-restaurante",
+      "nume": "Patronul de restaurante",
+      "desc": "Trei localuri, program de la 7 la 2 noaptea, bacșișul „e salariu”. Dacă e aglomerat, vine și el la bucătărie.",
+      "poz": {
+        "salarii": -1,
+        "fisc": 0.5,
+        "control": 1,
+        "risc": 1,
+        "clienti": -0.5,
+        "stat": -0.5,
+        "angajari": 0.5,
+        "imagine": 1,
+        "program": 2
+      }
+    },
+    {
+      "id": "fonduri-europene",
+      "nume": "Antreprenorul cu fonduri europene",
+      "desc": "Știe toate liniile de finanțare pe de rost și are consultant pe speed-dial. Firma face ce zice ghidul solicitantului.",
+      "poz": {
+        "salarii": 0,
+        "fisc": -1,
+        "control": -0.5,
+        "risc": 1,
+        "clienti": 0,
+        "stat": 2,
+        "angajari": -0.5,
+        "imagine": 0,
+        "program": -0.5
+      }
+    },
+    {
+      "id": "fermier",
+      "nume": "Fermierul din Bărăgan",
+      "desc": "Subvenții APIA, tractor pe leasing și oameni din sat. Se trezește la 5. Nu-i place Bruxelles-ul, dar îi ia banii.",
+      "poz": {
+        "salarii": -1,
+        "fisc": 0.5,
+        "control": 1.5,
+        "risc": 0,
+        "clienti": -1,
+        "stat": 1.5,
+        "angajari": 1,
+        "imagine": -1,
+        "program": 2
+      }
+    },
+    {
+      "id": "founder",
+      "nume": "Founder-ul cu pitch deck",
+      "desc": "A ridicat o rundă, a făcut „pivot” de două ori și plătește oamenii în equity. Totul e remote, inclusiv el, din Lisabona.",
+      "poz": {
+        "salarii": 0.5,
+        "fisc": -0.5,
+        "control": -2,
+        "risc": 2,
+        "clienti": -1,
+        "stat": -1,
+        "angajari": -1.5,
+        "imagine": 1,
+        "program": -1.5
+      }
+    },
+    {
+      "id": "patron-hala",
+      "nume": "Patronul de la hală",
+      "desc": "Marfă din China, hală la marginea orașului, oameni pe minim și plic. Nu știe ce e un KPI, dar știe exact cât are în seif.",
+      "poz": {
+        "salarii": -2,
+        "fisc": 2,
+        "control": 1.5,
+        "risc": 0.5,
+        "clienti": 1.5,
+        "stat": -1,
+        "angajari": 1.5,
+        "imagine": 0.5,
+        "program": 2
+      }
+    },
+    {
+      "id": "patroana-salon",
+      "nume": "Patroana de salon",
+      "desc": "Clientele sunt prietene, Instagramul e vitrina, iar fetele sunt „pe PFA”. Știe tot ce se întâmplă în cartier înaintea tuturor.",
+      "poz": {
+        "salarii": -0.5,
+        "fisc": 1,
+        "control": 1,
+        "risc": -0.5,
+        "clienti": -2,
+        "stat": -1.5,
+        "angajari": 0,
+        "imagine": 1.5,
+        "program": 0.5
+      }
+    },
+    {
+      "id": "firma-de-familie",
+      "nume": "Firma de familie din Ardeal",
+      "desc": "A treia generație, aceeași clădire, aceiași clienți. Nu-ți vinde nimic ce n-ar cumpăra el. Nepoții au început din depozit.",
+      "poz": {
+        "salarii": 0.5,
+        "fisc": -1.5,
+        "control": 0.5,
+        "risc": -1.5,
+        "clienti": -2,
+        "stat": -0.5,
+        "angajari": 2,
+        "imagine": -2,
+        "program": 0.5
+      }
+    },
+    {
+      "id": "smecher-constructii",
+      "nume": "Șmecherul din construcții",
+      "desc": "Dă cu ciment pe orice contract. Oamenii sunt „zilieri”, autorizațiile sunt „în lucru”, iar vila are trei etaje și un leu la poartă.",
+      "poz": {
+        "salarii": -1,
+        "fisc": 2,
+        "control": 1,
+        "risc": 1.5,
+        "clienti": 1.5,
+        "stat": 1.5,
+        "angajari": 1,
+        "imagine": 1.5,
+        "program": 1.5
+      }
+    },
+    {
+      "id": "corporatist",
+      "nume": "Corporatistul care și-a făcut firmă",
+      "desc": "A plecat din multinațională cu procedurile la subraț. Are HR, onboarding și cod de conduită de la primul angajat.",
+      "poz": {
+        "salarii": 1,
+        "fisc": -2,
+        "control": -1,
+        "risc": 0,
+        "clienti": -1,
+        "stat": 0,
+        "angajari": -2,
+        "imagine": 0,
+        "program": -1
+      }
+    },
+    {
+      "id": "freelancer",
+      "nume": "Freelancerul cu SRL",
+      "desc": "A făcut SRL pentru taxe, nu pentru angajați. Lucrează în pijama, pentru clienți din afară, și intră în panică la fiecare declarație.",
+      "poz": {
+        "salarii": 0,
+        "fisc": 0.5,
+        "control": -1,
+        "risc": -1,
+        "clienti": -1,
+        "stat": -2,
+        "angajari": -1,
+        "imagine": -1,
+        "program": -2
+      }
+    },
+    {
+      "id": "patron-tiruri",
+      "nume": "Patronul de TIR-uri",
+      "desc": "Flotă de 30 de camioane, șoferi care sună la 3 noaptea din Germania și o firmă de leasing care îl cunoaște după voce.",
+      "poz": {
+        "salarii": -0.5,
+        "fisc": 1,
+        "control": 1.5,
+        "risc": 0.5,
+        "clienti": 0,
+        "stat": 0,
+        "angajari": 1,
+        "imagine": 0.5,
+        "program": 2
       }
     }
   ]

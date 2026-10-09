@@ -148,9 +148,10 @@
   .nivel-salt .n { width:52px; height:52px; border-radius:14px; display:grid; place-items:center; font-size:22px; font-weight:700; background:var(--hartie2); }
   .nivel-salt .n.nou { background:var(--accent); color:#fff; }
   .clasament { font-family:system-ui, sans-serif; font-size:14px; }
-  .clasament .rand { display:flex; align-items:center; gap:10px; padding:6px 0; }
-  .clasament .rand b { width:44px; text-align:right; }
-  .clasament .b { flex:1; height:8px; background:var(--hartie2); border-radius:99px; overflow:hidden; } .clasament .b i { display:block; height:100%; background:var(--accent); }
+  .clasament .rand { display:grid; grid-template-columns:52px 1fr 220px; align-items:center; gap:10px; padding:6px 0; }
+  .clasament .rand b { text-align:right; }
+  .clasament .rand span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .clasament .b { height:8px; background:var(--hartie2); border-radius:99px; overflow:hidden; } .clasament .b i { display:block; height:100%; background:var(--accent); }
   .busola { font-family:system-ui, sans-serif; font-size:14px; color:var(--mut); }
   footer { margin-top:30px; font-family:system-ui, sans-serif; font-size:12px; color:var(--mut); display:flex; gap:14px; flex-wrap:wrap; }
   footer a { color:var(--mut); cursor:pointer; }
@@ -169,7 +170,7 @@
     .dezvaluire .carte { width:200px; }
     .mare { font-size:32px; }
     .tabel td:last-child { white-space:nowrap; padding-left:8px; }
-    .clasament .rand span { flex:1 1 100%; order:-1; font-size:13px; } .clasament .rand { flex-wrap:wrap; row-gap:2px; }
+    .clasament .rand { grid-template-columns:52px 1fr; } .clasament .rand span { grid-column:1 / -1; order:-1; font-size:13px; white-space:normal; }
     .modal { padding:10px; align-items:end; } .modal .card { max-height:85vh; width:100%; }
     footer { font-size:13px; gap:10px 16px; } footer a { padding:6px 0; }
   }
@@ -477,6 +478,7 @@ async function arataRezultat() {
       <div class="cand">Ce fel de patron ai fost</div>
       <h2>${esc(c.nume)} <span class="gol">· ${c.procent}% potrivire</span></h2>
       <p class="text">${esc(c.desc || '')}</p>
+      ${c.teme_la_fel && c.teme_la_fel.length ? `<div class="efecte" style="margin:0 0 10px">${c.teme_la_fel.map(t => `<span class="chip plus">${esc((CONT.teme[t] || {}).nume || t)}</span>`).join('')}</div><p class="gol" style="margin-top:-4px">temele pe care ați decis la fel</p>` : ''}
       ${p.busola && Object.keys(p.busola).length ? `<p class="busola">${Object.values(p.busola).map(a => esc(a.nume) + ': ' + esc(a.eticheta)).join(' · ')}</p>` : ''}
       <div class="clasament">${p.clasament.slice(0, 5).map(x => `<div class="rand"><b>${x.procent}%</b><div class="b"><i style="width:${x.procent}%"></i></div><span>${esc(x.nume)}</span></div>`).join('')}</div>
     </div>` : ''}

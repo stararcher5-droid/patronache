@@ -425,7 +425,13 @@ def pozitii_medii(stare: dict[str, Any]) -> dict[str, float]:
 
 
 def potrivire(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
-    """Cu ce arhetip seamănă jucătorul: 100 − (diferența medie ÷ 4) × 100."""
+    """Cu ce arhetip seamănă jucătorul, după pozițiile medii pe temele în care are date.
+
+    Diferența medie pe temele comune (0..4) se transformă în procent cu
+    100 − (medie ÷ 2,5) × 100: 0 = identic, 2,5 sau mai mult = 0%. Scara mai strânsă
+    decât 4 face diferențele dintre arhetipuri vizibile. Temele în care arhetipul n-are
+    date contează ca o diferență de 1,25, ca profilurile goale să nu câștige ușor.
+    """
     poz = pozitii_medii(stare)
     clasament = []
     for a in c.arhetipuri:
@@ -439,13 +445,13 @@ def potrivire(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
                 if d <= 0.5:
                     la_fel.append(t)
             else:
-                diferente.append(1.0)
+                diferente.append(1.25)
         if not diferente:
             continue
         medie = sum(diferente) / len(diferente)
         clasament.append({
             "id": a["id"], "nume": a["nume"], "desc": a.get("desc", ""),
-            "procent": round(max(0.0, min(100.0, 100 - medie / 4 * 100)), 1), "teme_la_fel": la_fel,
+            "procent": round(max(0.0, min(100.0, 100 - medie / 2.5 * 100)), 1), "teme_la_fel": la_fel,
         })
     clasament.sort(key=lambda x: -x["procent"])
     return {"pozitii": poz, "busola": busola(c, poz), "clasament": clasament, "castigator": clasament[0] if clasament else None}
