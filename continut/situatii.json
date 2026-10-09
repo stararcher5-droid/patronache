@@ -1,5 +1,5 @@
 {
-  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație apare dacă îi sunt îndeplinite 'cerinte' (nivel, cărți, flaguri, situații jucate înainte) și dacă anul curent e între 'an_min' și 'an_max'. O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe buget / bunastare / legalitate. 'profit' intră în bilanțul anual (mii lei). 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație.",
+  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație apare dacă îi sunt îndeplinite 'cerinte' (nivel, cărți, flaguri, situații jucate înainte) și dacă anul curent e între 'an_min' și 'an_max'. O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe parteneri / bunastare / legalitate (doar ce se schimbă). 'profit' = banii, în plus sau în minus (mii lei), intră în bilanțul anual. 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație.",
   "situatii": [
     {
       "id": "primul-angajat",
@@ -80,6 +80,9 @@
           "profit": -20,
           "teme": {
             "angajari": 1
+          },
+          "ef": {
+            "parteneri": -3
           }
         },
         {
@@ -97,7 +100,8 @@
         {
           "text": "Plătești tu paguba și nu zici nimic.",
           "ef": {
-            "bunastare": -2
+            "bunastare": -2,
+            "parteneri": 3
           },
           "profit": -40,
           "teme": {
@@ -119,7 +123,8 @@
         {
           "text": "Accepți. E început.",
           "ef": {
-            "legalitate": -8
+            "legalitate": -8,
+            "parteneri": 2
           },
           "profit": 60,
           "teme": {
@@ -131,7 +136,8 @@
           "text": "Doar cu factură.",
           "ef": {
             "bunastare": 2,
-            "legalitate": 4
+            "legalitate": 4,
+            "parteneri": -3
           },
           "profit": -10,
           "teme": {
@@ -143,7 +149,8 @@
           "text": "Îi explici că TVA-ul îl deduce și el. Semnați contract.",
           "ef": {
             "bunastare": 1,
-            "legalitate": 3
+            "legalitate": 3,
+            "parteneri": 4
           },
           "profit": 20,
           "carte": "team-building",
@@ -178,7 +185,8 @@
           "text": "Firmă de contabilitate serioasă. Scump, dar dormi noaptea.",
           "ef": {
             "bunastare": 1,
-            "legalitate": 6
+            "legalitate": 6,
+            "parteneri": 2
           },
           "carte": "petrecere-cu-standup",
           "flaguri": [
@@ -219,7 +227,8 @@
           "text": "Participi corect, cu oferta cea mai bună.",
           "ef": {
             "bunastare": 1,
-            "legalitate": 2
+            "legalitate": 2,
+            "parteneri": 3
           },
           "profit": 65,
           "teme": {
@@ -230,7 +239,8 @@
         {
           "text": "Participi, după cafea.",
           "ef": {
-            "legalitate": -12
+            "legalitate": -12,
+            "parteneri": 5
           },
           "profit": 165,
           "carte": "petrecere-concert",
@@ -245,7 +255,8 @@
         {
           "text": "Nu lucrezi cu statul.",
           "ef": {
-            "legalitate": 1
+            "legalitate": 1,
+            "parteneri": -2
           },
           "teme": {
             "stat": -2,
@@ -255,7 +266,8 @@
         {
           "text": "Contract-cadru direct cu ministerul, fără licitație.",
           "ef": {
-            "legalitate": -6
+            "legalitate": -6,
+            "parteneri": 6
           },
           "profit": 325,
           "cerinte": {
@@ -285,7 +297,8 @@
           "text": "Le dai toate actele.",
           "ef": {
             "bunastare": 1,
-            "legalitate": 5
+            "legalitate": 5,
+            "parteneri": 1
           },
           "profit": -15,
           "teme": {
@@ -296,7 +309,8 @@
         {
           "text": "Suni „pe cineva”.",
           "ef": {
-            "legalitate": -8
+            "legalitate": -8,
+            "parteneri": -2
           },
           "cerinte": {
             "flaguri": [
@@ -389,7 +403,8 @@
         {
           "text": "Cumperi clădire cu credit pe 15 ani.",
           "ef": {
-            "bunastare": 2
+            "bunastare": 2,
+            "parteneri": 3
           },
           "profit": -135,
           "teme": {
@@ -407,7 +422,8 @@
         {
           "text": "Închiriezi ceva mai mare, cu opțiune de cumpărare.",
           "ef": {
-            "bunastare": 2
+            "bunastare": 2,
+            "parteneri": 1
           },
           "profit": -45,
           "teme": {

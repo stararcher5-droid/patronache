@@ -1,5 +1,5 @@
 {
-  "_nota": "Cărțile speciale intră în inventar când jucătorul alege o opțiune care are 'carte': <id>. Jucătorul le poate folosi oricând în timpul unei decizii (POST /api/partida/{id}/carte); cartea se consumă și aplică 'efect' pe loc: delte pe buget / bunastare / legalitate și, opțional, 'profit' (mii lei, intră în bilanțul anului). O carte poate avea și 'scut': {'resurse': ['bunastare'], 'decizii': 1}: de la următoarea decizie (nu cea pe care o vezi), scăderile pe resursele alese sunt anulate, pentru atâtea decizii.",
+  "_nota": "Cărțile speciale intră în inventar când jucătorul alege o opțiune care are 'carte': <id>. Le folosește oricând în timpul unei decizii; cartea se consumă și aplică 'efect' pe loc: delte pe parteneri / bunastare / legalitate și 'profit' (mii lei, în plus sau în minus, intră în bilanțul anului). O carte poate avea și 'scut': {'resurse': ['bunastare'], 'decizii': 1}: de la următoarea decizie (nu cea pe care o vezi), scăderile pe resursele alese sunt anulate, pentru atâtea decizii.",
   "carti": [
     {
       "id": "petrecere-cu-pizza",
@@ -7,7 +7,6 @@
       "desc": "Vineri, la 5, 12 pizza și două lăzi de bere. Costă puțin, ține o săptămână.",
       "efect": {
         "bunastare": 6,
-        "legalitate": 0,
         "profit": -10
       }
     },
@@ -17,7 +16,6 @@
       "desc": "Un weekend la munte, cu tiroliană și „jocuri de încredere”. Toată lumea vine luni.",
       "efect": {
         "bunastare": 12,
-        "legalitate": 0,
         "profit": -30
       }
     },
@@ -27,7 +25,6 @@
       "desc": "Un comediant la sediu. Glumele despre patron sunt incluse în preț.",
       "efect": {
         "bunastare": 9,
-        "legalitate": 0,
         "profit": -20
       }
     },
