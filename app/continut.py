@@ -104,6 +104,7 @@ class Continut:
             "resurse": self.resurse,
             "domenii": self.domenii,
             "profit_de_baza_pe_an": int(self.config.get("profit_de_baza_pe_an", 0)),
+            "minijocuri": self.config.get("minijocuri", {}),
             "uzura_pe_an": {k: -abs(int(v)) for k, v in (self.config.get("uzura_pe_an") or {}).items()},
             "niveluri": self.niveluri,
             # cărțile surpriză nu apar deloc în lista publică: nici numele n-ar trebui să se vadă
@@ -256,6 +257,20 @@ def _valideaza_config(c: dict[str, Any]) -> None:
     uz = c.get("uzura_pe_an")
     if uz is not None and (not isinstance(uz, dict) or any(k not in RESURSE or not _numar(v) for k, v in uz.items())):
         raise ContinutInvalid(f"config: 'uzura_pe_an' trebuie să fie dict cu chei din {RESURSE} și valori numerice")
+    mj = c.get("minijocuri")
+    if mj is not None:
+        if not isinstance(mj, dict) or not isinstance(mj.get("lista", []), list):
+            raise ContinutInvalid("config: 'minijocuri' trebuie să fie {'activ': bool, 'lista': [...]}")
+        ids: set[str] = set()
+        for j in mj.get("lista", []):
+            if not j.get("id") or not j.get("nume") or not isinstance(j.get("efect_max", {}), dict):
+                raise ContinutInvalid("config: fiecare mini-joc are nevoie de 'id', 'nume' și 'efect_max' (dict)")
+            if j["id"] in ids:
+                raise ContinutInvalid(f"config: mini-jocul {j['id']!r} apare de două ori")
+            ids.add(j["id"])
+            for k, v in j.get("efect_max", {}).items():
+                if k not in (*RESURSE, "profit") or not _numar(v):
+                    raise ContinutInvalid(f"config: 'efect_max' al mini-jocului {j['id']!r} acceptă doar {RESURSE} și 'profit'")
     g = c.get("garantie_carte")
     if g is not None:
         if not isinstance(g, dict) or not isinstance(g.get("dupa"), int) or g["dupa"] < 0:

@@ -140,6 +140,23 @@
   .stampila.cade { animation:stampila .55s cubic-bezier(.2,1.4,.4,1) forwards; }
   @keyframes stampila { to { opacity:.9; transform:translate(-50%,-50%) rotate(-12deg) scale(1); } }
   @media (max-width:520px) { .stampila { font-size:32px; border-width:4px; } }
+  /* mini-jocuri */
+  .mj-arena { margin-top:14px; user-select:none; -webkit-user-select:none; touch-action:none; }
+  .mj-sus { font-family:system-ui, sans-serif; font-size:14px; color:var(--mut); margin-bottom:8px; }
+  .mj-camp { position:relative; height:300px; background:var(--hartie2); border:1px solid var(--linie); border-radius:12px; overflow:hidden; }
+  .mj-dosar { position:absolute; font-size:34px; background:none; border:0; cursor:pointer; padding:6px; transform:scale(.6); animation:mj-apare .2s ease forwards; }
+  @keyframes mj-apare { to { transform:scale(1); } }
+  .mj-dosar.ok { transform:scale(1.3); } .mj-dosar.dus { opacity:0; transition:opacity .25s; }
+  .mj-ob { position:absolute; font-size:30px; transform:translateX(-50%); pointer-events:none; }
+  .mj-cos { position:absolute; bottom:6px; font-size:40px; transform:translateX(-50%); transition:left .05s; }
+  .mj-cos.lovit { filter:drop-shadow(0 0 8px var(--rau)); }
+  .mj-bara { position:relative; height:56px; background:var(--hartie2); border:1px solid var(--linie); border-radius:12px; margin:10px 0; overflow:hidden; }
+  .mj-zona { position:absolute; top:0; bottom:0; background:rgba(95,201,168,.35); border-left:2px solid var(--ok); border-right:2px solid var(--ok); }
+  .mj-zona.ok { background:rgba(95,201,168,.8); } .mj-zona.rau { background:rgba(240,138,118,.5); }
+  .mj-cutit { position:absolute; top:8px; font-size:30px; transform:translateX(-50%); }
+  .mj-neg { display:flex; gap:8px; margin:10px 0; } .mj-neg input { flex:1; }
+  .mj-raspunsuri { display:flex; flex-direction:column; gap:6px; align-items:flex-start; font-family:system-ui, sans-serif; font-size:14px; }
+  .mj-gata { font-size:24px; text-align:center; padding:30px 0; font-family:system-ui, sans-serif; }
   /* bilanț & final */
   .mare { font-size:40px; font-weight:bold; line-height:1; margin:6px 0; }
   .tabel { width:100%; border-collapse:collapse; font-family:system-ui, sans-serif; font-size:14px; margin:10px 0; }
@@ -317,6 +334,7 @@ function arata() {
   let corp = '';
   if (pas.pas === 'decizie') corp = ecranDecizie();
   else if (pas.pas === 'bilant') corp = ecranBilant();
+  else if (pas.pas === 'minijoc') corp = ecranMinijoc();
   else corp = ecranFinal();
   el.innerHTML = antet() + corp;
   leagaEvenimente();
@@ -444,8 +462,122 @@ function ecranBilantRezultat(b) {
         <tr><td>Profit total</td><td>${semn(b.profit_total)} mii</td></tr>
       </table>
       <p class="gol">${urmator}</p>
-      <div class="actiuni"><button class="btn" id="mai-departe">${pas.pas === 'decizie' ? 'Anul următor' : 'Vezi cum s-a terminat'}</button></div>
+      <div class="actiuni"><button class="btn" id="mai-departe">${pas.pas === 'decizie' ? 'Anul următor' : pas.pas === 'minijoc' ? 'Înainte de anul următor…' : 'Vezi cum s-a terminat'}</button></div>
     </div>`;
+}
+
+function ecranMinijoc() {
+  const m = pas.minijoc;
+  const ef = Object.entries(m.efect_max || {}).map(([k, v]) => (k === 'profit' ? 'Profit' : numeRes(k)) + ' până la +' + v).join(', ');
+  return `
+    <div class="card intra">
+      <div class="cand">Sfârșitul anului ${pas.an} · mini-joc</div>
+      <h1>${esc(m.nume)}</h1>
+      <p class="text">${esc(m.desc || '')}</p>
+      <p class="gol">Scor bun = ${esc(ef)}. Scor slab = puțin în minus. Poți și să sari peste.</p>
+      <div id="mj-arena" class="mj-arena ascuns"></div>
+      <div class="actiuni" id="mj-actiuni"><button class="btn" id="mj-start">Începe</button><button class="btn secundar" id="mj-sari">Sari peste</button></div>
+    </div>`;
+}
+async function trimiteScor(scor) {
+  if (ocupat) return; ocupat = true;
+  try {
+    const d = await api('POST', '/api/partida/' + joc.id + '/minijoc', { scor });
+    const r = d.minijoc; pas = d.pas; ultimulEfect = null; pasUrmator = null;
+    const chips = efecteHtml({ delta: r.delta, profit: r.profit, carte: null });
+    $('#ecran').innerHTML = antet() + `<div class="card intra"><div class="cand">${esc(r.nume || 'Mini-joc')}</div><h1>${scor === null ? 'Ai sărit peste' : 'Scor: ' + scor + ' din 100'}</h1>
+      <p class="text">${scor === null ? 'Nimic nu s-a schimbat.' : scor >= 80 ? 'Ca la carte.' : scor >= 50 ? 'Merge, dar se poate și mai bine.' : scor >= 30 ? 'Pe muchie.' : 'A fost o zi proastă.'}</p>${chips}
+      <div class="actiuni"><button class="btn" id="mai-departe">${pas.pas === 'decizie' ? 'Anul ' + pas.an : 'Mai departe'}</button></div></div>`;
+    $('#mai-departe').addEventListener('click', () => arata());
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) { eroare(e.message); }
+  ocupat = false;
+}
+function porneste_minijoc(id) {
+  const arena = $('#mj-arena'); arena.classList.remove('ascuns'); $('#mj-actiuni').classList.add('ascuns');
+  const gata = scor => { arena.innerHTML = `<div class="mj-gata">Scor: <b>${scor}</b> din 100</div>`; setTimeout(() => trimiteScor(Math.max(0, Math.min(100, Math.round(scor)))), 900); };
+  const jocuri = { stampila: mjStampila, telefoanele: mjTelefoanele, pizza: mjPizza, negocierea: mjNegocierea };
+  (jocuri[id] || (() => gata(30)))(arena, gata);
+}
+// 1. Ștampila: dosarele apar și dispar; apeși pe ele cât sunt pe masă.
+function mjStampila(arena, gata) {
+  arena.innerHTML = '<div class="mj-sus"><span id="mj-timp">20</span>s · ștampilate: <b id="mj-scor">0</b></div><div class="mj-camp" id="mj-camp"></div>';
+  const camp = $('#mj-camp'); let timp = 20, aparute = 0, prinse = 0, activ = true;
+  const spawn = () => {
+    if (!activ || !document.contains(camp)) return;
+    const d = document.createElement('button'); d.className = 'mj-dosar'; d.textContent = '📄';
+    d.style.left = (5 + Math.random() * 80) + '%'; d.style.top = (5 + Math.random() * 70) + '%';
+    aparute++;
+    d.addEventListener('pointerdown', e => { e.preventDefault(); if (d.dataset.ok) return; d.dataset.ok = 1; d.textContent = '✅'; d.classList.add('ok'); prinse++; $('#mj-scor').textContent = prinse; setTimeout(() => d.remove(), 300); });
+    camp.appendChild(d);
+    setTimeout(() => { if (!d.dataset.ok) { d.classList.add('dus'); setTimeout(() => d.remove(), 250); } }, 1100);
+    setTimeout(spawn, 500 + Math.random() * 500);
+  };
+  spawn();
+  const t = setInterval(() => { if (!document.contains(camp)) { clearInterval(t); activ = false; return; } timp--; $('#mj-timp').textContent = timp; if (timp <= 0) { clearInterval(t); activ = false; camp.innerHTML = ''; gata(aparute ? prinse / aparute * 100 : 0); } }, 1000);
+}
+// 2. Telefoanele: prinzi apelurile (📞) cu telefonul de jos; plicurile ANAF (🧾) se evită.
+function mjTelefoanele(arena, gata) {
+  arena.innerHTML = '<div class="mj-sus"><span id="mj-timp">20</span>s · prinse: <b id="mj-scor">0</b></div><div class="mj-camp" id="mj-camp"><div class="mj-cos" id="mj-cos">📱</div></div>';
+  const camp = $('#mj-camp'), cos = $('#mj-cos'); let timp = 20, bune = 0, prinse = 0, rele = 0, activ = true, cx = 50;
+  const muta = e => { const r = camp.getBoundingClientRect(); cx = Math.max(6, Math.min(94, (e.clientX - r.left) / r.width * 100)); cos.style.left = cx + '%'; };
+  camp.addEventListener('pointermove', muta); camp.addEventListener('pointerdown', muta);
+  cos.style.left = '50%';
+  const cad = () => {
+    if (!activ || !document.contains(camp)) return;
+    const rau = Math.random() < 0.3; const o = document.createElement('div'); o.className = 'mj-ob'; o.textContent = rau ? '🧾' : '📞';
+    const x = 6 + Math.random() * 88; o.style.left = x + '%'; o.style.top = '-8%'; camp.appendChild(o);
+    if (!rau) bune++;
+    const t0 = performance.now(), durata = 1800 + Math.random() * 900;
+    const pas_ = () => {
+      if (!activ) { o.remove(); return; }
+      const p = (performance.now() - t0) / durata; o.style.top = (-8 + p * 100) + '%';
+      if (p >= 0.86 && p <= 1) { if (Math.abs(x - cx) < 9) { o.remove(); if (rau) { rele++; cos.classList.add('lovit'); setTimeout(() => cos.classList.remove('lovit'), 300); } else { prinse++; $('#mj-scor').textContent = prinse; } return; } }
+      if (p > 1.05) { o.remove(); return; }
+      requestAnimationFrame(pas_);
+    };
+    requestAnimationFrame(pas_);
+    setTimeout(cad, 450 + Math.random() * 450);
+  };
+  cad();
+  const t = setInterval(() => { if (!document.contains(camp)) { clearInterval(t); activ = false; return; } timp--; $('#mj-timp').textContent = timp; if (timp <= 0) { clearInterval(t); activ = false; gata(bune ? Math.max(0, (prinse - rele * 1.5) / bune * 100) : 0); } }, 1000);
+}
+// 3. Pizza: cuțitul pendulează; apeși când e în zona verde. 8 felii, zona se îngustează.
+function mjPizza(arena, gata) {
+  let felia = 0, reusite = 0, poz = 0, dir = 1, latime = 30, activ = true, ultimTimp = performance.now();
+  arena.innerHTML = '<div class="mj-sus">Felia <b id="mj-felia">1</b> din 8 · reușite: <b id="mj-scor">0</b></div><div class="mj-bara" id="mj-bara"><div class="mj-zona" id="mj-zona"></div><div class="mj-cutit" id="mj-cutit">🔪</div></div><p class="gol" style="text-align:center">Apasă oriunde (sau Spațiu) când cuțitul e în zona verde.</p>';
+  const zona = $('#mj-zona'), cutit = $('#mj-cutit');
+  const puneZona = () => { latime = Math.max(10, 30 - felia * 2.5); const st = 10 + Math.random() * (80 - latime); zona.style.left = st + '%'; zona.style.width = latime + '%'; zona.dataset.st = st; };
+  puneZona();
+  const anim = now => { if (!activ || !document.contains(zona)) { activ = false; document.removeEventListener('keydown', tasta); return; } const dt = (now - ultimTimp) / 1000; ultimTimp = now; poz += dir * (55 + felia * 8) * dt; if (poz >= 100) { poz = 100; dir = -1; } if (poz <= 0) { poz = 0; dir = 1; } cutit.style.left = poz + '%'; requestAnimationFrame(anim); };
+  requestAnimationFrame(anim);
+  const taie = e => {
+    if (!activ) return; if (e && e.preventDefault) e.preventDefault();
+    const st = +zona.dataset.st; const ok = poz >= st && poz <= st + latime;
+    if (ok) { reusite++; $('#mj-scor').textContent = reusite; zona.classList.add('ok'); } else zona.classList.add('rau');
+    setTimeout(() => zona.classList.remove('ok', 'rau'), 250);
+    felia++;
+    if (felia >= 8) { activ = false; document.removeEventListener('keydown', tasta); gata(reusite / 8 * 100); return; }
+    $('#mj-felia').textContent = felia + 1; puneZona();
+  };
+  const tasta = e => { if (e.code === 'Space') taie(e); };
+  arena.addEventListener('pointerdown', taie); document.addEventListener('keydown', tasta);
+}
+// 4. Negocierea: ghicești prețul clientului în 5 încercări, cu „prea mult / prea puțin”.
+function mjNegocierea(arena, gata) {
+  const tinta = 1000 + Math.floor(Math.random() * 80) * 100; let incercari = 0;
+  arena.innerHTML = '<div class="mj-sus">Prețul clientului e între 1.000 și 9.000 de lei. Ai <b id="mj-ram">5</b> încercări.</div><div class="mj-neg"><input type="number" id="mj-pret" min="1000" max="9000" step="100" placeholder="ex. 5000"><button class="btn" id="mj-ofer">Ofer</button></div><div id="mj-raspuns" class="mj-raspunsuri"></div>';
+  const inp = $('#mj-pret'); inp.focus();
+  const ofera = () => {
+    const v = Math.round(+inp.value / 100) * 100; if (!v || v < 1000 || v > 9000) return;
+    incercari++; $('#mj-ram').textContent = 5 - incercari;
+    const r = document.createElement('div'); r.className = 'chip ' + (v === tinta ? 'plus' : v > tinta ? 'minus' : 'scut');
+    r.textContent = v.toLocaleString('ro-RO') + ' lei: ' + (v === tinta ? 'Batem palma!' : v > tinta ? 'prea mult' : 'prea puțin');
+    $('#mj-raspuns').appendChild(r); inp.value = ''; inp.focus();
+    if (v === tinta) { gata(100 - (incercari - 1) * 15); return; }
+    if (incercari >= 5) { const dist = Math.abs(v - tinta) / 8000; gata(Math.max(0, 35 - dist * 100)); }
+  };
+  $('#mj-ofer').addEventListener('click', ofera); inp.addEventListener('keydown', e => { if (e.key === 'Enter') ofera(); });
 }
 
 function ecranFinal() {
@@ -502,6 +634,8 @@ function leagaEvenimente() {
   $$('[data-carte]').forEach(b => b.addEventListener('click', () => folosesteCarte(b.dataset.carte)));
   $('#mai-departe')?.addEventListener('click', () => { if (pasUrmator) pas = pasUrmator; pasUrmator = null; ultimulEfect = null; arata(); });
   $('#inchide-anul')?.addEventListener('click', bilant);
+  $('#mj-start')?.addEventListener('click', () => porneste_minijoc(pas.minijoc.id));
+  $('#mj-sari')?.addEventListener('click', () => trimiteScor(null));
   $('#vezi-rezultat')?.addEventListener('click', arataRezultat);
 }
 let ocupat = false;
@@ -546,7 +680,7 @@ $('#l-cum').addEventListener('click', () => {
   const m = $('#modal');
   m.innerHTML = `<div class="card"><h2>Cum se joacă</h2>
     <p>Ești patronul unei firme, ${CONT.ani} ani. În fiecare trimestru iei ${CONT.decizii_pe_trimestru} decizii: despre angajați, clienți, bani, ANAF, Primărie.</p>
-    <p><b>Trei lucruri de urmărit</b>: partenerii (furnizori, clienți, bănci), bunăstarea angajaților și legalitatea. Fiecare e între 0 și 100. Dacă una ajunge la zero, s-a terminat: partenerii te lasă, toți pleacă sau vine DNA-ul.</p><p><b>Nimic nu stă pe loc</b>: la fiecare bilanț anual cele trei bare scad puțin de la sine. Le ții sus prin ce alegi.</p><p><b>Banii</b> nu sunt o bară: fiecare alegere aduce sau pierde profit, iar profitul total dă nivelul firmei.</p>
+    <p><b>Trei lucruri de urmărit</b>: partenerii (furnizori, clienți, bănci), bunăstarea angajaților și legalitatea. Fiecare e între 0 și 100. Dacă una ajunge la zero, s-a terminat: partenerii te lasă, toți pleacă sau vine DNA-ul.</p><p><b>Nimic nu stă pe loc</b>: la fiecare bilanț anual cele trei bare scad puțin de la sine. Le ții sus prin ce alegi.</p><p><b>La final de an</b>, după bilanț, vine un mini-joc scurt: ștampilezi dosare, prinzi telefoane, tai pizza sau negociezi un preț. Scorul bun ridică o bară; scorul slab o scade puțin.</p><p><b>Banii</b> nu sunt o bară: fiecare alegere aduce sau pierde profit, iar profitul total dă nivelul firmei.</p>
     <p><b>Profit și nivel</b>: fiecare alegere aduce (sau pierde) bani. La finalul anului, profitul se adună la totalul firmei, iar totalul dă nivelul, de la 1 (firmă de apartament) la ${CONT.niveluri.length} (${esc(CONT.niveluri[CONT.niveluri.length - 1].nume)}). Nivelul deblochează alegeri noi, dar poate și să scadă după un an prost.</p>
     <p><b>Cărțile</b>: unele alegeri îți aduc cărți speciale în inventar. Le folosești când vrei, în timpul unei decizii; se consumă pe loc.</p>
     <p><b>Alegerile se leagă</b>: ce faci azi poate aduce o situație nouă mâine. Nepotul angajat azi greșește comanda mâine.</p>

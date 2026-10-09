@@ -171,6 +171,11 @@
       <div class="rand r3" id="cfg-resurse"></div>
       <h3>Uzura pe an (cât scade fiecare resursă la bilanț dacă nu e întreținută)</h3>
       <div class="rand r3" id="cfg-uzura"></div>
+      <h3>Mini-jocurile de final de an</h3>
+      <p class="nota">După bilanțul fiecărui an (în afară de ultimul) vine pe rând câte un mini-joc din listă. Scorul (0..100) dă un efect proporțional cu maximul de mai jos: 30 = nimic, 100 = maxim, sub 30 = puțin în minus. Jocurile sunt implementate în pagina jocului: ștampila, telefoanele, pizza, negocierea.</p>
+      <div class="bifa"><input type="checkbox" id="cfg-minijocuri-activ"> Mini-jocurile sunt active</div>
+      <table id="tabel-minijocuri"><thead><tr><th>Joc</th><th>Nume afișat</th><th>Descriere</th><th>Parteneri max</th><th>Bunăstare max</th><th>Legalitate max</th><th>Profit max</th><th></th></tr></thead><tbody></tbody></table>
+      <div style="margin-top:8px"><button id="minijoc-adauga">+ Mini-joc</button></div>
       <h3>Garanția de carte</h3>
       <p class="nota">Dacă atâtea decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză. Cartea se alege după felul alegerii: prima regulă de mai jos care se potrivește cu efectul opțiunii alese; „oricând” e rezerva. Doar cărțile surpriză intră aici.</p>
       <div class="rand r3"><div><label>După câte decizii fără carte (0 = oprit)</label><input type="number" id="cfg-garantie-dupa" min="0"></div></div>
@@ -890,6 +895,9 @@ function randeazaReguli() {
   $('#cfg-ani').value = c.ani; $('#cfg-trimestre').value = c.trimestre_pe_an; $('#cfg-decizii').value = c.decizii_pe_trimestru;
   $('#cfg-profit-baza').value = c.profit_de_baza_pe_an ?? 0;
   $('#cfg-garantie-dupa').value = (c.garantie_carte || {}).dupa ?? 0;
+  c.minijocuri = c.minijocuri || { activ: true, lista: [] };
+  $('#cfg-minijocuri-activ').checked = c.minijocuri.activ !== false;
+  randeazaMinijocuri();
   randeazaGarantie();
   $('#cfg-resurse').innerHTML = RESURSE.map(r => `<div><label>${esc(c.resurse[r].nume)}</label><input type="number" min="1" max="100" data-r="${r}" value="${c.resurse[r].start}"></div>`).join('');
   c.uzura_pe_an = c.uzura_pe_an || {};
@@ -897,7 +905,9 @@ function randeazaReguli() {
   randeazaDomenii();
   $('#cfg-finaluri').innerHTML = Object.entries(c.finaluri).map(([k, f]) => `<div class="rand r2"><div><label>${k} · titlu</label><input type="text" data-f="${k}" data-k="titlu" value="${esc(f.titlu)}"></div><div><label>text</label><input type="text" data-f="${k}" data-k="text" value="${esc(f.text || '')}"></div></div>`).join('');
   $$('#tab-reguli input').forEach(x => x.addEventListener('input', () => {
-    if (x.id === 'cfg-garantie-dupa') { c.garantie_carte = c.garantie_carte || { reguli: [] }; c.garantie_carte.dupa = numar(x.value, 0); }
+    if (x.id === 'cfg-minijocuri-activ') { c.minijocuri.activ = x.checked; }
+    else if (x.closest('#tabel-minijocuri')) return;
+    else if (x.id === 'cfg-garantie-dupa') { c.garantie_carte = c.garantie_carte || { reguli: [] }; c.garantie_carte.dupa = numar(x.value, 0); }
     else if (x.closest('#tabel-garantie')) return;
     else if (x.id === 'cfg-profit-baza') c.profit_de_baza_pe_an = numar(x.value, 0);
     else if (x.id === 'cfg-ani') c.ani = numar(x.value, 4); else if (x.id === 'cfg-trimestre') c.trimestre_pe_an = numar(x.value, 4); else if (x.id === 'cfg-decizii') c.decizii_pe_trimestru = numar(x.value, 2);
@@ -907,6 +917,23 @@ function randeazaReguli() {
     marcheaza('config.json');
   }));
 }
+const MINIJOCURI_CUNOSCUTE = { stampila: 'Ștampila (reflex)', telefoanele: 'Telefoanele (prinde apelurile)', pizza: 'Pizza (moment potrivit)', negocierea: 'Negocierea (ghicești prețul)' };
+function randeazaMinijocuri() {
+  const m = cfg().minijocuri; m.lista = m.lista || [];
+  const tb = $('#tabel-minijocuri tbody'); tb.innerHTML = '';
+  m.lista.forEach((j, i) => {
+    const tr = document.createElement('tr'); j.efect_max = j.efect_max || {};
+    tr.innerHTML = `<td><select>${Object.entries(MINIJOCURI_CUNOSCUTE).map(([k, v]) => `<option value="${k}" ${j.id === k ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
+      <td><input type="text" data-k="nume" value="${esc(j.nume || '')}"></td><td><input type="text" data-k="desc" value="${esc(j.desc || '')}"></td>
+      ${['parteneri', 'bunastare', 'legalitate', 'profit'].map(k => `<td><input type="number" data-e="${k}" value="${j.efect_max[k] ?? ''}" placeholder="0" style="width:70px"></td>`).join('')}
+      <td><button class="mic pericol">șterge</button></td>`;
+    $('select', tr).addEventListener('change', e => { j.id = e.target.value; marcheaza('config.json'); });
+    $$('input', tr).forEach(x => x.addEventListener('input', () => { if (x.dataset.k) j[x.dataset.k] = x.value; else { const v = numar(x.value, 0); if (v) j.efect_max[x.dataset.e] = v; else delete j.efect_max[x.dataset.e]; } marcheaza('config.json'); }));
+    $('button', tr).addEventListener('click', () => { m.lista.splice(i, 1); marcheaza('config.json'); randeazaMinijocuri(); });
+    tb.appendChild(tr);
+  });
+}
+$('#minijoc-adauga').addEventListener('click', () => { const m = cfg().minijocuri; const id = Object.keys(MINIJOCURI_CUNOSCUTE).find(k => !m.lista.some(j => j.id === k)) || 'stampila'; m.lista.push({ id, nume: MINIJOCURI_CUNOSCUTE[id].split(' (')[0], desc: '', efect_max: {} }); marcheaza('config.json'); randeazaMinijocuri(); });
 const CONDITII_GARANTIE = { legalitate_scade: 'scade legalitatea', bunastare_scade: 'scade bunăstarea', parteneri_scade: 'scade partenerii', profit_creste: 'aduce profit', bunastare_creste: 'crește bunăstarea', parteneri_creste: 'crește partenerii', oricand: 'oricând (rezervă)' };
 function randeazaGarantie() {
   const g = cfg().garantie_carte || { dupa: 0, reguli: [] }; cfg().garantie_carte = g; g.reguli = g.reguli || [];

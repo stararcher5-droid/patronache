@@ -5,7 +5,8 @@ Joc:
     GET    /api/partida/{id}            pasul curent
     POST   /api/partida/{id}/alege      {"optiune": 0..3} -> efect + pasul următor
     POST   /api/partida/{id}/carte      {"carte": "<id>"} folosește o carte din inventar
-    POST   /api/partida/{id}/bilant     închide anul -> profit, nivel + pasul următor
+    POST   /api/partida/{id}/bilant     închide anul -> profit, nivel + pasul următor (poate fi un mini-joc)
+    POST   /api/partida/{id}/minijoc    {"scor": 0..100 | null} -> efectul mini-jocului + pasul următor
     GET    /api/partida/{id}/rezultat   rezultatul final (doar după final)
     DELETE /api/partida/{id}            renunță la partidă
     GET    /api/continut                reguli, niveluri, cărți, arhetipuri (fără efecte ascunse)
@@ -170,6 +171,10 @@ class Carte(BaseModel):
     carte: str = Field(max_length=80)
 
 
+class ScorMinijoc(BaseModel):
+    scor: int | None = Field(default=None, ge=0, le=100)
+
+
 # ---------------------------------------------------------------- ajutoare
 
 def _partida(id_: str) -> dict[str, Any]:
@@ -280,6 +285,19 @@ def bilant(id_: str) -> dict[str, Any]:
     _noteaza_final(c, stare)
     db.salveaza_partida(id_, stare)
     return _raspuns(id_, stare, {"bilant": rezultat})
+
+
+@app.post("/api/partida/{id_}/minijoc")
+def minijoc(id_: str, corp: ScorMinijoc) -> dict[str, Any]:
+    stare = _partida(id_)
+    c = continut()
+    try:
+        rezultat = motor.minijoc(c, stare, corp.scor)
+    except motor.ActiuneInvalida as e:
+        raise HTTPException(409, str(e))
+    _noteaza_final(c, stare)
+    db.salveaza_partida(id_, stare)
+    return _raspuns(id_, stare, {"minijoc": rezultat})
 
 
 @app.get("/api/partida/{id_}/rezultat")

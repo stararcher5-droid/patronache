@@ -1,5 +1,5 @@
 {
-  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json). 'profit_de_baza_pe_an' = ce aduce activitatea curentă a firmei în fiecare an (mii lei), peste efectele alegerilor; se adaugă la bilanț. 'garantie_carte': dacă 'dupa' decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză, aleasă după felul alegerii (prima regulă care se potrivește). 'uzura_pe_an': cât scade fiecare resursă la fiecare bilanț anual dacă nu e întreținută prin alegeri.",
+  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json). 'profit_de_baza_pe_an' = ce aduce activitatea curentă a firmei în fiecare an (mii lei), peste efectele alegerilor; se adaugă la bilanț. 'garantie_carte': dacă 'dupa' decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză, aleasă după felul alegerii (prima regulă care se potrivește). 'uzura_pe_an': cât scade fiecare resursă la fiecare bilanț anual dacă nu e întreținută prin alegeri. 'minijocuri': după bilanțul fiecărui an vine pe rând câte un mini-joc din 'lista'; scorul 0..100 dă un efect proporțional cu 'efect_max' (30 = nimic, 100 = maxim, sub 30 = puțin în minus).",
   "ani": 5,
   "trimestre_pe_an": 4,
   "decizii_pe_trimestru": 2,
@@ -222,5 +222,44 @@
     "parteneri": 5,
     "bunastare": 6,
     "legalitate": 4
+  },
+  "minijocuri": {
+    "activ": true,
+    "lista": [
+      {
+        "id": "stampila",
+        "nume": "Ștampila",
+        "desc": "Dosarele apar pe birou și dispar repede. Ștampilează cât mai multe înainte să le ia vântul. Fiecare dosar neștampilat e o hârtie care lipsește la control.",
+        "efect_max": {
+          "legalitate": 8
+        }
+      },
+      {
+        "id": "telefoanele",
+        "nume": "Telefoanele",
+        "desc": "Sună clienții. Mișcă telefonul ca să prinzi apelurile care cad, dar ferește-te de plicurile de la ANAF: alea nu se prind, se evită.",
+        "efect_max": {
+          "parteneri": 8,
+          "profit": 20
+        }
+      },
+      {
+        "id": "pizza",
+        "nume": "Pizza",
+        "desc": "Petrecerea firmei. Împarți feliile pe rând: apasă când cuțitul e în zona verde. Felii strâmbe, oameni supărați.",
+        "efect_max": {
+          "bunastare": 8
+        }
+      },
+      {
+        "id": "negocierea",
+        "nume": "Negocierea",
+        "desc": "Un client mare vrea ofertă. Are un preț în cap pe care nu ți-l spune. Ai cinci încercări; după fiecare îți zice doar „prea mult” sau „prea puțin”.",
+        "efect_max": {
+          "profit": 30,
+          "parteneri": 4
+        }
+      }
+    ]
   }
 }

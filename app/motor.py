@@ -8,6 +8,8 @@ Regulile:
 - Trei resurse 0..100 (parteneri, bunăstare angajați, legalitate). Una la 0 = partida s-a terminat.
   La fiecare bilanț resursele se uzează cu `uzura_pe_an` din config; alegerile le întrețin.
   Banii nu sunt resursă: sunt profitul, care dă nivelul.
+- După bilanțul fiecărui an (în afară de ultimul) vine un mini-joc scurt; scorul lui
+  (0..100) dă un efect pe resurse/profit proporțional cu `efect_max` din config.
 - Fiecare opțiune aduce profit (mii lei). Unele, rare, schimbă permanent profitul
   de bază anual al firmei (`profit_baza`), de atunci până la final. La finalul anului se face bilanțul:
   profitul anului se adună la profitul total, care dă nivelul firmei (1..10).
@@ -45,6 +47,7 @@ from .continut import RESURSE, Continut
 
 PAS_DECIZIE = "decizie"
 PAS_BILANT = "bilant"
+PAS_MINIJOC = "minijoc"   # după bilanț: un mini-joc scurt, cu efect după scor
 PAS_CARTE = "carte"       # doar în istoric: o carte folosită
 PAS_FINAL = "final"       # mandat dus la capăt (sau povestea s-a terminat), se poate cere rezultatul
 PAS_TERMINAT = "terminat"  # o resursă a ajuns la 0
@@ -440,11 +443,53 @@ def bilant(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     if stare["an"] >= c.ani:
         _incheie(c, stare, "mandat")
         return rezultat
+    mj = minijocul_anului(c, stare["an"])
+    if mj:
+        # Înainte de anul următor: un mini-joc. Anul se schimbă abia după scor.
+        stare["pas"], stare["pas_id"] = PAS_MINIJOC, mj["id"]
+        return rezultat
+    _an_urmator(c, stare)
+    return rezultat
+
+
+def _an_urmator(c: Continut, stare: dict[str, Any]) -> None:
     stare["an"] += 1
     stare["trimestru"], stare["decizia"] = 1, 1
     stare["pas"] = PAS_DECIZIE
     if not _alege_situatia(c, stare):
         _incheie(c, stare, "fara_situatii")
+
+
+def minijocul_anului(c: Continut, an: int) -> dict[str, Any] | None:
+    """Mini-jocul de la finalul anului `an`: pe rând, din lista din config (dacă e activă)."""
+    cfg = c.config.get("minijocuri") or {}
+    lista = cfg.get("lista") or []
+    if not cfg.get("activ", True) or not lista:
+        return None
+    return lista[(an - 1) % len(lista)]
+
+
+def minijoc(c: Continut, stare: dict[str, Any], scor: int | None) -> dict[str, Any]:
+    """Jucătorul a terminat mini-jocul cu un scor 0..100 (None = a sărit peste, ca un scor de 30).
+    Efectul e proporțional: 30 = nimic, 100 = efectul maxim, sub 30 = puțin în minus."""
+    if stare["pas"] != PAS_MINIJOC:
+        raise ActiuneInvalida(f"nu e momentul unui mini-joc, pasul curent e {stare['pas']!r}")
+    mj = minijocul_anului(c, stare["an"]) or {}
+    if scor is None:
+        scor = 30
+    if not isinstance(scor, int) or not 0 <= scor <= 100:
+        raise ActiuneInvalida("scorul trebuie să fie un întreg între 0 și 100")
+    factor = (scor - 30) / 70 if scor >= 30 else -0.3 * (30 - scor) / 30
+    efect_max = mj.get("efect_max") or {}
+    ef = {k: int(round(v * factor)) for k, v in efect_max.items() if k in RESURSE}
+    delta = _aplica_resurse(stare, ef)
+    profit = int(round(efect_max.get("profit", 0) * factor))
+    stare["profit_an"] += profit      # intră în bilanțul anului care urmează
+    stare["istoric"].append({"tip": PAS_MINIJOC, "id": mj.get("id"), "an": stare["an"], "scor": scor, "delta": delta, "profit": profit})
+    rezultat = {"id": mj.get("id"), "nume": mj.get("nume"), "scor": scor, "delta": delta, "profit": profit, "resurse": dict(stare["resurse"])}
+    if _verifica_terminat(c, stare):
+        return rezultat
+    _an_urmator(c, stare)
     return rezultat
 
 
@@ -626,6 +671,9 @@ def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
         })
     elif pas == PAS_BILANT:
         baza["profit_an"] = stare["profit_an"]
+    elif pas == PAS_MINIJOC:
+        mj = minijocul_anului(c, stare["an"]) or {}
+        baza["minijoc"] = {"id": mj.get("id"), "nume": mj.get("nume"), "desc": mj.get("desc", ""), "efect_max": mj.get("efect_max", {})}
     else:
         baza["final"] = stare["final"]
     return baza

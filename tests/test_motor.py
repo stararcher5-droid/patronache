@@ -20,7 +20,7 @@ def continut_de_test(**schimbari) -> modul_continut.Continut:
     brut = {n: modul_continut.citeste_fisier(RADACINA / "continut", n) for n in modul_continut.FISIERE}
     brut = copy.deepcopy(brut)
     for k in brut["config.json"]["resurse"]: brut["config.json"]["resurse"][k]["start"] = 50
-    brut["config.json"].update({"ani": 2, "trimestre_pe_an": 1, "decizii_pe_trimestru": 2, "profit_de_baza_pe_an": 0, "garantie_carte": {"dupa": 0, "reguli": []}, "uzura_pe_an": {}})
+    brut["config.json"].update({"ani": 2, "trimestre_pe_an": 1, "decizii_pe_trimestru": 2, "profit_de_baza_pe_an": 0, "garantie_carte": {"dupa": 0, "reguli": []}, "uzura_pe_an": {}, "minijocuri": {"activ": False, "lista": []}})
     brut["niveluri.json"]["niveluri"] = [
         {"nivel": 1, "nume": "Apartament", "prag": 0},
         {"nivel": 2, "nume": "Sediu", "prag": 50},
@@ -111,6 +111,35 @@ class Reguli(unittest.TestCase):
         b = motor.bilant(c, s)
         self.assertEqual(b["uzura"], {"parteneri": -4, "bunastare": -5, "legalitate": -3})
         self.assertEqual(s["resurse"], {"parteneri": 56, "bunastare": 55, "legalitate": 57})
+
+    def test_minijocul_vine_dupa_bilant_si_scorul_da_efect(self):
+        c = continut_de_test()
+        c.config["minijocuri"] = {"activ": True, "lista": [{"id": "stampila", "nume": "Ștampila", "efect_max": {"legalitate": 10, "profit": 20}}]}
+        s = motor.stare_noua(c, {}, seed=1)
+        motor.alege(c, s, 0); motor.alege(c, s, 0)
+        motor.bilant(c, s)
+        self.assertEqual(s["pas"], motor.PAS_MINIJOC); self.assertEqual(s["an"], 1, "anul se schimbă abia după mini-joc")
+        self.assertEqual(motor.pas_curent(c, s)["minijoc"]["id"], "stampila")
+        with self.assertRaises(motor.ActiuneInvalida):
+            motor.alege(c, s, 0)
+        leg = s["resurse"]["legalitate"]
+        r = motor.minijoc(c, s, 100)
+        self.assertEqual((r["delta"]["legalitate"], r["profit"]), (10, 20))
+        self.assertEqual(s["resurse"]["legalitate"], leg + 10); self.assertEqual(s["profit_an"], 20)
+        self.assertEqual((s["an"], s["pas"]), (2, motor.PAS_DECIZIE))
+        # anul 2 e ultimul: după bilanț nu mai vine mini-joc, ci finalul
+        motor.alege(c, s, 0); motor.alege(c, s, 0); motor.bilant(c, s)
+        self.assertEqual(s["pas"], motor.PAS_FINAL)
+
+    def test_minijoc_sarit_sau_slab(self):
+        c = continut_de_test()
+        c.config["minijocuri"] = {"activ": True, "lista": [{"id": "pizza", "nume": "Pizza", "efect_max": {"bunastare": 10}}]}
+        s = motor.stare_noua(c, {}, seed=1)
+        motor.alege(c, s, 0); motor.alege(c, s, 0); motor.bilant(c, s)
+        self.assertEqual(motor.minijoc(c, s, None)["delta"], {}, "sărit = fără efect")
+        s2 = motor.stare_noua(c, {}, seed=1)
+        motor.alege(c, s2, 0); motor.alege(c, s2, 0); motor.bilant(c, s2)
+        self.assertEqual(motor.minijoc(c, s2, 0)["delta"], {"bunastare": -3}, "scor 0 = puțin în minus")
 
     def test_resursa_la_zero_termina_partida(self):
         c = continut_de_test()
