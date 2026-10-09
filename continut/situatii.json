@@ -65,7 +65,7 @@
     {
       "id": "nepotul-greseste",
       "titlu": "Nepotul a greșit comanda",
-      "text": "Nepotul a trimis marfa la adresa greșită. Clientul e furios, iar mama te-a sunat deja să nu te superi pe el.",
+      "text": "Nepotul a încurcat comanda celui mai important client. Clientul e furios, iar mama te-a sunat deja să nu te superi pe el.",
       "nivel": 1,
       "doar_legata": true,
       "cerinte": {
@@ -376,7 +376,8 @@
           "teme": {
             "salarii": 1,
             "control": -1
-          }
+          },
+          "carte": "bonus-surpriza"
         }
       ]
     },
@@ -409,7 +410,11 @@
           "teme": {
             "risc": -2,
             "imagine": -1
-          }
+          },
+          "ef": {
+            "bunastare": -2
+          },
+          "profit": 5
         },
         {
           "text": "Închiriezi ceva mai mare, cu opțiune de cumpărare.",
@@ -444,7 +449,8 @@
           "teme": {
             "program": -2,
             "control": -2
-          }
+          },
+          "carte": "laptopuri-noi"
         },
         {
           "text": "Doar dacă vine la birou o săptămână pe lună, pe banii lui.",
@@ -454,7 +460,8 @@
           "teme": {
             "program": 0,
             "control": 1
-          }
+          },
+          "carte": "conferinta"
         },
         {
           "text": "Nu. Ori aici, ori la revedere.",
@@ -488,7 +495,8 @@
           "profit": -25,
           "teme": {
             "fisc": -1
-          }
+          },
+          "carte": "echipament-nou"
         },
         {
           "text": "Îi trimiți pe cei trei „la depozit” cât e inspectorul acolo.",
@@ -499,7 +507,8 @@
           "profit": 0,
           "teme": {
             "fisc": 2
-          }
+          },
+          "carte": "accidentul-pe-santier"
         },
         {
           "text": "Îl inviți pe inspector la o cafea în baracă.",
@@ -535,7 +544,7 @@
             "clienti": -2,
             "imagine": 0
           },
-          "carte": "seara-cu-casa-inchisa"
+          "carte": "degustarea"
         },
         {
           "text": "Îi răspunzi că „nici noi nu vrem clienți ca dumneavoastră”.",
@@ -558,7 +567,8 @@
           "teme": {
             "imagine": 2,
             "clienti": 1
-          }
+          },
+          "carte": "controlul-dsv"
         }
       ]
     },
@@ -582,7 +592,8 @@
           "teme": {
             "clienti": -1,
             "program": -1
-          }
+          },
+          "carte": "camion-nou"
         },
         {
           "text": "Îi spui să repare cum poate și să meargă mai departe. Tahograful „se rezolvă”.",
@@ -595,7 +606,8 @@
           "teme": {
             "fisc": 2,
             "program": 2
-          }
+          },
+          "carte": "camionul-in-service"
         },
         {
           "text": "Trimiți alt camion din țară și pierzi comanda.",
@@ -631,7 +643,8 @@
           "profit": -40,
           "teme": {
             "clienti": -2
-          }
+          },
+          "carte": "reducerea-angajatilor"
         },
         {
           "text": "Rambursezi doar cutiile sigilate, restul „nu respectă condițiile”.",
@@ -677,7 +690,8 @@
           "teme": {
             "stat": 1,
             "fisc": -1
-          }
+          },
+          "carte": "subventia"
         },
         {
           "text": "Suni la „cineva de la APIA”. Dosarul merge mai repede, cu un procent.",
@@ -739,7 +753,11 @@
           "teme": {
             "clienti": -1,
             "risc": -1
-          }
+          },
+          "carte": [
+            "clientul-din-germania",
+            "comanda-mare"
+          ]
         },
         {
           "text": "Le faci preț dublu, că oricum nu știu prețurile.",
@@ -865,6 +883,10 @@
             "program": -1
           }
         }
+      ],
+      "domenii": [
+        "it",
+        "comert"
       ]
     },
     {
@@ -917,6 +939,10 @@
             "control": 2
           }
         }
+      ],
+      "domenii": [
+        "it",
+        "comert"
       ]
     },
     {
@@ -974,7 +1000,7 @@
     {
       "id": "concurentul-copiaza",
       "titlu": "Concurentul care copiază",
-      "text": "Un fost angajat și-a făcut firmă, ți-a copiat site-ul cuvânt cu cuvânt și vinde cu 20% mai ieftin.",
+      "text": "Un fost angajat și-a făcut firmă, ți-a copiat oferta cuvânt cu cuvânt și vinde cu 20% mai ieftin, la clienții tăi.",
       "nivel": 1,
       "greutate": 2,
       "optiuni": [
@@ -1017,7 +1043,10 @@
             "parteneri": 4
           },
           "profit": -40,
-          "carte": "comanda-mare",
+          "carte": [
+            "comanda-mare",
+            "contractul-mare"
+          ],
           "teme": {
             "risc": 1
           }
@@ -1068,7 +1097,7 @@
     {
       "id": "tva-ul",
       "titlu": "Decontul de TVA",
-      "text": "Contabilul zice că ai de plată un TVA cât o mașină. Banii i-ai cheltuit deja pe marfă.",
+      "text": "Contabilul zice că ai de plată un TVA cât o mașină. Banii i-ai cheltuit deja pe salarii și furnizori.",
       "nivel": 1,
       "greutate": 2,
       "optiuni": [
@@ -1090,7 +1119,8 @@
           "profit": -20,
           "teme": {
             "fisc": -1
-          }
+          },
+          "carte": "avocatul-firmei"
         },
         {
           "text": "Nu depui decontul luna asta. „Îl depunem rectificativ.”",
@@ -1107,7 +1137,7 @@
     {
       "id": "prima-reclamatie",
       "titlu": "Prima reclamație",
-      "text": "Un client scrie pe Facebook că „ați luat banii și n-ați livrat”. A livrat colegul, dar la adresa greșită.",
+      "text": "Un client scrie pe Facebook că „ați luat banii și n-ați livrat”. A livrat colegul, dar cu trei zile întârziere și fără să anunțe.",
       "nivel": 1,
       "greutate": 2,
       "optiuni": [
@@ -1173,7 +1203,8 @@
           "teme": {
             "stat": -2,
             "risc": -1
-          }
+          },
+          "profit": 5
         },
         {
           "text": "Aplici la o schemă mică, fără credit.",
@@ -1496,7 +1527,8 @@
           "teme": {
             "risc": -2,
             "clienti": -1
-          }
+          },
+          "profit": -10
         },
         {
           "text": "Accepți jumătate, restul rămâne pentru clienții vechi.",
@@ -1614,7 +1646,8 @@
           "teme": {
             "control": -2,
             "program": -2
-          }
+          },
+          "carte": "vineri-scurta"
         },
         {
           "text": "Îi tai din salariu la fiecare întârziere.",
@@ -1804,7 +1837,6 @@
             "parteneri": 2,
             "bunastare": 3
           },
-          "profit": 5,
           "teme": {
             "program": -1,
             "control": 1
@@ -2023,7 +2055,8 @@
           "teme": {
             "angajari": -1,
             "risc": -1
-          }
+          },
+          "carte": "mostenirea"
         },
         {
           "text": "Îi faci contract de împrumut cu dobândă, ca la bancă.",
@@ -2164,6 +2197,9 @@
           "teme": {
             "risc": -1,
             "control": 2
+          },
+          "ef": {
+            "bunastare": 2
           }
         },
         {
@@ -2219,7 +2255,7 @@
         {
           "text": "Accepți, dar livrezi pe bune, cu echipă și 200 de pagini.",
           "ef": {
-            "legalitate": -2
+            "legalitate": 1
           },
           "profit": 60,
           "teme": {
@@ -2244,7 +2280,7 @@
     {
       "id": "angajata-insarcinata",
       "titlu": "Angajata însărcinată",
-      "text": "Cea mai bună vânzătoare a ta vine zâmbind: e însărcinată. Pleacă doi ani și fix acum ai cel mai mare pipeline.",
+      "text": "Cel mai bun om din echipa ta vine zâmbind: e însărcinată. Pleacă doi ani și fix acum ai cea mai mare comandă.",
       "nivel": 1,
       "greutate": 2,
       "optiuni": [
@@ -2309,7 +2345,10 @@
             "bunastare": 6
           },
           "profit": -25,
-          "carte": "petrecere-concert",
+          "carte": [
+            "camion-nou",
+            "petrecere-concert"
+          ],
           "teme": {
             "salarii": 2
           }
@@ -2398,6 +2437,10 @@
             "program": 1
           }
         }
+      ],
+      "domenii": [
+        "it",
+        "constructii"
       ]
     },
     {
@@ -2472,7 +2515,7 @@
           "profit": 40,
           "teme": {
             "salarii": -2,
-            "fisc": 1
+            "fisc": 0
           }
         },
         {
@@ -2551,6 +2594,10 @@
             "control": 0
           }
         }
+      ],
+      "domenii": [
+        "it",
+        "comert"
       ]
     },
     {
@@ -2593,6 +2640,13 @@
             "control": 2
           }
         }
+      ],
+      "domenii": [
+        "comert",
+        "transport",
+        "horeca",
+        "agricultura",
+        "constructii"
       ]
     },
     {
@@ -2655,7 +2709,8 @@
             "risc": 2,
             "clienti": 1
           },
-          "profit_baza": 20
+          "profit_baza": 20,
+          "carte": "furtul-din-depozit"
         },
         {
           "text": "Comanzi un lot mic de test și ceri certificatele înainte.",
@@ -2678,6 +2733,12 @@
             "clienti": -2
           }
         }
+      ],
+      "domenii": [
+        "comert",
+        "constructii",
+        "horeca",
+        "agricultura"
       ]
     },
     {
@@ -2718,6 +2779,11 @@
             "fisc": 2
           }
         }
+      ],
+      "domenii": [
+        "it",
+        "comert",
+        "horeca"
       ]
     },
     {
@@ -2752,7 +2818,8 @@
         {
           "text": "Îi spui că nu se poate. Să-și ia credit mai mic.",
           "ef": {
-            "bunastare": -5
+            "bunastare": -5,
+            "legalitate": -1
           },
           "teme": {
             "fisc": 1,
@@ -2787,7 +2854,11 @@
             "bunastare": 5
           },
           "profit": -8,
-          "carte": "petrecere-cu-pizza",
+          "carte": [
+            "degustarea",
+            "praznicul",
+            "petrecere-cu-pizza"
+          ],
           "teme": {
             "imagine": 0
           }
@@ -2867,7 +2938,8 @@
           "teme": {
             "angajari": -2,
             "salarii": 1
-          }
+          },
+          "carte": "pranzul-cu-saorma"
         },
         {
           "text": "Îi iei și îi pui la Excel-uri. Munca e muncă.",
@@ -2907,7 +2979,8 @@
           "teme": {
             "clienti": -2,
             "risc": -1
-          }
+          },
+          "carte": "asigurarea"
         },
         {
           "text": "Plătești jumătate și promiți restul luna viitoare.",
@@ -2998,7 +3071,7 @@
           },
           "profit": -10,
           "teme": {
-            "salarii": -1
+            "salarii": 0
           }
         },
         {
@@ -3055,6 +3128,12 @@
             "control": 1
           }
         }
+      ],
+      "domenii": [
+        "it",
+        "comert",
+        "constructii",
+        "transport"
       ]
     },
     {
@@ -3090,7 +3169,13 @@
           "teme": {
             "fisc": 2,
             "stat": 1
-          }
+          },
+          "carte": [
+            "controlul-dsv",
+            "accidentul-pe-santier",
+            "camionul-in-service",
+            "furtul-din-depozit"
+          ]
         }
       ]
     },
@@ -3107,7 +3192,10 @@
             "parteneri": 1
           },
           "profit": -50,
-          "carte": "comanda-mare",
+          "carte": [
+            "comanda-mare",
+            "contractul-mare"
+          ],
           "teme": {
             "risc": 2
           }
@@ -3168,6 +3256,10 @@
             "clienti": 0
           }
         }
+      ],
+      "domenii": [
+        "horeca",
+        "comert"
       ]
     },
     {
@@ -3192,7 +3284,8 @@
           "text": "Mai stai o oră. Doar una.",
           "teme": {
             "program": 1
-          }
+          },
+          "profit": 2
         },
         {
           "text": "Rămâi. „Firma nu se face singură.”",
@@ -3287,6 +3380,13 @@
             "risc": 1
           }
         }
+      ],
+      "domenii": [
+        "it",
+        "comert",
+        "horeca",
+        "constructii",
+        "transport"
       ]
     },
     {
@@ -3326,12 +3426,17 @@
             "fisc": 2
           }
         }
+      ],
+      "domenii": [
+        "transport",
+        "comert",
+        "constructii"
       ]
     },
     {
       "id": "angajatul-bolnav",
       "titlu": "Concediul medical",
-      "text": "Omul de la depozit e în concediu medical de două luni. Al treilea. Contabilul zice că „se poate face ceva”.",
+      "text": "Unul din oamenii tăi e în concediu medical de două luni. Al treilea. Contabilul zice că „se poate face ceva”.",
       "nivel": 1,
       "greutate": 2,
       "optiuni": [
@@ -3380,12 +3485,13 @@
         {
           "text": "Îl angajezi. Să rezolve, cum știe el.",
           "ef": {
-            "parteneri": 1,
-            "legalitate": 4
+            "legalitate": 2,
+            "parteneri": 1
           },
           "profit": -40,
           "teme": {
-            "fisc": 1
+            "fisc": 0,
+            "risc": 0
           }
         },
         {
@@ -3596,6 +3702,9 @@
           "text": "Refuzi. Nu-ți place să ieși în față.",
           "teme": {
             "imagine": -2
+          },
+          "ef": {
+            "parteneri": -1
           }
         }
       ],

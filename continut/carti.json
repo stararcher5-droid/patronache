@@ -126,7 +126,13 @@
       "efect": {
         "profit": 60,
         "parteneri": 3
-      }
+      },
+      "domenii": [
+        "comert",
+        "agricultura",
+        "constructii",
+        "horeca"
+      ]
     },
     {
       "id": "premiul",
@@ -191,6 +197,288 @@
         "bunastare": -8,
         "parteneri": -4,
         "profit": -30
+      }
+    },
+    {
+      "id": "contractul-mare",
+      "nume": "Contractul",
+      "icon": "📄",
+      "surpriza": true,
+      "domenii": [
+        "it",
+        "transport"
+      ],
+      "desc": "Un client de care n-ai auzit vrea o echipă întreagă pe un an. Plătește în avans. Nu întreabă de preț.",
+      "efect": {
+        "profit": 60,
+        "parteneri": 3
+      }
+    },
+    {
+      "id": "pranzul-cu-saorma",
+      "nume": "Prânzul cu șaorma",
+      "icon": "🌯",
+      "desc": "Comanzi șaorma pentru toată lumea. Mică, dar ține de vorbă două zile.",
+      "efect": {
+        "bunastare": 4,
+        "profit": -3
+      }
+    },
+    {
+      "id": "vineri-scurta",
+      "nume": "Vineri scurtă",
+      "icon": "🏖️",
+      "desc": "Toată lumea pleacă la 14. Nimeni nu întreabă de ce.",
+      "efect": {
+        "bunastare": 5,
+        "profit": -8
+      }
+    },
+    {
+      "id": "bonus-surpriza",
+      "nume": "Bonusul surpriză",
+      "icon": "💶",
+      "desc": "Un plic la fiecare, fără ocazie. Cel mai bun moral pe care-l pot cumpăra banii.",
+      "efect": {
+        "bunastare": 8,
+        "profit": -20
+      }
+    },
+    {
+      "id": "avocatul-firmei",
+      "nume": "Avocatul firmei",
+      "icon": "👩‍⚖️",
+      "desc": "O oră cu un avocat bun înainte de următoarea decizie. Legalitatea nu poate scădea la următoarea alegere.",
+      "efect": {
+        "profit": -10,
+        "scut": {
+          "resurse": [
+            "legalitate"
+          ],
+          "decizii": 1
+        }
+      }
+    },
+    {
+      "id": "asigurarea",
+      "nume": "Asigurarea",
+      "icon": "🛡️",
+      "desc": "Ai semnat polița pe care o amânai de un an. Partenerii nu pot scădea la următoarea alegere.",
+      "efect": {
+        "profit": -8,
+        "scut": {
+          "resurse": [
+            "parteneri"
+          ],
+          "decizii": 1
+        }
+      }
+    },
+    {
+      "id": "laptopuri-noi",
+      "nume": "Laptopuri noi",
+      "icon": "💻",
+      "domenii": [
+        "it"
+      ],
+      "desc": "Toată echipa primește laptopuri noi. Cel vechi devine „al stagiarului”.",
+      "efect": {
+        "bunastare": 7,
+        "profit": -25
+      }
+    },
+    {
+      "id": "conferinta",
+      "nume": "Conferința",
+      "icon": "🎟️",
+      "domenii": [
+        "it"
+      ],
+      "desc": "Trimiți trei oameni la o conferință în Lisabona. Vin cu idei și cu tricouri.",
+      "efect": {
+        "bunastare": 5,
+        "parteneri": 3,
+        "profit": -15
+      }
+    },
+    {
+      "id": "echipament-nou",
+      "nume": "Echipament nou",
+      "icon": "👷",
+      "domenii": [
+        "constructii"
+      ],
+      "desc": "Căști, bocanci și veste noi pentru toată lumea. Și ISC-ul e mulțumit.",
+      "efect": {
+        "bunastare": 5,
+        "legalitate": 3,
+        "profit": -10
+      }
+    },
+    {
+      "id": "degustarea",
+      "nume": "Degustarea",
+      "icon": "🍲",
+      "domenii": [
+        "horeca"
+      ],
+      "desc": "Meniul nou se gustă întâi cu echipa, cu vin. Bucătarul primește aplauze.",
+      "efect": {
+        "bunastare": 6,
+        "parteneri": 2,
+        "profit": -5
+      }
+    },
+    {
+      "id": "camion-nou",
+      "nume": "Camionul nou",
+      "icon": "🚛",
+      "domenii": [
+        "transport"
+      ],
+      "desc": "Cel mai vechi șofer primește camionul nou. Ceilalți se uită, dar înțeleg.",
+      "efect": {
+        "bunastare": 8,
+        "parteneri": 2,
+        "profit": -40
+      }
+    },
+    {
+      "id": "reducerea-angajatilor",
+      "nume": "Reducerea pentru angajați",
+      "icon": "🏷️",
+      "domenii": [
+        "comert"
+      ],
+      "desc": "30% reducere la tot pentru oamenii tăi și familiile lor.",
+      "efect": {
+        "bunastare": 5,
+        "profit": -5
+      }
+    },
+    {
+      "id": "praznicul",
+      "nume": "Praznicul de după recoltă",
+      "icon": "🍖",
+      "domenii": [
+        "agricultura"
+      ],
+      "desc": "Masă lungă în curte, după ultimul transport. Tot satul vine.",
+      "efect": {
+        "bunastare": 8,
+        "parteneri": 2,
+        "profit": -6
+      }
+    },
+    {
+      "id": "clientul-din-germania",
+      "nume": "Mailul din Germania",
+      "icon": "🇩🇪",
+      "surpriza": true,
+      "domenii": [
+        "it",
+        "transport"
+      ],
+      "desc": "Un client din Germania te-a găsit pe LinkedIn. Vrea un contract pe doi ani și plătește la timp.",
+      "efect": {
+        "profit": 50,
+        "parteneri": 2
+      }
+    },
+    {
+      "id": "furtul-din-depozit",
+      "nume": "Depozitul",
+      "icon": "🔓",
+      "surpriza": true,
+      "domenii": [
+        "comert",
+        "constructii",
+        "agricultura",
+        "horeca"
+      ],
+      "desc": "Luni dimineață lacătul e tăiat. Lipsesc exact lucrurile scumpe. Paznicul „n-a văzut nimic”.",
+      "efect": {
+        "profit": -25,
+        "bunastare": -2
+      }
+    },
+    {
+      "id": "grindina",
+      "nume": "Norul",
+      "icon": "🌩️",
+      "surpriza": true,
+      "domenii": [
+        "agricultura"
+      ],
+      "desc": "Zece minute de grindină într-o după-amiază de iunie. Jumătate din cultură e la pământ.",
+      "efect": {
+        "profit": -40
+      }
+    },
+    {
+      "id": "subventia",
+      "nume": "Plicul de la APIA",
+      "icon": "🏛️",
+      "surpriza": true,
+      "domenii": [
+        "agricultura"
+      ],
+      "desc": "A intrat subvenția. Toată, și la timp. Nu știi ce s-a întâmplat.",
+      "efect": {
+        "profit": 45
+      }
+    },
+    {
+      "id": "controlul-dsv",
+      "nume": "Vizita",
+      "icon": "🧪",
+      "surpriza": true,
+      "domenii": [
+        "horeca"
+      ],
+      "desc": "DSV-ul a venit la prânz, cu termometrul. Frigiderul de la bar avea 9 grade.",
+      "efect": {
+        "legalitate": -6,
+        "profit": -10
+      }
+    },
+    {
+      "id": "camionul-in-service",
+      "nume": "Telefonul",
+      "icon": "🔧",
+      "surpriza": true,
+      "domenii": [
+        "transport"
+      ],
+      "desc": "Motorul a cedat pe autostradă, cu marfă în el. Service-ul cere o săptămână și o avere.",
+      "efect": {
+        "profit": -30,
+        "parteneri": -2
+      }
+    },
+    {
+      "id": "accidentul-pe-santier",
+      "nume": "Ambulanța",
+      "icon": "🚑",
+      "surpriza": true,
+      "domenii": [
+        "constructii"
+      ],
+      "desc": "Un om a căzut de pe schelă. E bine, dar Inspecția Muncii a aflat înaintea ta.",
+      "efect": {
+        "legalitate": -7,
+        "bunastare": -4,
+        "profit": -15
+      }
+    },
+    {
+      "id": "mostenirea",
+      "nume": "Notarul",
+      "icon": "📜",
+      "surpriza": true,
+      "desc": "Un unchi de care nu-ți aminteai ți-a lăsat un teren. Îl vinzi în două săptămâni.",
+      "efect": {
+        "profit": 35
       }
     }
   ]

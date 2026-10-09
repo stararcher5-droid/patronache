@@ -162,20 +162,25 @@
         "cand": "legalitate_scade",
         "carti": [
           "mail-de-la-anaf",
-          "procesul"
+          "procesul",
+          "controlul-dsv",
+          "accidentul-pe-santier"
         ]
       },
       {
         "cand": "bunastare_scade",
         "carti": [
           "demisia-cto",
-          "demisia-omului-de-baza"
+          "demisia-omului-de-baza",
+          "furtul-din-depozit"
         ]
       },
       {
         "cand": "parteneri_scade",
         "carti": [
-          "hackerul"
+          "hackerul",
+          "camionul-in-service",
+          "furtul-din-depozit"
         ]
       },
       {
@@ -188,20 +193,27 @@
         "cand": "profit_creste",
         "carti": [
           "comanda-mare",
-          "plicul"
+          "plicul",
+          "contractul-mare",
+          "clientul-din-germania",
+          "subventia",
+          "mostenirea"
         ]
       },
       {
         "cand": "parteneri_creste",
         "carti": [
-          "comanda-mare"
+          "comanda-mare",
+          "contractul-mare"
         ]
       },
       {
         "cand": "oricand",
         "carti": [
           "zvonul",
-          "plicul"
+          "plicul",
+          "grindina",
+          "mostenirea"
         ]
       }
     ]
