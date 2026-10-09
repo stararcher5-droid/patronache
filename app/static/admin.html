@@ -77,6 +77,11 @@
   #harta .nod.mutare { opacity:.85; cursor:grabbing; } #harta .nod.mutare rect { stroke:#5fc9a8; stroke-width:2.5; }
   #harta .coloana-tinta { fill:rgba(95,201,168,.08); stroke:#5fc9a8; stroke-dasharray:6 4; rx:10; pointer-events:none; }
   #harta .nod { cursor:grab; }
+  #harta .leg-hit { stroke:transparent; stroke-width:14; fill:none; cursor:pointer; pointer-events:stroke; }
+  #harta .leg-hit:hover + * , #harta path.leg:has(+ .leg-hit:hover) { stroke:#9fd8bb; }
+  #harta path.leg.selectata { stroke:#5fc9a8; stroke-width:3; marker-end:url(#sageata-verde); }
+  #harta .sterge-leg.selectata circle { stroke:#5fc9a8; fill:#1f3a31; } #harta .sterge-leg.selectata text { fill:#5fc9a8; }
+  #harta .nod.cap rect { stroke:#5fc9a8; stroke-width:2.5; }
   #harta .temp { stroke:#2f6fed; stroke-width:2; stroke-dasharray:6 4; fill:none; pointer-events:none; }
   #panou-legatura { position:fixed; z-index:20; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; width:320px; box-shadow:0 8px 30px rgba(0,0,0,.15); }
   #panou-legatura h4 { margin:0 0 8px; font-size:13px; }
@@ -122,7 +127,7 @@
       <h2>Harta legăturilor</h2>
       <p class="nota">Coloanele sunt nivelurile firmei de la care situația poate apărea (la nivelul 3 jucătorul primește din 1, 2 și 3). Săgețile sunt legăturile „urmatoare” din opțiuni. Galben = apare doar legată.
         <b>Ca să legi:</b> trage din cerculețul albastru al unei situații peste altă situație, apoi alege opțiunea care o deschide. Clic pe × de lângă căsuța-sursă scoate legătura. <b>Ca să schimbi nivelul:</b> trage căsuța în altă coloană. Clic scurt pe o situație o deschide în editor.</p>
-      <div style="display:flex; gap:8px; margin-bottom:10px"><button class="primar" id="salveaza-harta">Salvează legăturile</button><span class="nota" id="harta-stare"></span></div>
+      <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center; flex-wrap:wrap"><button class="primar" id="salveaza-harta">Salvează legăturile</button><span class="nota" id="harta-stare"></span><span class="nota" id="harta-selectie" style="margin-left:auto"></span></div>
       <div id="harta"></div>
       <div id="panou-legatura" class="ascuns"></div>
     </div>
@@ -506,7 +511,7 @@ function randeazaHarta() {
   const poz = {}; let maxRanduri = 0;
   Object.entries(coloane).forEach(([a, ls]) => { ls.forEach((s, i) => { poz[s.id] = { x: pad + (a - 1) * (W + GX), y: pad + 30 + i * (H + GY), s }; }); maxRanduri = Math.max(maxRanduri, ls.length); });
   const latime = pad * 2 + nr * (W + GX), inaltime = pad * 2 + 30 + maxRanduri * (H + GY);
-  let svg = `<svg viewBox="0 0 ${latime} ${inaltime}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="sageata" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97b8"/></marker></defs>`;
+  let svg = `<svg viewBox="0 0 ${latime} ${inaltime}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="sageata" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97b8"/></marker><marker id="sageata-verde" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5fc9a8"/></marker></defs>`;
   for (let a = 1; a <= nr; a++) svg += `<text x="${pad + (a - 1) * (W + GX)}" y="${pad + 12}" font-size="13" fill="#9aa1b4">Nivel ${a} · ${esc(niveluri()[a - 1].nume)}</text>`;
   // legăturile; butoanele × se adună separat și se desenează la urmă, peste căsuțe
   let butoane = '';
@@ -533,6 +538,29 @@ function randeazaHarta() {
   }
   el.innerHTML = svg + butoane + '</svg>';
   const svgEl = $('svg', el);
+  // trasee invizibile, groase, ca linia să poată fi atinsă cu mouse-ul; selectarea colorează legătura în verde
+  $$('path.leg', svgEl).forEach(cale => {
+    const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    hit.setAttribute('class', 'leg-hit'); hit.setAttribute('d', cale.getAttribute('d')); hit.dataset.leg = cale.dataset.leg;
+    cale.after(hit);
+    hit.addEventListener('click', e => { e.stopPropagation(); selecteazaLegatura(cale.dataset.leg); });
+  });
+  svgEl.addEventListener('click', e => { if (e.target === svgEl) selecteazaLegatura(null); });
+  function selecteazaLegatura(cheie) {
+    legaturaSelectata = cheie;
+    $$('path.leg.selectata, .sterge-leg.selectata, .nod.cap', svgEl).forEach(x => x.classList.remove('selectata', 'cap'));
+    const info = $('#harta-selectie');
+    if (!cheie) { info.textContent = ''; return; }
+    const [sursa, opt, tinta] = cheie.split('|');
+    svgEl.querySelector(`path.leg[data-leg="${CSS.escape(cheie)}"]`)?.classList.add('selectata');
+    $$('.sterge-leg', svgEl).find(g => g.dataset.sursa === sursa && g.dataset.opt === opt && g.dataset.tinta === tinta)?.classList.add('selectata');
+    svgEl.querySelector(`.nod[data-id="${CSS.escape(sursa)}"]`)?.classList.add('cap');
+    svgEl.querySelector(`.nod[data-id="${CSS.escape(tinta)}"]`)?.classList.add('cap');
+    const S = sit().find(x => x.id === sursa), T = sit().find(x => x.id === tinta);
+    info.innerHTML = `<span class="eticheta flag">„${esc(S?.titlu)}” → „${esc(T?.titlu)}”</span> prin opțiunea ${+opt + 1}: „${esc(S?.optiuni[+opt]?.text || '')}”`;
+  }
+  if (legaturaSelectata) selecteazaLegatura(legaturaSelectata);
+
   // × stă exact pe curbă, la 30px de la ieșirea din căsuța-sursă
   $$('.sterge-leg', el).forEach(g => {
     const cale = svgEl.querySelector(`path[data-leg="${CSS.escape(g.dataset.sursa + '|' + g.dataset.opt + '|' + g.dataset.tinta)}"]`);
@@ -555,12 +583,14 @@ function randeazaHarta() {
     try { svgEl.setPointerCapture(e.pointerId); } catch (_) {}
   }));
 
-  // × pe săgeată = scoate legătura
+  // × pe săgeată = scoate legătura; trecerea cu mouse-ul peste el o evidențiază
+  $$('.sterge-leg', el).forEach(g => g.addEventListener('mouseenter', () => selecteazaLegatura(g.dataset.sursa + '|' + g.dataset.opt + '|' + g.dataset.tinta)));
   $$('.sterge-leg', el).forEach(g => g.addEventListener('click', e => {
     e.stopPropagation();
     const s = sit().find(x => x.id === g.dataset.sursa); const o = s.optiuni[+g.dataset.opt];
     if (!confirm(`Scoți legătura: opțiunea ${+g.dataset.opt + 1} din „${s.titlu}” nu va mai deschide „${poz[g.dataset.tinta].s.titlu}”?`)) return;
     o.urmatoare = (o.urmatoare || []).filter(u => u !== g.dataset.tinta); if (!o.urmatoare.length) delete o.urmatoare;
+    legaturaSelectata = null;
     marcheaza('situatii.json'); randeazaHarta(); if (curent === s.id) deschide(s.id);
   }));
 
@@ -650,6 +680,7 @@ $('#salveaza-harta').addEventListener('click', () => { citesteEditor(); salveaza
 
 // ------------------------------------------------------------------ cărți
 let carteCurenta = null;
+let legaturaSelectata = null;  // cheia „sursa|optiune|tinta” a legăturii evidențiate pe hartă
 $('#cauta-carte').addEventListener('input', randeazaCarti);
 function randeazaCarti() {
   const q = $('#cauta-carte').value.toLowerCase();
