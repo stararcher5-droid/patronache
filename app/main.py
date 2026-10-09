@@ -314,9 +314,10 @@ def rezultat(id_: str) -> dict[str, Any]:
 
 @app.get("/", include_in_schema=False)
 def pagina_joc() -> FileResponse:
-    return FileResponse(STATIC / "joc.html")
+    # Fără cache: după un update, browserul trebuie să ia mereu pagina nouă.
+    return FileResponse(STATIC / "joc.html", headers={"Cache-Control": "no-cache"})
 
 
 @app.get("/admin", include_in_schema=False)
 def pagina_admin() -> FileResponse:
-    return FileResponse(STATIC / "admin.html")
+    return FileResponse(STATIC / "admin.html", headers={"Cache-Control": "no-cache"})
