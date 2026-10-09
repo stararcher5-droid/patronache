@@ -135,6 +135,11 @@ class API(unittest.TestCase):
 
         self.assertEqual(self.client.put("/api/admin/continut/altceva.json", json={}, headers=h).status_code, 404)
 
+    def test_pagina_joc(self):
+        r = self.client.get("/")
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("Patronache", r.text)
+
     def test_pagina_admin(self):
         r = self.client.get("/admin")
         self.assertEqual(r.status_code, 200)

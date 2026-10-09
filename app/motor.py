@@ -149,12 +149,21 @@ def _aplica_resurse(stare: dict[str, Any], ef: dict[str, float]) -> dict[str, in
     return aplicat
 
 
+def _inchide_anul_neterminat(c: Continut, stare: dict[str, Any]) -> None:
+    """Când partida se oprește în mijlocul anului, profitul de până atunci intră totuși în total și în nivel."""
+    if stare["profit_an"]:
+        stare["profit_total"] += stare["profit_an"]
+        stare["profit_an"] = 0
+        stare["nivel"] = int(c.nivel_pentru(stare["profit_total"])["nivel"])
+
+
 def _verifica_terminat(c: Continut, stare: dict[str, Any]) -> bool:
     for k in RESURSE:
         if stare["resurse"][k] <= 0:
             f = c.finaluri[k]
             stare["final"] = {"motiv": k, "titlu": f["titlu"], "text": f["text"], "mandat_complet": False}
             stare["pas"], stare["pas_id"] = PAS_TERMINAT, None
+            _inchide_anul_neterminat(c, stare)
             return True
     return False
 
@@ -163,6 +172,7 @@ def _incheie(c: Continut, stare: dict[str, Any], motiv: str) -> None:
     f = c.finaluri[motiv]
     stare["final"] = {"motiv": motiv, "titlu": f["titlu"], "text": f["text"], "mandat_complet": motiv == "mandat"}
     stare["pas"], stare["pas_id"] = PAS_FINAL, None
+    _inchide_anul_neterminat(c, stare)
 
 
 # ---------------------------------------------------------------- acțiuni

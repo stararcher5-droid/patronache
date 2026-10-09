@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patronache</title>
+<meta name="description" content="Ești patronul unei firme românești. Ai patru ani. Ține firma pe linia de plutire, oamenii mulțumiți și ANAF-ul departe.">
+<style>
+  :root {
+    --hartie:#fbf7ef; --hartie2:#f3ecdd; --cerneala:#2b2419; --mut:#7a6f5f; --linie:#e2d8c3;
+    --accent:#c9472b; --buget:#d9a62b; --bunastare:#e2694f; --legalitate:#3f8f7a; --ok:#3f8f7a; --rau:#c9472b;
+    --umbra:0 10px 30px rgba(60,40,10,.12);
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; min-height:100%; }
+  body { font:16px/1.5 Georgia, "Times New Roman", serif; color:var(--cerneala); background:var(--hartie);
+    background-image:radial-gradient(circle at 20% 0%, #fff8e8 0, transparent 50%), radial-gradient(circle at 100% 100%, #efe3cc 0, transparent 45%); }
+  .pagina { max-width:760px; margin:0 auto; padding:16px 16px 60px; }
+  header.top { display:flex; align-items:center; gap:12px; padding:6px 0 14px; }
+  header.top .sigla { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:24px; background:var(--accent); color:#fff; box-shadow:var(--umbra); }
+  header.top .firma { flex:1; min-width:0; }
+  header.top .firma b { display:block; font-size:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  header.top .firma small { color:var(--mut); }
+  .nivel { text-align:right; font-family:system-ui, sans-serif; font-size:12px; color:var(--mut); }
+  .nivel b { display:block; font-size:15px; color:var(--cerneala); }
+  .resurse { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; font-family:system-ui, sans-serif; }
+  .res { background:#fff; border:1px solid var(--linie); border-radius:12px; padding:8px 10px; }
+  .res .et { display:flex; justify-content:space-between; font-size:12px; color:var(--mut); }
+  .res .et b { color:var(--cerneala); font-size:14px; }
+  .bara { height:8px; border-radius:99px; background:var(--hartie2); margin-top:6px; overflow:hidden; }
+  .bara i { display:block; height:100%; border-radius:99px; transition:width .6s ease; }
+  .res.buget i { background:var(--buget); } .res.bunastare i { background:var(--bunastare); } .res.legalitate i { background:var(--legalitate); }
+  .res.alarma { border-color:var(--rau); animation:puls 1.2s infinite; }
+  @keyframes puls { 50% { box-shadow:0 0 0 4px rgba(201,71,43,.15); } }
+  .card { background:#fff; border:1px solid var(--linie); border-radius:16px; padding:22px; box-shadow:var(--umbra); margin-bottom:14px; }
+  .card.intra { animation:intra .35s ease; }
+  @keyframes intra { from { opacity:0; transform:translateY(10px); } }
+  .cand { font-family:system-ui, sans-serif; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--mut); margin-bottom:6px; }
+  h1 { font-size:28px; line-height:1.15; margin:0 0 10px; }
+  h2 { font-size:22px; margin:0 0 8px; }
+  p { margin:0 0 12px; }
+  .text { font-size:17px; }
+  .optiuni { display:grid; gap:10px; margin-top:16px; }
+  .opt { text-align:left; font:inherit; font-size:16px; padding:14px 16px; border-radius:12px; border:1.5px solid var(--linie); background:var(--hartie); cursor:pointer; transition:transform .12s, border-color .12s; position:relative; }
+  .opt:hover:not(:disabled) { border-color:var(--accent); transform:translateX(3px); }
+  .opt:disabled { cursor:not-allowed; color:var(--mut); background:#f6f3ec; }
+  .opt .blocat { display:block; font-family:system-ui, sans-serif; font-size:12px; color:var(--rau); margin-top:4px; }
+  .opt .procent { position:absolute; right:12px; top:12px; font-family:system-ui, sans-serif; font-size:13px; color:var(--mut); }
+  .opt.aleasa { border-color:var(--accent); background:#fff3ef; }
+  .efecte { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; font-family:system-ui, sans-serif; font-size:14px; }
+  .chip { padding:5px 10px; border-radius:99px; background:var(--hartie2); }
+  .chip.plus { background:#e3f2ec; color:#245e4f; } .chip.minus { background:#fbe4df; color:#8a2e1c; } .chip.carte { background:#fff0c7; color:#6a4b00; }
+  .actiuni { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; align-items:center; }
+  .btn { font:inherit; font-size:16px; padding:12px 20px; border-radius:12px; border:0; background:var(--accent); color:#fff; cursor:pointer; box-shadow:var(--umbra); }
+  .btn.secundar { background:#fff; color:var(--cerneala); border:1.5px solid var(--linie); box-shadow:none; }
+  .btn:disabled { opacity:.5; cursor:default; }
+  .inventar { margin-top:4px; }
+  .inventar h3 { font-family:system-ui, sans-serif; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--mut); margin:0 0 8px; }
+  .carti { display:flex; gap:10px; flex-wrap:wrap; }
+  .carte { background:linear-gradient(160deg, #fff6d6, #ffe8a3); border:1px solid #e8cf7a; border-radius:12px; padding:10px 12px; width:200px; font-family:system-ui, sans-serif; font-size:13px; }
+  .carte b { display:block; font-size:14px; margin-bottom:2px; }
+  .carte .d { color:#6a4b00; margin-bottom:8px; }
+  .carte button { font:inherit; font-size:13px; padding:6px 10px; border-radius:8px; border:0; background:#6a4b00; color:#fff; cursor:pointer; }
+  .carte button:disabled { opacity:.5; cursor:default; }
+  .gol { color:var(--mut); font-family:system-ui, sans-serif; font-size:13px; }
+  /* start */
+  .start h1 { font-size:34px; }
+  .camp { margin-bottom:14px; }
+  label { display:block; font-family:system-ui, sans-serif; font-size:12px; color:var(--mut); margin-bottom:4px; }
+  input[type=text] { width:100%; font:inherit; font-size:17px; padding:10px 12px; border:1.5px solid var(--linie); border-radius:10px; background:#fff; }
+  .alegeri { display:flex; flex-wrap:wrap; gap:8px; }
+  .alegeri button { font-size:22px; width:46px; height:46px; border-radius:10px; border:2px solid transparent; background:var(--hartie2); cursor:pointer; }
+  .alegeri button.activ { border-color:var(--cerneala); background:#fff; }
+  .alegeri .culoare { width:34px; height:34px; border-radius:99px; }
+  .tine { position:relative; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; }
+  .tine i { position:absolute; left:0; top:0; bottom:0; width:0; background:rgba(0,0,0,.25); transition:width .1s linear; }
+  .tine span { position:relative; }
+  /* bilanț & final */
+  .mare { font-size:40px; font-weight:bold; line-height:1; margin:6px 0; }
+  .tabel { width:100%; border-collapse:collapse; font-family:system-ui, sans-serif; font-size:14px; margin:10px 0; }
+  .tabel td { padding:6px 0; border-bottom:1px solid var(--linie); } .tabel td:last-child { text-align:right; font-weight:600; }
+  .nivel-salt { display:flex; align-items:center; gap:12px; margin:12px 0; font-family:system-ui, sans-serif; }
+  .nivel-salt .n { width:52px; height:52px; border-radius:14px; display:grid; place-items:center; font-size:22px; font-weight:700; background:var(--hartie2); }
+  .nivel-salt .n.nou { background:var(--accent); color:#fff; }
+  .clasament { font-family:system-ui, sans-serif; font-size:14px; }
+  .clasament .rand { display:flex; align-items:center; gap:10px; padding:6px 0; }
+  .clasament .rand b { width:44px; text-align:right; }
+  .clasament .b { flex:1; height:8px; background:var(--hartie2); border-radius:99px; overflow:hidden; } .clasament .b i { display:block; height:100%; background:var(--accent); }
+  .busola { font-family:system-ui, sans-serif; font-size:14px; color:var(--mut); }
+  footer { margin-top:30px; font-family:system-ui, sans-serif; font-size:12px; color:var(--mut); display:flex; gap:14px; flex-wrap:wrap; }
+  footer a { color:var(--mut); cursor:pointer; }
+  .eroare { background:#fbe4df; color:#8a2e1c; padding:10px 14px; border-radius:10px; font-family:system-ui, sans-serif; font-size:14px; margin-bottom:12px; }
+  .modal { position:fixed; inset:0; background:rgba(40,30,10,.5); display:grid; place-items:center; padding:16px; z-index:10; }
+  .modal .card { max-width:560px; max-height:90vh; overflow:auto; }
+  .ascuns { display:none !important; }
+  @media (max-width:520px) { .resurse { gap:6px; } .res { padding:6px 8px; } h1 { font-size:24px; } .card { padding:16px; } .carte { width:100%; } }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <div id="eroare" class="eroare ascuns"></div>
+  <div id="ecran"></div>
+  <footer>
+    <a id="l-cum">Cum se joacă</a>
+    <a id="l-renunta" class="ascuns">Închide firma și ia-o de la capăt</a>
+    <span style="flex:1"></span>
+    <span id="versiune"></span>
+  </footer>
+</div>
+<div id="modal" class="modal ascuns"></div>
+
+<script>
+// ------------------------------------------------------------------ stare
+const RES = [
+  { k: 'buget', nume: 'Buget', icon: '💰' },
+  { k: 'bunastare', nume: 'Bunăstare', icon: '👷' },
+  { k: 'legalitate', nume: 'Legalitate', icon: '⚖️' },
+];
+const SIGLE = ['🥨', '🔧', '🚚', '💡', '🏗️', '🍕', '💻', '✂️', '🐓', '🚜', '☕', '🧱', '🛒', '📦', '🎩', '🍺'];
+const CULORI = ['#c9472b', '#d9a62b', '#3f8f7a', '#2f6fed', '#8a4fbf', '#2b2419'];
+let CONT = null;          // /api/continut
+let joc = null;           // { id, firma }
+let pas = null;           // pasul curent de la server
+let ultimulEfect = null;  // efectul ultimei alegeri, cât e afișat
+let pasUrmator = null;    // pasul primit de la server după alegere, afișat la „Mai departe”
+
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const semn = n => (n > 0 ? '+' : '') + n;
+
+async function api(metoda, cale, corp) {
+  const r = await fetch(cale, { method: metoda, headers: { 'Content-Type': 'application/json' }, body: corp ? JSON.stringify(corp) : undefined });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(typeof d.detail === 'string' ? d.detail : 'Eroare ' + r.status); e.status = r.status; throw e; }
+  return d;
+}
+function eroare(msg) { const e = $('#eroare'); if (!msg) return e.classList.add('ascuns'); e.textContent = msg; e.classList.remove('ascuns'); }
+function salveazaLocal() { try { joc ? localStorage.setItem('patronache-joc', JSON.stringify(joc)) : localStorage.removeItem('patronache-joc'); } catch (e) {} }
+function citesteLocal() { try { return JSON.parse(localStorage.getItem('patronache-joc') || 'null'); } catch (e) { return null; } }
+
+// ------------------------------------------------------------------ pornire
+async function porneste() {
+  try { CONT = await api('GET', '/api/continut'); } catch (e) { return eroare('Serverul nu răspunde: ' + e.message); }
+  const salvat = citesteLocal();
+  if (salvat && salvat.id) {
+    try { const d = await api('GET', '/api/partida/' + salvat.id); joc = salvat; pas = d.pas; return arata(); }
+    catch (e) { localStorage.removeItem('patronache-joc'); }
+  }
+  ecranStart();
+}
+
+function ecranStart() {
+  joc = null; pas = null; salveazaLocal();
+  $('#l-renunta').classList.add('ascuns');
+  const el = $('#ecran');
+  el.innerHTML = `
+    <div class="card intra start">
+      <div class="cand">Registrul Comerțului · formular de înființare</div>
+      <h1>Ești patron. Ai ${CONT.ani} ani.</h1>
+      <p class="text">Ține firma pe linia de plutire, oamenii mulțumiți și ANAF-ul departe. Fiecare alegere mișcă bugetul, bunăstarea angajaților și legalitatea. Dacă una ajunge la zero, s-a terminat.</p>
+      <div class="camp"><label>Numele firmei</label><input type="text" id="f-nume" maxlength="40" placeholder="Patronache SRL"></div>
+      <div class="camp"><label>Slogan (opțional)</label><input type="text" id="f-slogan" maxlength="80" placeholder="Ieftin, rapid, aproape legal"></div>
+      <div class="camp"><label>Sigla</label><div class="alegeri" id="f-sigle">${SIGLE.map((s, i) => `<button type="button" data-v="${s}" class="${i === 0 ? 'activ' : ''}">${s}</button>`).join('')}</div></div>
+      <div class="camp"><label>Culoarea</label><div class="alegeri" id="f-culori">${CULORI.map((c, i) => `<button type="button" data-v="${c}" class="${i === 0 ? 'activ' : ''}"><span class="culoare" style="background:${c}; display:block"></span></button>`).join('')}</div></div>
+      <div class="actiuni"><button class="btn tine" id="f-start"><i></i><span>Ține apăsat: semnezi actele</span></button></div>
+      ${CONT.situatii < CONT.ani * CONT.trimestre_pe_an * CONT.decizii_pe_trimestru ? '<p class="gol" style="margin-top:12px">Conținutul e încă în lucru: partida se poate termina înainte de ' + CONT.ani + ' ani dacă nu mai sunt situații.</p>' : ''}
+    </div>`;
+  for (const g of ['#f-sigle', '#f-culori']) $(g, el).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $$(g + ' button').forEach(x => x.classList.remove('activ')); b.classList.add('activ'); });
+  tineApasat($('#f-start', el), 1200, incepePartida);
+}
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+
+function tineApasat(btn, ms, cb) {
+  let t0 = null, raf = null;
+  const bara = $('i', btn);
+  const tick = () => { const p = Math.min(1, (performance.now() - t0) / ms); bara.style.width = p * 100 + '%'; if (p >= 1) { gata(); cb(); } else raf = requestAnimationFrame(tick); };
+  const gata = () => { cancelAnimationFrame(raf); t0 = null; bara.style.width = '0'; };
+  btn.addEventListener('pointerdown', e => { e.preventDefault(); btn.setPointerCapture(e.pointerId); t0 = performance.now(); raf = requestAnimationFrame(tick); });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) btn.addEventListener(ev, () => { if (t0) gata(); });
+  btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cb(); } });
+}
+
+async function incepePartida() {
+  eroare(null);
+  const firma = {
+    nume: $('#f-nume').value.trim() || 'Patronache SRL',
+    slogan: $('#f-slogan').value.trim(),
+    sigla: $('.activ', $('#f-sigle')).dataset.v,
+    culoare: $('.activ', $('#f-culori')).dataset.v,
+  };
+  try {
+    const d = await api('POST', '/api/partida', firma);
+    joc = { id: d.id, firma }; pas = d.pas; ultimulEfect = null; pasUrmator = null; salveazaLocal(); arata();
+  } catch (e) { eroare('Nu s-a putut deschide firma: ' + e.message); }
+}
+
+// ------------------------------------------------------------------ afișare
+function arata() {
+  eroare(null);
+  document.documentElement.style.setProperty('--accent', joc.firma.culoare || '#c9472b');
+  $('#l-renunta').classList.toggle('ascuns', !joc);
+  const el = $('#ecran');
+  let corp = '';
+  if (pas.pas === 'decizie') corp = ecranDecizie();
+  else if (pas.pas === 'bilant') corp = ecranBilant();
+  else corp = ecranFinal();
+  el.innerHTML = antet() + corp;
+  leagaEvenimente();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function antet() {
+  const f = joc.firma;
+  const r = pas.resurse;
+  return `
+    <header class="top">
+      <div class="sigla">${esc(f.sigla || '🏢')}</div>
+      <div class="firma"><b>${esc(f.nume)}</b><small>${esc(f.slogan || 'Anul ' + pas.an + ', trimestrul ' + pas.trimestru)}</small></div>
+      <div class="nivel">nivelul ${pas.nivel.nivel}<b>${esc(pas.nivel.nume)}</b></div>
+    </header>
+    <div class="resurse">
+      ${RES.map(x => `<div class="res ${x.k} ${r[x.k] <= 15 ? 'alarma' : ''}"><div class="et"><span>${x.icon} ${x.nume}</span><b>${r[x.k]}</b></div><div class="bara"><i style="width:${r[x.k]}%"></i></div></div>`).join('')}
+    </div>`;
+}
+
+function ecranDecizie() {
+  const ef = ultimulEfect;
+  const total = CONT.ani * CONT.trimestre_pe_an * CONT.decizii_pe_trimestru;
+  return `
+    <div class="card intra">
+      <div class="cand">Anul ${pas.an} · trimestrul ${pas.trimestru} · decizia ${pas.nr_decizie} din ${total}${pas.profit_an ? ' · profit pe an: ' + semn(pas.profit_an) + ' mii' : ''}</div>
+      <h1>${esc(pas.titlu)}</h1>
+      <p class="text">${esc(pas.text)}</p>
+      <div class="optiuni">
+        ${pas.optiuni.map((o, i) => `<button class="opt ${ef && ef.ales === i ? 'aleasa' : ''}" data-i="${i}" ${o.blocat || ef ? 'disabled' : ''}>${esc(o.text)}${o.blocat ? `<span class="blocat">🔒 ${esc(o.blocat)}</span>` : ''}${ef ? `<span class="procent">${ef.procente[i]}%</span>` : ''}</button>`).join('')}
+      </div>
+      ${ef ? efecteHtml(ef) + `<div class="actiuni"><button class="btn" id="mai-departe">Mai departe</button><span class="gol">procentele: câți jucători au ales fiecare variantă</span></div>` : ''}
+    </div>
+    <div class="card inventar">
+      <h3>Inventar · cărți speciale</h3>
+      ${pas.carti.length ? `<div class="carti">${pas.carti.map((c, i) => `<div class="carte"><b>${esc(c.icon ? c.icon + ' ' : '')}${esc(c.nume)}</b><div class="d">${esc(c.desc || '')}</div><div class="efecte" style="margin:0 0 8px">${efectCarte(c.efect)}</div><button data-carte="${esc(c.id)}" ${ef ? 'disabled' : ''}>Folosește acum</button></div>`).join('')}</div>`
+        : '<div class="gol">Nimic încă. Unele alegeri îți aduc cărți: petreceri, team building, lucruri care ridică moralul când ai nevoie.</div>'}
+    </div>`;
+}
+function efectCarte(ef) {
+  if (!ef) return '';
+  return RES.filter(x => ef[x.k]).map(x => `<span class="chip ${ef[x.k] > 0 ? 'plus' : 'minus'}">${x.nume} ${semn(ef[x.k])}</span>`).join('') + (ef.profit ? `<span class="chip ${ef.profit > 0 ? 'plus' : 'minus'}">Profit ${semn(ef.profit)}</span>` : '');
+}
+function efecteHtml(ef) {
+  const chips = RES.filter(x => ef.delta[x.k]).map(x => `<span class="chip ${ef.delta[x.k] > 0 ? 'plus' : 'minus'}">${x.icon} ${x.nume} ${semn(ef.delta[x.k])}</span>`);
+  if (ef.profit) chips.push(`<span class="chip ${ef.profit > 0 ? 'plus' : 'minus'}">Profit ${semn(ef.profit)} mii</span>`);
+  if (ef.carte) chips.push(`<span class="chip carte">🃏 Ai primit: ${esc(ef.carte.nume)}</span>`);
+  if (!chips.length) chips.push('<span class="chip">Nimic nu s-a schimbat. Deocamdată.</span>');
+  return `<div class="efecte">${chips.join('')}</div>`;
+}
+
+function ecranBilant() {
+  return `
+    <div class="card intra">
+      <div class="cand">Sfârșitul anului ${pas.an}</div>
+      <h1>Bilanțul</h1>
+      <p class="text">Contabilul pune hârtiile pe masă. Profitul pe anul ăsta:</p>
+      <div class="mare" style="color:${pas.profit_an >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(pas.profit_an)} mii lei</div>
+      <p class="gol">Profit total până acum: ${semn(pas.profit_total)} mii lei. Nivelul se recalculează din totalul firmei; un an pe minus îl poate coborî.</p>
+      <div class="actiuni"><button class="btn" id="inchide-anul">Închide anul</button></div>
+    </div>`;
+}
+
+function ecranBilantRezultat(b) {
+  const nivelNou = CONT.niveluri[b.nivel - 1];
+  const dir = b.nivel > b.nivel_vechi ? 'Firma a crescut' : b.nivel < b.nivel_vechi ? 'Firma a scăzut' : 'Firma a rămas la același nivel';
+  const urmator = CONT.niveluri[b.nivel] ? `Pentru nivelul ${b.nivel + 1} (${esc(CONT.niveluri[b.nivel].nume)}) îți trebuie ${CONT.niveluri[b.nivel].prag} mii lei profit total.` : 'Ești la nivelul maxim.';
+  return antet() + `
+    <div class="card intra">
+      <div class="cand">Anul ${b.an} s-a încheiat</div>
+      <h1>${dir}</h1>
+      <div class="nivel-salt"><div class="n">${b.nivel_vechi}</div><span>→</span><div class="n nou">${b.nivel}</div><div><b>${esc(nivelNou.nume)}</b><br><span class="gol">${esc(nivelNou.desc || '')}</span></div></div>
+      <table class="tabel">
+        <tr><td>Profitul anului</td><td style="color:${b.profit_an >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(b.profit_an)} mii</td></tr>
+        <tr><td>Profit total</td><td>${semn(b.profit_total)} mii</td></tr>
+      </table>
+      <p class="gol">${urmator}</p>
+      <div class="actiuni"><button class="btn" id="mai-departe">${pas.pas === 'decizie' ? 'Anul următor' : 'Vezi cum s-a terminat'}</button></div>
+    </div>`;
+}
+
+function ecranFinal() {
+  const f = pas.final;
+  return `
+    <div class="card intra">
+      <div class="cand">${f.mandat_complet ? 'Mandat dus la capăt' : 'S-a terminat'}</div>
+      <h1>${esc(f.titlu)}</h1>
+      <p class="text">${esc(f.text)}</p>
+      <div class="actiuni"><button class="btn" id="vezi-rezultat">Vezi rezultatul</button></div>
+    </div>`;
+}
+
+async function arataRezultat() {
+  let r;
+  try { r = await api('GET', '/api/partida/' + joc.id + '/rezultat'); } catch (e) { return eroare(e.message); }
+  const p = r.potrivire, c = p.castigator;
+  const el = $('#ecran');
+  el.innerHTML = antet() + `
+    <div class="card intra">
+      <div class="cand">${esc(joc.firma.nume)} · ${r.decizii} decizii · ${r.final.mandat_complet ? CONT.ani + ' ani' : 'oprit în anul ' + r.ani_jucati}</div>
+      <h1>Nivelul ${r.nivel.nivel}: ${esc(r.nivel.nume)}</h1>
+      <p class="text">${esc(r.nivel.desc || '')}</p>
+      <table class="tabel">
+        <tr><td>Profit total</td><td>${semn(r.profit_total)} mii lei</td></tr>
+        <tr><td>Cum s-a terminat</td><td>${esc(r.final.titlu)}</td></tr>
+        <tr><td>Cărți rămase în inventar</td><td>${r.carti.length ? r.carti.map(x => esc(x.nume)).join(', ') : 'niciuna'}</td></tr>
+      </table>
+    </div>
+    ${c ? `<div class="card intra">
+      <div class="cand">Ce fel de patron ai fost</div>
+      <h2>${esc(c.nume)} <span class="gol">· ${c.procent}% potrivire</span></h2>
+      <p class="text">${esc(c.desc || '')}</p>
+      ${p.busola && Object.keys(p.busola).length ? `<p class="busola">${Object.values(p.busola).map(a => esc(a.nume) + ': ' + esc(a.eticheta)).join(' · ')}</p>` : ''}
+      <div class="clasament">${p.clasament.slice(0, 5).map(x => `<div class="rand"><b>${x.procent}%</b><div class="b"><i style="width:${x.procent}%"></i></div><span>${esc(x.nume)}</span></div>`).join('')}</div>
+    </div>` : ''}
+    <div class="actiuni">
+      <button class="btn" id="din-nou">Deschide altă firmă</button>
+      <button class="btn secundar" id="copiaza">Copiază rezultatul</button>
+    </div>`;
+  $('#din-nou').addEventListener('click', ecranStart);
+  $('#copiaza').addEventListener('click', () => {
+    const text = `Am fost patron ${CONT.ani} ani la ${joc.firma.nume}: nivelul ${r.nivel.nivel}, ${r.nivel.nume}, profit ${r.profit_total} mii lei. ${r.final.titlu}.${c ? ' Semăn cu: ' + c.nume + ' (' + c.procent + '%).' : ''} ${location.origin}`;
+    navigator.clipboard?.writeText(text).then(() => { $('#copiaza').textContent = 'Copiat!'; }).catch(() => { prompt('Copiază:', text); });
+  });
+  joc = null; salveazaLocal(); $('#l-renunta').classList.add('ascuns');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ------------------------------------------------------------------ acțiuni
+function leagaEvenimente() {
+  $$('.opt').forEach(b => b.addEventListener('click', () => alege(+b.dataset.i)));
+  $$('[data-carte]').forEach(b => b.addEventListener('click', () => folosesteCarte(b.dataset.carte)));
+  $('#mai-departe')?.addEventListener('click', () => { if (pasUrmator) pas = pasUrmator; pasUrmator = null; ultimulEfect = null; arata(); });
+  $('#inchide-anul')?.addEventListener('click', bilant);
+  $('#vezi-rezultat')?.addEventListener('click', arataRezultat);
+}
+let ocupat = false;
+async function alege(i) {
+  if (ocupat) return; ocupat = true;
+  try {
+    const d = await api('POST', '/api/partida/' + joc.id + '/alege', { optiune: i });
+    ultimulEfect = { ...d.efect, ales: i };
+    pasUrmator = d.pas;
+    pas = { ...pas, resurse: d.efect.resurse, carti: d.pas.carti, nivel: d.pas.nivel, profit_an: pas.profit_an + (d.efect.profit || 0) };
+    arata();
+  } catch (e) { eroare(e.message); if (e.status === 409 || e.status === 404) { await reincarca(); } }
+  ocupat = false;
+}
+async function folosesteCarte(id) {
+  if (ocupat) return; ocupat = true;
+  try {
+    const d = await api('POST', '/api/partida/' + joc.id + '/carte', { carte: id });
+    pas = d.pas; arata();
+    const chips = $('.card .cand'); if (chips) chips.insertAdjacentHTML('afterend', efecteHtml({ delta: d.efect.delta, profit: d.efect.profit, carte: null }).replace('class="efecte"', 'class="efecte" style="margin:0 0 10px"'));
+  } catch (e) { eroare(e.message); }
+  ocupat = false;
+}
+async function bilant() {
+  if (ocupat) return; ocupat = true;
+  try {
+    const d = await api('POST', '/api/partida/' + joc.id + '/bilant');
+    pas = d.pas; ultimulEfect = null; pasUrmator = null;
+    $('#ecran').innerHTML = ecranBilantRezultat(d.bilant);
+    $('#mai-departe').addEventListener('click', () => arata());
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) { eroare(e.message); }
+  ocupat = false;
+}
+async function reincarca() {
+  try { const d = await api('GET', '/api/partida/' + joc.id); pas = d.pas; ultimulEfect = null; pasUrmator = null; arata(); }
+  catch (e) { ecranStart(); }
+}
+
+// ------------------------------------------------------------------ meniu
+$('#l-cum').addEventListener('click', () => {
+  const m = $('#modal');
+  m.innerHTML = `<div class="card"><h2>Cum se joacă</h2>
+    <p>Ești patronul unei firme, ${CONT.ani} ani. În fiecare trimestru iei ${CONT.decizii_pe_trimestru} decizii: despre angajați, clienți, bani, ANAF, Primărie.</p>
+    <p><b>Trei lucruri de urmărit</b>: bugetul, bunăstarea angajaților și legalitatea. Fiecare e între 0 și 100. Dacă una ajunge la zero, s-a terminat: faliment, toți pleacă sau vine DNA-ul.</p>
+    <p><b>Profit și nivel</b>: fiecare alegere aduce (sau pierde) bani. La finalul anului, profitul se adună la totalul firmei, iar totalul dă nivelul, de la 1 (firmă de apartament) la ${CONT.niveluri.length} (${esc(CONT.niveluri[CONT.niveluri.length - 1].nume)}). Nivelul deblochează alegeri noi, dar poate și să scadă după un an prost.</p>
+    <p><b>Cărțile</b>: unele alegeri îți aduc cărți speciale în inventar. Le folosești când vrei, în timpul unei decizii; se consumă pe loc.</p>
+    <p><b>Alegerile se leagă</b>: ce faci azi poate aduce o situație nouă mâine. Nepotul angajat azi greșește comanda mâine.</p>
+    <p class="gol">Nu salvăm nimic despre tine: doar partida, sub un cod aleator, și numărăm anonim ce alege lumea.</p>
+    <div class="actiuni"><button class="btn" id="inchide-modal">Am înțeles</button></div></div>`;
+  m.classList.remove('ascuns');
+  $('#inchide-modal').addEventListener('click', () => m.classList.add('ascuns'));
+  m.addEventListener('click', e => { if (e.target === m) m.classList.add('ascuns'); });
+});
+$('#l-renunta').addEventListener('click', async () => {
+  if (!joc || !confirm('Închizi firma? Partida curentă se pierde.')) return;
+  try { await api('DELETE', '/api/partida/' + joc.id); } catch (e) {}
+  ecranStart();
+});
+
+porneste();
+</script>
+</body>
+</html>

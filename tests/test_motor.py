@@ -150,6 +150,7 @@ class Legaturi(unittest.TestCase):
         motor.alege(c, s, 0)
         self.assertEqual(s["pas"], motor.PAS_FINAL)
         self.assertEqual(s["final"]["motiv"], "fara_situatii")
+        self.assertEqual(s["profit_total"], 30, "profitul anului neterminat intră în total")
 
     def test_cerinta_de_nivel_pe_situatie(self):
         c = continut_de_test()

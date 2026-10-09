@@ -1,8 +1,7 @@
 # Patronache
 
-Joc în care ești patronul unei firme românești, patru ani. Deocamdată doar
-backendul (motorul jocului + API) și meniul de admin pentru conținut. Fără
-interfață de joc încă.
+Joc în care ești patronul unei firme românești, patru ani. Motorul jocului,
+API-ul, interfața jocului (la `/`) și meniul de admin pentru conținut (la `/admin`).
 
 ## Regulile (cum le implementează motorul)
 
@@ -33,6 +32,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
+- Jocul: http://127.0.0.1:8000/
 - Meniul de admin: http://127.0.0.1:8000/admin
 - Documentația API: http://127.0.0.1:8000/docs
 
@@ -80,7 +80,7 @@ git sau de build local.
    din `truenas-app.yaml` (verifică portul 9090 și calea datasetului).
 3. Dacă vrei meniul de admin protejat, decomentează `PATRONACHE_ADMIN_PAROLA`
    și pune o parolă.
-4. Deschide `http://IP-NAS:9090/admin`.
+4. Jocul e la `http://IP-NAS:9090/`, admin-ul la `http://IP-NAS:9090/admin`.
 
 Dacă NAS-ul nu poate trage imaginea (pachetul de pe ghcr.io e privat), rulează
 o singură dată în shell-ul TrueNAS `docker login ghcr.io -u stararcher5-droid`
