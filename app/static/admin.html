@@ -74,6 +74,9 @@
   #harta .sterge-leg circle { fill:var(--card); stroke:#f07a7a; }
   #harta .sterge-leg text { fill:#d64545; font-size:11px; font-weight:700; pointer-events:none; }
   #harta .sterge-leg:hover circle { fill:#4a2622; }
+  #harta .nod.mutare { opacity:.85; cursor:grabbing; } #harta .nod.mutare rect { stroke:#5fc9a8; stroke-width:2.5; }
+  #harta .coloana-tinta { fill:rgba(95,201,168,.08); stroke:#5fc9a8; stroke-dasharray:6 4; rx:10; pointer-events:none; }
+  #harta .nod { cursor:grab; }
   #harta .temp { stroke:#2f6fed; stroke-width:2; stroke-dasharray:6 4; fill:none; pointer-events:none; }
   #panou-legatura { position:fixed; z-index:20; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; width:320px; box-shadow:0 8px 30px rgba(0,0,0,.15); }
   #panou-legatura h4 { margin:0 0 8px; font-size:13px; }
@@ -118,7 +121,7 @@
     <div class="card">
       <h2>Harta legăturilor</h2>
       <p class="nota">Coloanele sunt nivelurile firmei de la care situația poate apărea (la nivelul 3 jucătorul primește din 1, 2 și 3). Săgețile sunt legăturile „urmatoare” din opțiuni. Galben = apare doar legată.
-        <b>Ca să legi:</b> trage din cerculețul albastru al unei situații peste altă situație, apoi alege opțiunea care o deschide. Clic pe × de pe săgeată o scoate. Clic pe o situație o deschide în editor.</p>
+        <b>Ca să legi:</b> trage din cerculețul albastru al unei situații peste altă situație, apoi alege opțiunea care o deschide. Clic pe × de lângă căsuța-sursă scoate legătura. <b>Ca să schimbi nivelul:</b> trage căsuța în altă coloană. Clic scurt pe o situație o deschide în editor.</p>
       <div style="display:flex; gap:8px; margin-bottom:10px"><button class="primar" id="salveaza-harta">Salvează legăturile</button><span class="nota" id="harta-stare"></span></div>
       <div id="harta"></div>
       <div id="panou-legatura" class="ascuns"></div>
@@ -510,14 +513,17 @@ function randeazaHarta() {
   for (const s of sit()) s.optiuni.forEach((o, oi) => { for (const u of o.urmatoare || []) {
     const A = poz[s.id], B = poz[u]; if (!A || !B) continue;
     let mx, my;
-    if (B.x <= A.x) {
-      const x1 = A.x + W / 2, y1 = A.y + H, x2 = B.x + W / 2, y2 = B.y;
-      svg += `<path class="leg" d="M${x1},${y1} C${x1},${y1 + 40} ${x2},${y2 - 40} ${x2},${y2}"/>`;
-      mx = (x1 + x2) / 2 + 60; my = (y1 + y2) / 2;
+    const x1 = A.x + W, y1 = A.y + H / 2;
+    if (B.x > A.x) {
+      // coloană mai la dreapta: curbă în S între marginea dreaptă a sursei și marginea stângă a țintei
+      const x2 = B.x, y2 = B.y + H / 2, cx = (x1 + x2) / 2;
+      svg += `<path class="leg" d="M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}"/>`;
+      mx = x1 + 26; my = y1 + (y2 - y1) * 0.06;
     } else {
-      const x1 = A.x + W, y1 = A.y + H / 2, x2 = B.x, y2 = B.y + H / 2;
-      svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
-      mx = (x1 + x2) / 2; my = (y1 + y2) / 2;
+      // aceeași coloană sau la stânga: ocolim pe dreapta, pe canalul dintre coloane, și intrăm tot pe dreapta țintei
+      const x2 = B.x + W, y2 = B.y + H / 2, ocol = Math.max(x1, x2) + 24;
+      svg += `<path class="leg" d="M${x1},${y1} C${ocol},${y1} ${ocol},${y2} ${x2},${y2}"/>`;
+      mx = x1 + 18; my = y1 + (y2 > y1 ? 10 : -10);
     }
     butoane += `<g class="sterge-leg" data-sursa="${esc(s.id)}" data-opt="${oi}" data-tinta="${esc(u)}"><title>Opțiunea ${oi + 1}: „${esc(o.text)}” deschide „${esc(poz[u].s.titlu)}”. Clic ca să scoți legătura.</title><circle cx="${mx}" cy="${my}" r="8"/><text x="${mx}" y="${my + 4}" text-anchor="middle">×</text></g>`;
   } });
@@ -529,9 +535,17 @@ function randeazaHarta() {
   const svgEl = $('svg', el);
   $('#harta-stare').textContent = nesalvat.has('situatii.json') ? 'legături nesalvate' : '';
 
-  // clic pe situație = editor (dar nu când tragem)
-  let tragere = null, tocmaiTras = false;
+  // clic pe situație = editor (dar nu când tragem); tragere cu căsuța = mutare în altă coloană (alt nivel)
+  let tragere = null, tocmaiTras = false, mutare = null;
   $$('.nod', el).forEach(n => n.addEventListener('click', e => { if (e.target.classList.contains('maner') || tocmaiTras) return; deschide(n.dataset.id); }));
+  const coloanaLa = x => Math.min(nr, Math.max(1, Math.floor((x - pad + GX / 2) / (W + GX)) + 1));
+  $$('.nod', el).forEach(n => n.addEventListener('pointerdown', e => {
+    if (e.target.classList.contains('maner') || e.button !== 0) return;
+    e.preventDefault();
+    const P = poz[n.dataset.id]; const p0 = punctSvg(e);
+    mutare = { id: n.dataset.id, nod: n, dx: p0.x - P.x, dy: p0.y - P.y, miscat: false, coloana: null };
+    try { svgEl.setPointerCapture(e.pointerId); } catch (_) {}
+  }));
 
   // × pe săgeată = scoate legătura
   $$('.sterge-leg', el).forEach(g => g.addEventListener('click', e => {
@@ -552,9 +566,18 @@ function randeazaHarta() {
     linie.setAttribute('x2', P.x + W - 12); linie.setAttribute('y2', P.y + H / 2); svgEl.appendChild(linie);
     tragere = { id, linie };
     m.closest('.nod').classList.add('sursa');
-    svgEl.setPointerCapture(e.pointerId);
+    try { svgEl.setPointerCapture(e.pointerId); } catch (_) {}
   }));
   svgEl.addEventListener('pointermove', e => {
+    if (mutare) {
+      const p = punctSvg(e); const P = poz[mutare.id];
+      if (!mutare.miscat && Math.hypot(p.x - mutare.dx - P.x, p.y - mutare.dy - P.y) < 6) return;
+      mutare.miscat = true; mutare.nod.classList.add('mutare');
+      mutare.nod.setAttribute('transform', `translate(${p.x - mutare.dx - P.x}, ${p.y - mutare.dy - P.y})`);
+      const col = coloanaLa(p.x - mutare.dx + W / 2);
+      if (col !== mutare.coloana) { mutare.coloana = col; $$('.coloana-tinta', el).forEach(x => x.remove()); const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); r.setAttribute('class', 'coloana-tinta'); r.setAttribute('x', pad + (col - 1) * (W + GX) - 8); r.setAttribute('y', pad + 20); r.setAttribute('width', W + 16); r.setAttribute('height', inaltime - pad - 20); svgEl.insertBefore(r, svgEl.firstChild.nextSibling); }
+      return;
+    }
     if (!tragere) return;
     const p = punctSvg(e); tragere.linie.setAttribute('x2', p.x); tragere.linie.setAttribute('y2', p.y);
     const sub = document.elementFromPoint(e.clientX, e.clientY)?.closest('.nod');
@@ -562,6 +585,15 @@ function randeazaHarta() {
     if (sub && sub.dataset.id !== tragere.id) sub.classList.add('tinta');
   });
   svgEl.addEventListener('pointerup', e => {
+    if (mutare) {
+      const m = mutare; mutare = null; $$('.coloana-tinta', el).forEach(x => x.remove());
+      if (!m.miscat) return;   // clic scurt: lăsăm „click” să deschidă editorul
+      tocmaiTras = true; setTimeout(() => { tocmaiTras = false; }, 0);
+      const s = sit().find(x => x.id === m.id);
+      if (m.coloana && m.coloana !== (s.nivel || 1)) { s.nivel = m.coloana; marcheaza('situatii.json'); if (curent === s.id) deschide(s.id); }
+      randeazaHarta();
+      return;
+    }
     if (!tragere) return;
     const sub = document.elementFromPoint(e.clientX, e.clientY)?.closest('.nod');
     const t = tragere; tragere = null; t.linie.remove();
@@ -570,7 +602,7 @@ function randeazaHarta() {
     if (sub && sub.dataset.id !== t.id) panouLegatura(t.id, sub.dataset.id, e.clientX, e.clientY);
   });
   // dacă pointerup nu ajunge la svg (ieșire din fereastră, clic scurt), curățăm oricum
-  const renunta = () => { if (tragere) { tragere.linie.remove(); tragere = null; } $$('.nod.sursa, .nod.tinta', el).forEach(n => n.classList.remove('sursa', 'tinta')); };
+  const renunta = () => { if (tragere) { tragere.linie.remove(); tragere = null; } if (mutare) { mutare = null; randeazaHarta(); } $$('.nod.sursa, .nod.tinta', el).forEach(n => n.classList.remove('sursa', 'tinta')); };
   svgEl.addEventListener('pointercancel', renunta);
   document.addEventListener('pointerup', e => { if (tragere && !svgEl.contains(e.target)) renunta(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') renunta(); });
