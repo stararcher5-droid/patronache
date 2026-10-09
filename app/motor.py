@@ -8,7 +8,8 @@ Regulile:
 - Trei resurse 0..100 (parteneri, bunăstare angajați, legalitate). Una la 0 = partida s-a terminat.
   La fiecare bilanț resursele se uzează cu `uzura_pe_an` din config; alegerile le întrețin.
   Banii nu sunt resursă: sunt profitul, care dă nivelul.
-- După bilanțul fiecărui an (în afară de ultimul) vine un mini-joc scurt; scorul lui
+- După bilanțul fiecărui an (în afară de ultimul) vine un mini-joc scurt, ales la întâmplare
+  dintre cele de nivelul firmei sau mai mic („Mă fură angajații?” verifică răspunsul pe server); scorul lui
   (0..100) dă un efect pe resurse/profit proporțional cu `efect_max` din config.
 - Fiecare opțiune aduce profit (mii lei). Unele, rare, schimbă permanent profitul
   de bază anual al firmei (`profit_baza`), de atunci până la final. La finalul anului se face bilanțul:
@@ -443,9 +444,10 @@ def bilant(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     if stare["an"] >= c.ani:
         _incheie(c, stare, "mandat")
         return rezultat
-    mj = minijocul_anului(c, stare["an"])
+    mj = minijocul_anului(c, stare)
     if mj:
         # Înainte de anul următor: un mini-joc. Anul se schimbă abia după scor.
+        _pregateste_minijoc(c, stare, mj)
         stare["pas"], stare["pas_id"] = PAS_MINIJOC, mj["id"]
         return rezultat
     _an_urmator(c, stare)
@@ -460,21 +462,48 @@ def _an_urmator(c: Continut, stare: dict[str, Any]) -> None:
         _incheie(c, stare, "fara_situatii")
 
 
-def minijocul_anului(c: Continut, an: int) -> dict[str, Any] | None:
-    """Mini-jocul de la finalul anului `an`: pe rând, din lista din config (dacă e activă)."""
+def minijocul_anului(c: Continut, stare: dict[str, Any]) -> dict[str, Any] | None:
+    """Mini-jocul de la finalul anului: ales la întâmplare dintre cele de nivelul firmei sau mai mic."""
     cfg = c.config.get("minijocuri") or {}
-    lista = cfg.get("lista") or []
+    lista = [j for j in (cfg.get("lista") or []) if int(j.get("nivel", 1)) <= stare["nivel"]]
     if not cfg.get("activ", True) or not lista:
         return None
-    return lista[(an - 1) % len(lista)]
+    return _rng(stare).choice(lista)
 
 
-def minijoc(c: Continut, stare: dict[str, Any], scor: int | None) -> dict[str, Any]:
+def _pregateste_minijoc(c: Continut, stare: dict[str, Any], mj: dict[str, Any]) -> None:
+    """Datele secrete ale mini-jocului (ex. produsul și prețul real) se aleg pe server și stau în stare."""
+    date: dict[str, Any] = {}
+    if mj["id"] == "pretul":
+        lista = c.produse.get(stare["firma"].get("domeniu"), []) or [x for l in c.produse.values() for x in l]
+        if lista:
+            nume, pret = _rng(stare).choice(lista)
+            date = {"produs": nume, "pret": pret}
+    stare["minijoc"] = {"id": mj["id"], "date": date}
+
+
+def scor_pret(pret_real: float, raspuns: float) -> int:
+    """„Mă fură angajații?”: 0% eroare = 100, 10% = 80, 35% = 30 (neutru), 50% sau mai mult = 0."""
+    eroare = abs(raspuns - pret_real) / pret_real
+    return int(round(max(0.0, min(100.0, 100 - eroare * 200))))
+
+
+def minijoc(c: Continut, stare: dict[str, Any], scor: int | None, raspuns: float | None = None) -> dict[str, Any]:
     """Jucătorul a terminat mini-jocul cu un scor 0..100 (None = a sărit peste, ca un scor de 30).
+    La jocurile cu răspuns verificat pe server (prețul), scorul se calculează aici din `raspuns`.
     Efectul e proporțional: 30 = nimic, 100 = efectul maxim, sub 30 = puțin în minus."""
     if stare["pas"] != PAS_MINIJOC:
         raise ActiuneInvalida(f"nu e momentul unui mini-joc, pasul curent e {stare['pas']!r}")
-    mj = minijocul_anului(c, stare["an"]) or {}
+    curent = stare.get("minijoc") or {}
+    mj = next((j for j in (c.config.get("minijocuri") or {}).get("lista", []) if j.get("id") == curent.get("id")), {})
+    extra: dict[str, Any] = {}
+    if curent.get("id") == "pretul":
+        date = curent.get("date") or {}
+        if raspuns is not None and date.get("pret"):
+            scor = scor_pret(float(date["pret"]), float(raspuns))
+        elif scor is None:
+            scor = 30
+        extra = {"produs": date.get("produs"), "pret_real": date.get("pret"), "raspuns": raspuns}
     if scor is None:
         scor = 30
     if not isinstance(scor, int) or not 0 <= scor <= 100:
@@ -486,7 +515,8 @@ def minijoc(c: Continut, stare: dict[str, Any], scor: int | None) -> dict[str, A
     profit = int(round(efect_max.get("profit", 0) * factor))
     stare["profit_an"] += profit      # intră în bilanțul anului care urmează
     stare["istoric"].append({"tip": PAS_MINIJOC, "id": mj.get("id"), "an": stare["an"], "scor": scor, "delta": delta, "profit": profit})
-    rezultat = {"id": mj.get("id"), "nume": mj.get("nume"), "scor": scor, "delta": delta, "profit": profit, "resurse": dict(stare["resurse"])}
+    rezultat = {"id": mj.get("id"), "nume": mj.get("nume"), "scor": scor, "delta": delta, "profit": profit, "resurse": dict(stare["resurse"]), **extra}
+    stare.pop("minijoc", None)
     if _verifica_terminat(c, stare):
         return rezultat
     _an_urmator(c, stare)
@@ -672,8 +702,10 @@ def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     elif pas == PAS_BILANT:
         baza["profit_an"] = stare["profit_an"]
     elif pas == PAS_MINIJOC:
-        mj = minijocul_anului(c, stare["an"]) or {}
-        baza["minijoc"] = {"id": mj.get("id"), "nume": mj.get("nume"), "desc": mj.get("desc", ""), "efect_max": mj.get("efect_max", {})}
+        curent = stare.get("minijoc") or {}
+        mj = next((j for j in (c.config.get("minijocuri") or {}).get("lista", []) if j.get("id") == curent.get("id")), {})
+        baza["minijoc"] = {"id": mj.get("id"), "nume": mj.get("nume"), "desc": mj.get("desc", ""), "efect_max": mj.get("efect_max", {}),
+                           "produs": (curent.get("date") or {}).get("produs")}   # prețul real rămâne pe server
     else:
         baza["final"] = stare["final"]
     return baza

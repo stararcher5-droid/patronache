@@ -173,6 +173,7 @@ class Carte(BaseModel):
 
 class ScorMinijoc(BaseModel):
     scor: int | None = Field(default=None, ge=0, le=100)
+    raspuns: float | None = Field(default=None, ge=0, le=1e9)   # pentru jocurile verificate pe server (prețul)
 
 
 # ---------------------------------------------------------------- ajutoare
@@ -292,7 +293,7 @@ def minijoc(id_: str, corp: ScorMinijoc) -> dict[str, Any]:
     stare = _partida(id_)
     c = continut()
     try:
-        rezultat = motor.minijoc(c, stare, corp.scor)
+        rezultat = motor.minijoc(c, stare, corp.scor, corp.raspuns)
     except motor.ActiuneInvalida as e:
         raise HTTPException(409, str(e))
     _noteaza_final(c, stare)

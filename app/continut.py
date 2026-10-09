@@ -14,7 +14,7 @@ from typing import Any
 RADACINA = Path(__file__).resolve().parent.parent
 DIR_CONTINUT_IMPLICIT = RADACINA / "continut"
 
-FISIERE = ("config.json", "niveluri.json", "carti.json", "situatii.json", "arhetipuri.json")
+FISIERE = ("config.json", "niveluri.json", "carti.json", "situatii.json", "arhetipuri.json", "produse.json")
 RESURSE = ("parteneri", "bunastare", "legalitate")
 FACTOR_BUGET_IN_PROFIT = 5   # la migrare: un punct de „buget” din vechiul model = 5 mii lei profit
 CHEI_CERINTE = {"nivel_min", "nivel_max", "carti", "fara_carti", "flaguri", "fara_flaguri", "dupa", "resurse"}
@@ -33,6 +33,7 @@ class Continut:
     carti: list[dict[str, Any]]
     situatii: list[dict[str, Any]]
     arhetipuri: list[dict[str, Any]]
+    produse: dict[str, list[list[Any]]] = field(default_factory=dict)
     minim_teme: int = 5
     _situatii: dict[str, dict[str, Any]] = field(default_factory=dict, repr=False)
     _carti: dict[str, dict[str, Any]] = field(default_factory=dict, repr=False)
@@ -189,7 +190,14 @@ def citeste_fisier(director: Path, nume: str) -> dict[str, Any]:
 
 def incarca(director: Path | str | None = None) -> Continut:
     director = Path(director) if director else DIR_CONTINUT_IMPLICIT
-    brut = {nume: citeste_fisier(director, nume) for nume in FISIERE}
+    brut = {}
+    for nume in FISIERE:
+        try:
+            brut[nume] = citeste_fisier(director, nume)
+        except ContinutInvalid:
+            if nume != "produse.json":
+                raise
+            brut[nume] = {"produse": {}}   # conținut mai vechi, fără produse
     if migreaza(brut) and director != DIR_CONTINUT_IMPLICIT:
         # conținut scris pentru modelul vechi: îl scriem înapoi migrat, ca admin-ul să vadă același lucru
         for nume, corp in brut.items():
@@ -221,8 +229,18 @@ def construieste(brut: dict[str, dict[str, Any]]) -> Continut:
     arhetipuri = brut["arhetipuri.json"].get("arhetipuri", [])
     _valideaza_arhetipuri(arhetipuri, teme, ids_domenii)
 
+    produse = (brut.get("produse.json") or {}).get("produse", {})
+    if not isinstance(produse, dict):
+        raise ContinutInvalid("produse: 'produse' trebuie să fie dict domeniu -> listă de [nume, preț]")
+    for dom, lista in produse.items():
+        if dom not in ids_domenii and ids_domenii:
+            raise ContinutInvalid(f"produse: domeniul necunoscut {dom!r}")
+        for item in lista:
+            if not (isinstance(item, list) and len(item) == 2 and isinstance(item[0], str) and _numar(item[1]) and item[1] > 0):
+                raise ContinutInvalid(f"produse: fiecare produs din {dom!r} trebuie să fie [nume, preț > 0], nu {item!r}")
+
     return Continut(
-        config=config, niveluri=niveluri, carti=carti, situatii=situatii, arhetipuri=arhetipuri,
+        config=config, niveluri=niveluri, carti=carti, situatii=situatii, arhetipuri=arhetipuri, produse=produse,
         minim_teme=int(brut["arhetipuri.json"].get("minim_teme", 5)),
     )
 
@@ -268,6 +286,8 @@ def _valideaza_config(c: dict[str, Any]) -> None:
             if j["id"] in ids:
                 raise ContinutInvalid(f"config: mini-jocul {j['id']!r} apare de două ori")
             ids.add(j["id"])
+            if "nivel" in j and (not isinstance(j["nivel"], int) or j["nivel"] < 1):
+                raise ContinutInvalid(f"config: 'nivel' al mini-jocului {j['id']!r} trebuie să fie întreg >= 1")
             for k, v in j.get("efect_max", {}).items():
                 if k not in (*RESURSE, "profit") or not _numar(v):
                     raise ContinutInvalid(f"config: 'efect_max' al mini-jocului {j['id']!r} acceptă doar {RESURSE} și 'profit'")

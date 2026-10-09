@@ -1,0 +1,401 @@
+{
+  "_nota": "Produse pentru mini-jocul „Mă fură angajații?”: jucătorul ghicește prețul unui produs din domeniul firmei (lei). Prețurile sunt orientative; se editează din Admin → Produse.",
+  "produse": {
+    "it": [
+      [
+        "Laptop de business",
+        6000
+      ],
+      [
+        "Monitor 27 inch",
+        1500
+      ],
+      [
+        "Licență Windows 11 Pro",
+        900
+      ],
+      [
+        "Scaun ergonomic de birou",
+        1800
+      ],
+      [
+        "O oră de programator senior",
+        350
+      ],
+      [
+        "Abonament Jira, 10 utilizatori, pe lună",
+        450
+      ],
+      [
+        "Server dedicat, pe lună",
+        900
+      ],
+      [
+        "Tastatură mecanică",
+        500
+      ],
+      [
+        "MacBook Pro 14",
+        12000
+      ],
+      [
+        "Cafeaua de birou, pe lună",
+        600
+      ],
+      [
+        "Domeniu .ro, pe an",
+        60
+      ],
+      [
+        "Certificat SSL, pe an",
+        300
+      ],
+      [
+        "Imprimantă multifuncțională",
+        2500
+      ],
+      [
+        "Telefon de serviciu",
+        3000
+      ],
+      [
+        "Curs certificare AWS",
+        2000
+      ],
+      [
+        "Abonament Microsoft 365, pe utilizator, pe an",
+        700
+      ]
+    ],
+    "constructii": [
+      [
+        "Sac de ciment 40 kg",
+        35
+      ],
+      [
+        "Metru cub de beton",
+        450
+      ],
+      [
+        "Paletă de BCA",
+        1200
+      ],
+      [
+        "O oră de zidar",
+        60
+      ],
+      [
+        "Schelă închiriată, pe zi",
+        150
+      ],
+      [
+        "Bormașină cu percuție",
+        800
+      ],
+      [
+        "Metru pătrat de gresie",
+        90
+      ],
+      [
+        "Tonă de fier-beton",
+        4500
+      ],
+      [
+        "Cască de protecție",
+        40
+      ],
+      [
+        "Excavator închiriat, pe zi",
+        1500
+      ],
+      [
+        "Container-dormitor, pe lună",
+        1200
+      ],
+      [
+        "Autorizație de construire pentru o casă",
+        2000
+      ],
+      [
+        "Metru pătrat de termosistem",
+        120
+      ],
+      [
+        "Betonieră",
+        2500
+      ],
+      [
+        "Metru pătrat de acoperiș cu țiglă",
+        150
+      ],
+      [
+        "Metru cub de nisip",
+        120
+      ]
+    ],
+    "horeca": [
+      [
+        "Kilogram de piept de pui",
+        25
+      ],
+      [
+        "Kilogram de cafea boabe",
+        120
+      ],
+      [
+        "Sticlă de vin al casei",
+        35
+      ],
+      [
+        "Kilogram de brânză",
+        45
+      ],
+      [
+        "Cuptor de pizza profesional",
+        15000
+      ],
+      [
+        "Masă cu patru scaune",
+        2500
+      ],
+      [
+        "O oră de ospătar",
+        30
+      ],
+      [
+        "Litru de ulei",
+        12
+      ],
+      [
+        "Kilogram de cartofi",
+        4
+      ],
+      [
+        "Espressor profesional",
+        18000
+      ],
+      [
+        "Set de tacâmuri pentru 12 persoane",
+        400
+      ],
+      [
+        "Frigider profesional",
+        8000
+      ],
+      [
+        "Kilogram de carne de vită",
+        70
+      ],
+      [
+        "Bax de 24 de beri",
+        90
+      ],
+      [
+        "Autorizație DSV",
+        500
+      ],
+      [
+        "Mașină de spălat vase profesională",
+        9000
+      ]
+    ],
+    "transport": [
+      [
+        "Litru de motorină",
+        8
+      ],
+      [
+        "Anvelopă de camion",
+        1800
+      ],
+      [
+        "Tahograf digital",
+        3000
+      ],
+      [
+        "Rovinietă de camion, pe an",
+        2200
+      ],
+      [
+        "O oră de șofer",
+        45
+      ],
+      [
+        "Camion second-hand",
+        150000
+      ],
+      [
+        "Semiremorcă",
+        80000
+      ],
+      [
+        "Asigurare CMR, pe an",
+        6000
+      ],
+      [
+        "Taxă de drum Ungaria, un tur",
+        600
+      ],
+      [
+        "Bidon de 20 litri de ulei de motor",
+        700
+      ],
+      [
+        "Transpaletă",
+        1500
+      ],
+      [
+        "GPS de flotă, pe camion, pe lună",
+        80
+      ],
+      [
+        "Revizie de camion",
+        4000
+      ],
+      [
+        "Set de cauciucuri pentru camion",
+        12000
+      ],
+      [
+        "Parcare securizată, pe noapte",
+        150
+      ],
+      [
+        "Rezervor suplimentar de motorină",
+        2500
+      ]
+    ],
+    "comert": [
+      [
+        "Cutie de carton 40×30",
+        3
+      ],
+      [
+        "Expediere prin curier",
+        18
+      ],
+      [
+        "Terminal POS",
+        1200
+      ],
+      [
+        "Bax de bandă adezivă",
+        120
+      ],
+      [
+        "Raft metalic de depozit",
+        600
+      ],
+      [
+        "Casă de marcat",
+        1500
+      ],
+      [
+        "Abonament platformă de magazin online, pe lună",
+        150
+      ],
+      [
+        "O fotografie de produs",
+        50
+      ],
+      [
+        "Paletă de transport",
+        60
+      ],
+      [
+        "Etichetator",
+        400
+      ],
+      [
+        "O oră de picker în depozit",
+        35
+      ],
+      [
+        "Reclamă pe Facebook, pe zi",
+        100
+      ],
+      [
+        "Scanner de coduri de bare",
+        350
+      ],
+      [
+        "Rolă de folie stretch",
+        40
+      ],
+      [
+        "Metru pătrat de depozit, chirie pe lună",
+        25
+      ],
+      [
+        "Motostivuitor second-hand",
+        25000
+      ]
+    ],
+    "agricultura": [
+      [
+        "Tonă de grâu",
+        1000
+      ],
+      [
+        "Litru de motorină agricolă",
+        7
+      ],
+      [
+        "Sac de îngrășământ 50 kg",
+        180
+      ],
+      [
+        "Hectar de arendă, pe an",
+        1500
+      ],
+      [
+        "Tractor second-hand",
+        120000
+      ],
+      [
+        "Doză de sămânță de porumb",
+        900
+      ],
+      [
+        "O oră de zilier",
+        30
+      ],
+      [
+        "O oră de combină",
+        900
+      ],
+      [
+        "Balot de fân",
+        25
+      ],
+      [
+        "Erbicid pentru un hectar",
+        250
+      ],
+      [
+        "Remorcă agricolă",
+        25000
+      ],
+      [
+        "Instalație de irigații pentru un hectar",
+        8000
+      ],
+      [
+        "O vacă de lapte",
+        6000
+      ],
+      [
+        "Tonă de floarea-soarelui",
+        2200
+      ],
+      [
+        "Asigurare de culturi pentru un hectar",
+        120
+      ],
+      [
+        "Semănătoare",
+        60000
+      ]
+    ]
+  }
+}

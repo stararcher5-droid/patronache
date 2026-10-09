@@ -1,5 +1,5 @@
 {
-  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json). 'profit_de_baza_pe_an' = ce aduce activitatea curentă a firmei în fiecare an (mii lei), peste efectele alegerilor; se adaugă la bilanț. 'garantie_carte': dacă 'dupa' decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză, aleasă după felul alegerii (prima regulă care se potrivește). 'uzura_pe_an': cât scade fiecare resursă la fiecare bilanț anual dacă nu e întreținută prin alegeri. 'minijocuri': după bilanțul fiecărui an vine pe rând câte un mini-joc din 'lista'; scorul 0..100 dă un efect proporțional cu 'efect_max' (30 = nimic, 100 = maxim, sub 30 = puțin în minus).",
+  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json). 'profit_de_baza_pe_an' = ce aduce activitatea curentă a firmei în fiecare an (mii lei), peste efectele alegerilor; se adaugă la bilanț. 'garantie_carte': dacă 'dupa' decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză, aleasă după felul alegerii (prima regulă care se potrivește). 'uzura_pe_an': cât scade fiecare resursă la fiecare bilanț anual dacă nu e întreținută prin alegeri. 'minijocuri': după bilanțul fiecărui an vine un mini-joc ales la întâmplare din 'lista', dintre cele cu 'nivel' <= nivelul firmei; scorul 0..100 dă un efect proporțional cu 'efect_max' (30 = nimic, 100 = maxim, sub 30 = puțin în minus).",
   "ani": 5,
   "trimestre_pe_an": 4,
   "decizii_pe_trimestru": 2,
@@ -232,7 +232,8 @@
         "desc": "Dosarele apar pe birou și dispar repede. Ștampilează cât mai multe înainte să le ia vântul. Fiecare dosar neștampilat e o hârtie care lipsește la control.",
         "efect_max": {
           "legalitate": 8
-        }
+        },
+        "nivel": 1
       },
       {
         "id": "telefoanele",
@@ -241,7 +242,8 @@
         "efect_max": {
           "parteneri": 8,
           "profit": 20
-        }
+        },
+        "nivel": 1
       },
       {
         "id": "pizza",
@@ -249,7 +251,8 @@
         "desc": "Petrecerea firmei. Împarți feliile pe rând: apasă când cuțitul e în zona verde. Felii strâmbe, oameni supărați.",
         "efect_max": {
           "bunastare": 8
-        }
+        },
+        "nivel": 1
       },
       {
         "id": "negocierea",
@@ -258,6 +261,16 @@
         "efect_max": {
           "profit": 30,
           "parteneri": 4
+        },
+        "nivel": 2
+      },
+      {
+        "id": "pretul",
+        "nume": "Mă fură angajații?",
+        "nivel": 1,
+        "desc": "Îți vine o factură pentru ceva ce cumpără firma în fiecare lună. Știi cât costă pe bune? Cu cât ești mai aproape de prețul real, cu atât câștigi mai mult; cu cât ești mai departe, cu atât te fură mai ușor.",
+        "efect_max": {
+          "profit": 30
         }
       }
     ]

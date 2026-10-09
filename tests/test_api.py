@@ -85,7 +85,11 @@ class API(unittest.TestCase):
                 self.assertEqual(r.status_code, 200, r.text)
                 self.assertIn("nivel", r.json()["bilant"])
             elif pas["pas"] == "minijoc":
-                self.assertIn(pas["minijoc"]["id"], ("stampila", "telefoanele", "pizza", "negocierea"))
+                self.assertIn(pas["minijoc"]["id"], ("stampila", "telefoanele", "pizza", "negocierea", "pretul"))
+                if pas["minijoc"]["id"] == "pretul":
+                    self.assertTrue(pas["minijoc"]["produs"])
+                    r = self.client.post(f"/api/partida/{id_}/minijoc", json={"raspuns": 1234})
+                    self.assertEqual(r.status_code, 200, r.text); self.assertIn("pret_real", r.json()["minijoc"]); continue
                 self.assertEqual(self.client.post(f"/api/partida/{id_}/minijoc", json={"scor": 101}).status_code, 422)
                 r = self.client.post(f"/api/partida/{id_}/minijoc", json={"scor": 80})
                 self.assertEqual(r.status_code, 200, r.text)

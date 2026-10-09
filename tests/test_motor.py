@@ -131,6 +131,28 @@ class Reguli(unittest.TestCase):
         motor.alege(c, s, 0); motor.alege(c, s, 0); motor.bilant(c, s)
         self.assertEqual(s["pas"], motor.PAS_FINAL)
 
+    def test_ma_fura_angajatii_verifica_pretul_pe_server(self):
+        c = continut_de_test()
+        c.config["domenii"] = [{"id": "it", "nume": "IT"}]
+        c.produse = {"it": [["Laptop", 6000]]}
+        c.config["minijocuri"] = {"activ": True, "lista": [{"id": "pretul", "nume": "Mă fură angajații?", "efect_max": {"profit": 30}}]}
+        s = motor.stare_noua(c, {"domeniu": "it"}, seed=1)
+        motor.alege(c, s, 0); motor.alege(c, s, 0); motor.bilant(c, s)
+        pas = motor.pas_curent(c, s)
+        self.assertEqual(pas["minijoc"]["produs"], "Laptop"); self.assertNotIn("pret", pas["minijoc"]); self.assertNotIn("pret_real", pas["minijoc"])
+        r = motor.minijoc(c, s, None, raspuns=6300)      # 5% eroare -> 90
+        self.assertEqual((r["scor"], r["pret_real"], r["profit"]), (90, 6000, 26))
+        self.assertEqual(motor.scor_pret(100, 150), 0); self.assertEqual(motor.scor_pret(100, 135), 30); self.assertEqual(motor.scor_pret(100, 100), 100)
+
+    def test_minijocul_se_alege_dupa_nivel(self):
+        c = continut_de_test()
+        c.config["minijocuri"] = {"activ": True, "lista": [{"id": "pizza", "nume": "Pizza", "nivel": 1, "efect_max": {}}, {"id": "negocierea", "nume": "Negocierea", "nivel": 3, "efect_max": {}}]}
+        for seed in range(6):
+            s = motor.stare_noua(c, {}, seed=seed)
+            self.assertEqual(motor.minijocul_anului(c, s)["id"], "pizza", "la nivelul 1 doar pizza")
+        s["nivel"] = 3
+        self.assertIn(motor.minijocul_anului(c, s)["id"], ("pizza", "negocierea"))
+
     def test_minijoc_sarit_sau_slab(self):
         c = continut_de_test()
         c.config["minijocuri"] = {"activ": True, "lista": [{"id": "pizza", "nume": "Pizza", "efect_max": {"bunastare": 10}}]}

@@ -99,6 +99,7 @@
     <button data-tab="niveluri">Niveluri</button>
     <button data-tab="reguli">Reguli</button>
     <button data-tab="arhetipuri">Arhetipuri</button>
+    <button data-tab="produse">Produse</button>
     <button data-tab="verificare">Verificare</button>
   </nav>
   <div class="spatiu"></div>
@@ -172,9 +173,9 @@
       <h3>Uzura pe an (cât scade fiecare resursă la bilanț dacă nu e întreținută)</h3>
       <div class="rand r3" id="cfg-uzura"></div>
       <h3>Mini-jocurile de final de an</h3>
-      <p class="nota">După bilanțul fiecărui an (în afară de ultimul) vine pe rând câte un mini-joc din listă. Scorul (0..100) dă un efect proporțional cu maximul de mai jos: 30 = nimic, 100 = maxim, sub 30 = puțin în minus. Jocurile sunt implementate în pagina jocului: ștampila, telefoanele, pizza, negocierea.</p>
+      <p class="nota">După bilanțul fiecărui an (în afară de ultimul) vine un mini-joc ales la întâmplare dintre cele de nivelul firmei sau mai mic („de la nivelul”). Scorul (0..100) dă un efect proporțional cu maximul de mai jos: 30 = nimic, 100 = maxim, sub 30 = puțin în minus. Jocurile sunt implementate în pagina jocului: ștampila, telefoanele, pizza, negocierea.</p>
       <div class="bifa"><input type="checkbox" id="cfg-minijocuri-activ"> Mini-jocurile sunt active</div>
-      <table id="tabel-minijocuri"><thead><tr><th>Joc</th><th>Nume afișat</th><th>Descriere</th><th>Parteneri max</th><th>Bunăstare max</th><th>Legalitate max</th><th>Profit max</th><th></th></tr></thead><tbody></tbody></table>
+      <table id="tabel-minijocuri"><thead><tr><th>Joc</th><th>Nume afișat</th><th>Descriere</th><th>De la nivelul</th><th>Parteneri max</th><th>Bunăstare max</th><th>Legalitate max</th><th>Profit max</th><th></th></tr></thead><tbody></tbody></table>
       <div style="margin-top:8px"><button id="minijoc-adauga">+ Mini-joc</button></div>
       <h3>Garanția de carte</h3>
       <p class="nota">Dacă atâtea decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză. Cartea se alege după felul alegerii: prima regulă de mai jos care se potrivește cu efectul opțiunii alese; „oricând” e rezerva. Doar cărțile surpriză intră aici.</p>
@@ -200,6 +201,16 @@
     </div>
   </section>
 
+  <!-- ===================== PRODUSE ===================== -->
+  <section id="tab-produse" class="ascuns">
+    <div class="card">
+      <h2>Produse pentru „Mă fură angajații?”</h2>
+      <p class="nota">Pe fiecare domeniu, o listă de [nume, preț în lei]. La finalul anului jucătorul primește unul la întâmplare din domeniul firmei lui și ghicește prețul. Editare directă în JSON.</p>
+      <textarea id="json-produse" style="min-height:50vh; font-family:ui-monospace, monospace; font-size:12px"></textarea>
+      <div style="margin-top:10px; display:flex; gap:8px"><button class="primar" id="salveaza-produse">Salvează produsele</button><button data-reset="produse.json">Revino la implicit</button></div>
+    </div>
+  </section>
+
   <!-- ===================== VERIFICARE ===================== -->
   <section id="tab-verificare" class="ascuns">
     <div class="card">
@@ -210,7 +221,7 @@
       <h3>Conținutul implicit</h3>
       <p class="nota">Fișierele pe care nu le-ai editat se actualizează singure la fiecare versiune nouă a aplicației. Cele editate rămân ale tale; de aici le poți aduce la versiunea livrată cu aplicația (editările din fișierul respectiv se pierd).</p>
       <div class="etichete">
-        <button data-reset="config.json">Reguli</button><button data-reset="niveluri.json">Niveluri</button><button data-reset="carti.json">Cărți</button><button data-reset="situatii.json">Situații</button><button data-reset="arhetipuri.json">Arhetipuri</button>
+        <button data-reset="config.json">Reguli</button><button data-reset="niveluri.json">Niveluri</button><button data-reset="carti.json">Cărți</button><button data-reset="situatii.json">Situații</button><button data-reset="arhetipuri.json">Arhetipuri</button><button data-reset="produse.json">Produse</button>
       </div>
     </div>
   </section>
@@ -263,7 +274,7 @@ async function api(metoda, cale, corp) {
 async function incarca() {
   C = await api('GET', '/api/admin/continut');
   nesalvat.clear(); arataStare();
-  randeazaLista(); randeazaCarti(); randeazaNiveluri(); randeazaReguli(); randeazaArhetipuri(); randeazaHarta();
+  randeazaLista(); randeazaCarti(); randeazaNiveluri(); randeazaReguli(); randeazaArhetipuri(); randeazaProduse(); randeazaHarta();
 }
 async function salveaza(fisier) {
   eroare(null);
@@ -917,7 +928,7 @@ function randeazaReguli() {
     marcheaza('config.json');
   }));
 }
-const MINIJOCURI_CUNOSCUTE = { stampila: 'Ștampila (reflex)', telefoanele: 'Telefoanele (prinde apelurile)', pizza: 'Pizza (moment potrivit)', negocierea: 'Negocierea (ghicești prețul)' };
+const MINIJOCURI_CUNOSCUTE = { stampila: 'Ștampila (reflex)', telefoanele: 'Telefoanele (prinde apelurile)', pizza: 'Pizza (moment potrivit)', negocierea: 'Negocierea (ghicești prețul clientului)', pretul: 'Mă fură angajații? (prețul unui produs din domeniu)' };
 function randeazaMinijocuri() {
   const m = cfg().minijocuri; m.lista = m.lista || [];
   const tb = $('#tabel-minijocuri tbody'); tb.innerHTML = '';
@@ -925,10 +936,11 @@ function randeazaMinijocuri() {
     const tr = document.createElement('tr'); j.efect_max = j.efect_max || {};
     tr.innerHTML = `<td><select>${Object.entries(MINIJOCURI_CUNOSCUTE).map(([k, v]) => `<option value="${k}" ${j.id === k ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
       <td><input type="text" data-k="nume" value="${esc(j.nume || '')}"></td><td><input type="text" data-k="desc" value="${esc(j.desc || '')}"></td>
+      <td><input type="number" data-n="1" min="1" max="${niveluri().length}" value="${j.nivel || 1}" style="width:60px"></td>
       ${['parteneri', 'bunastare', 'legalitate', 'profit'].map(k => `<td><input type="number" data-e="${k}" value="${j.efect_max[k] ?? ''}" placeholder="0" style="width:70px"></td>`).join('')}
       <td><button class="mic pericol">șterge</button></td>`;
     $('select', tr).addEventListener('change', e => { j.id = e.target.value; marcheaza('config.json'); });
-    $$('input', tr).forEach(x => x.addEventListener('input', () => { if (x.dataset.k) j[x.dataset.k] = x.value; else { const v = numar(x.value, 0); if (v) j.efect_max[x.dataset.e] = v; else delete j.efect_max[x.dataset.e]; } marcheaza('config.json'); }));
+    $$('input', tr).forEach(x => x.addEventListener('input', () => { if (x.dataset.k) j[x.dataset.k] = x.value; else if (x.dataset.n) j.nivel = Math.max(1, numar(x.value, 1)); else { const v = numar(x.value, 0); if (v) j.efect_max[x.dataset.e] = v; else delete j.efect_max[x.dataset.e]; } marcheaza('config.json'); }));
     $('button', tr).addEventListener('click', () => { m.lista.splice(i, 1); marcheaza('config.json'); randeazaMinijocuri(); });
     tb.appendChild(tr);
   });
@@ -981,6 +993,12 @@ $('#salveaza-reguli').addEventListener('click', async () => {
 
 // ------------------------------------------------------------------ arhetipuri
 function randeazaArhetipuri() { $('#json-arhetipuri').value = JSON.stringify(C['arhetipuri.json'], null, 2); }
+function randeazaProduse() { $('#json-produse').value = JSON.stringify(C['produse.json'] || { produse: {} }, null, 2); }
+$('#json-produse').addEventListener('input', () => marcheaza('produse.json'));
+$('#salveaza-produse').addEventListener('click', () => {
+  try { C['produse.json'] = JSON.parse($('#json-produse').value); } catch (e) { return eroare('JSON invalid: ' + e.message); }
+  salveaza('produse.json');
+});
 $('#json-arhetipuri').addEventListener('input', () => marcheaza('arhetipuri.json'));
 $('#salveaza-arhetipuri').addEventListener('click', () => {
   try { C['arhetipuri.json'] = JSON.parse($('#json-arhetipuri').value); } catch (e) { return eroare('JSON invalid: ' + e.message); }

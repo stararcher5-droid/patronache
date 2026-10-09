@@ -155,6 +155,7 @@
   .mj-zona.ok { background:rgba(95,201,168,.8); } .mj-zona.rau { background:rgba(240,138,118,.5); }
   .mj-cutit { position:absolute; top:8px; font-size:30px; transform:translateX(-50%); }
   .mj-neg { display:flex; gap:8px; margin:10px 0; } .mj-neg input { flex:1; }
+  .mj-produs { font-size:24px; font-weight:bold; margin:6px 0 10px; }
   .mj-raspunsuri { display:flex; flex-direction:column; gap:6px; align-items:flex-start; font-family:system-ui, sans-serif; font-size:14px; }
   .mj-gata { font-size:24px; text-align:center; padding:30px 0; font-family:system-ui, sans-serif; }
   /* bilanț & final */
@@ -479,13 +480,16 @@ function ecranMinijoc() {
       <div class="actiuni" id="mj-actiuni"><button class="btn" id="mj-start">Începe</button><button class="btn secundar" id="mj-sari">Sari peste</button></div>
     </div>`;
 }
-async function trimiteScor(scor) {
+async function trimiteScor(scor, raspuns = null) {
   if (ocupat) return; ocupat = true;
   try {
-    const d = await api('POST', '/api/partida/' + joc.id + '/minijoc', { scor });
+    const d = await api('POST', '/api/partida/' + joc.id + '/minijoc', raspuns === null ? { scor } : { raspuns });
     const r = d.minijoc; pas = d.pas; ultimulEfect = null; pasUrmator = null;
+    if (raspuns !== null) scor = r.scor;
+    const sarit = scor === null || (raspuns === null && r.scor === 30 && scor === null);
     const chips = efecteHtml({ delta: r.delta, profit: r.profit, carte: null });
-    $('#ecran').innerHTML = antet() + `<div class="card intra"><div class="cand">${esc(r.nume || 'Mini-joc')}</div><h1>${scor === null ? 'Ai sărit peste' : 'Scor: ' + scor + ' din 100'}</h1>
+    const pret = r.pret_real != null ? `<p class="text">${esc(r.produs || 'Produsul')} costă <b>${Number(r.pret_real).toLocaleString('ro-RO')} lei</b>. Tu ai zis ${Number(r.raspuns).toLocaleString('ro-RO')} lei${r.scor >= 80 ? '. Pe tine nu te fură nimeni.' : r.scor >= 30 ? '. Aproape.' : '. Ți-ar lua și cămașa.'}</p>` : '';
+    $('#ecran').innerHTML = antet() + `<div class="card intra"><div class="cand">${esc(r.nume || 'Mini-joc')}</div><h1>${scor === null ? 'Ai sărit peste' : 'Scor: ' + scor + ' din 100'}</h1>${pret}
       <p class="text">${scor === null ? 'Nimic nu s-a schimbat.' : scor >= 80 ? 'Ca la carte.' : scor >= 50 ? 'Merge, dar se poate și mai bine.' : scor >= 30 ? 'Pe muchie.' : 'A fost o zi proastă.'}</p>${chips}
       <div class="actiuni"><button class="btn" id="mai-departe">${pas.pas === 'decizie' ? 'Anul ' + pas.an : 'Mai departe'}</button></div></div>`;
     $('#mai-departe').addEventListener('click', () => arata());
@@ -496,7 +500,7 @@ async function trimiteScor(scor) {
 function porneste_minijoc(id) {
   const arena = $('#mj-arena'); arena.classList.remove('ascuns'); $('#mj-actiuni').classList.add('ascuns');
   const gata = scor => { arena.innerHTML = `<div class="mj-gata">Scor: <b>${scor}</b> din 100</div>`; setTimeout(() => trimiteScor(Math.max(0, Math.min(100, Math.round(scor)))), 900); };
-  const jocuri = { stampila: mjStampila, telefoanele: mjTelefoanele, pizza: mjPizza, negocierea: mjNegocierea };
+  const jocuri = { stampila: mjStampila, telefoanele: mjTelefoanele, pizza: mjPizza, negocierea: mjNegocierea, pretul: mjPretul };
   (jocuri[id] || (() => gata(30)))(arena, gata);
 }
 // 1. Ștampila: dosarele apar și dispar; apeși pe ele cât sunt pe masă.
@@ -578,6 +582,15 @@ function mjNegocierea(arena, gata) {
     if (incercari >= 5) { const dist = Math.abs(v - tinta) / 8000; gata(Math.max(0, 35 - dist * 100)); }
   };
   $('#mj-ofer').addEventListener('click', ofera); inp.addEventListener('keydown', e => { if (e.key === 'Enter') ofera(); });
+}
+
+// 5. Mă fură angajații?: ghicești prețul unui produs din domeniu; prețul real e pe server.
+function mjPretul(arena, gata) {
+  const produs = pas.minijoc.produs || 'un produs';
+  arena.innerHTML = `<div class="mj-sus">Factura de luna asta:</div><div class="mj-produs">${esc(produs)}</div><div class="mj-neg"><input type="number" id="mj-pret" min="0" step="1" placeholder="cât costă, în lei?"><button class="btn" id="mj-ofer">Atât costă</button></div><p class="gol" style="text-align:center">Cu cât ești mai aproape de prețul real, cu atât câștigi mai mult.</p>`;
+  const inp = $('#mj-pret'); inp.focus();
+  const trimite = () => { const v = +inp.value; if (!(v >= 0)) return; $('#mj-ofer').disabled = true; trimiteScor(null, v); };
+  $('#mj-ofer').addEventListener('click', trimite); inp.addEventListener('keydown', e => { if (e.key === 'Enter') trimite(); });
 }
 
 function ecranFinal() {
@@ -680,7 +693,7 @@ $('#l-cum').addEventListener('click', () => {
   const m = $('#modal');
   m.innerHTML = `<div class="card"><h2>Cum se joacă</h2>
     <p>Ești patronul unei firme, ${CONT.ani} ani. În fiecare trimestru iei ${CONT.decizii_pe_trimestru} decizii: despre angajați, clienți, bani, ANAF, Primărie.</p>
-    <p><b>Trei lucruri de urmărit</b>: partenerii (furnizori, clienți, bănci), bunăstarea angajaților și legalitatea. Fiecare e între 0 și 100. Dacă una ajunge la zero, s-a terminat: partenerii te lasă, toți pleacă sau vine DNA-ul.</p><p><b>Nimic nu stă pe loc</b>: la fiecare bilanț anual cele trei bare scad puțin de la sine. Le ții sus prin ce alegi.</p><p><b>La final de an</b>, după bilanț, vine un mini-joc scurt: ștampilezi dosare, prinzi telefoane, tai pizza sau negociezi un preț. Scorul bun ridică o bară; scorul slab o scade puțin.</p><p><b>Banii</b> nu sunt o bară: fiecare alegere aduce sau pierde profit, iar profitul total dă nivelul firmei.</p>
+    <p><b>Trei lucruri de urmărit</b>: partenerii (furnizori, clienți, bănci), bunăstarea angajaților și legalitatea. Fiecare e între 0 și 100. Dacă una ajunge la zero, s-a terminat: partenerii te lasă, toți pleacă sau vine DNA-ul.</p><p><b>Nimic nu stă pe loc</b>: la fiecare bilanț anual cele trei bare scad puțin de la sine. Le ții sus prin ce alegi.</p><p><b>La final de an</b>, după bilanț, vine un mini-joc scurt, ales la întâmplare: ștampilezi dosare, prinzi telefoane, tai pizza, negociezi un preț sau ghicești cât costă ceva ce cumpără firma ta. Scorul bun ridică o bară; scorul slab o scade puțin.</p><p><b>Banii</b> nu sunt o bară: fiecare alegere aduce sau pierde profit, iar profitul total dă nivelul firmei.</p>
     <p><b>Profit și nivel</b>: fiecare alegere aduce (sau pierde) bani. La finalul anului, profitul se adună la totalul firmei, iar totalul dă nivelul, de la 1 (firmă de apartament) la ${CONT.niveluri.length} (${esc(CONT.niveluri[CONT.niveluri.length - 1].nume)}). Nivelul deblochează alegeri noi, dar poate și să scadă după un an prost.</p>
     <p><b>Cărțile</b>: unele alegeri îți aduc cărți speciale în inventar. Le folosești când vrei, în timpul unei decizii; se consumă pe loc.</p>
     <p><b>Alegerile se leagă</b>: ce faci azi poate aduce o situație nouă mâine. Nepotul angajat azi greșește comanda mâine.</p>
