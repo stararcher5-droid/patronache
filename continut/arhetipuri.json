@@ -3,24 +3,68 @@
   "minim_teme": 5,
   "arhetipuri": [
     {
-      "id": "pipera", "nume": "Patronul din Pipera",
+      "id": "pipera",
+      "nume": "Patronul din Pipera",
       "desc": "Firmă de IT cu masă de ping-pong, salarii bune și ședințe de „alignment”.",
-      "poz": { "salarii": 1.5, "fisc": -1, "control": -1.5, "risc": 0.5, "clienti": -1, "stat": -1.5, "angajari": -2, "imagine": 0.5, "program": -2 }
+      "poz": {
+        "salarii": 1.5,
+        "fisc": -1,
+        "control": -1.5,
+        "risc": 0.5,
+        "clienti": -1,
+        "stat": -1.5,
+        "angajari": -2,
+        "imagine": 0.5,
+        "program": -2
+      }
     },
     {
-      "id": "nea-gigi", "nume": "Nea Gigi de la service",
+      "id": "nea-gigi",
+      "nume": "Nea Gigi de la service",
       "desc": "Are service-ul de 20 de ani, știe fiecare client pe nume. Factura e opțională, munca e serioasă.",
-      "poz": { "salarii": -1, "fisc": 1.5, "control": 2, "risc": -1.5, "clienti": -1.5, "stat": -1, "angajari": 1.5, "imagine": -1.5, "program": 1.5 }
+      "poz": {
+        "salarii": -1,
+        "fisc": 1.5,
+        "control": 2,
+        "risc": -1.5,
+        "clienti": -1.5,
+        "stat": -1,
+        "angajari": 1.5,
+        "imagine": -1.5,
+        "program": 1.5
+      }
     },
     {
-      "id": "lamborghini", "nume": "Băiatul cu Lamborghini-ul",
+      "id": "lamborghini",
+      "nume": "Băiatul cu Lamborghini-ul",
       "desc": "Dropshipping, crypto, „mindset de abundență” și un curs despre cum să ai și tu Lamborghini.",
-      "poz": { "salarii": -0.5, "fisc": 1.5, "control": 0, "risc": 2, "clienti": 2, "stat": -2, "angajari": 0, "imagine": 2, "program": 0 }
+      "poz": {
+        "salarii": -0.5,
+        "fisc": 1.5,
+        "control": 0,
+        "risc": 2,
+        "clienti": 2,
+        "stat": -2,
+        "angajari": 0,
+        "imagine": 2,
+        "program": 0
+      }
     },
     {
-      "id": "cumnatul-primarie", "nume": "Patronul cu cumnatul la Primărie",
+      "id": "cumnatul-primarie",
+      "nume": "Patronul cu cumnatul la Primărie",
       "desc": "Câștigă licitații pe care nimeni nu le vede. 12 angajați, 9 cu același nume de familie.",
-      "poz": { "salarii": 0, "fisc": 1, "control": 1, "risc": 1, "clienti": 1, "stat": 2, "angajari": 2, "imagine": 1, "program": 1 }
+      "poz": {
+        "salarii": 0,
+        "fisc": 1,
+        "control": 1,
+        "risc": 1,
+        "clienti": 1,
+        "stat": 2,
+        "angajari": 2,
+        "imagine": 1,
+        "program": 1
+      }
     }
   ]
 }

@@ -15,7 +15,8 @@ RADACINA = Path(__file__).resolve().parent.parent
 DIR_CONTINUT_IMPLICIT = RADACINA / "continut"
 
 FISIERE = ("config.json", "niveluri.json", "carti.json", "situatii.json", "arhetipuri.json")
-RESURSE = ("buget", "bunastare", "legalitate")
+RESURSE = ("parteneri", "bunastare", "legalitate")
+FACTOR_BUGET_IN_PROFIT = 5   # la migrare: un punct de „buget” din vechiul model = 5 mii lei profit
 CHEI_CERINTE = {"nivel_min", "nivel_max", "carti", "fara_carti", "flaguri", "fara_flaguri", "dupa"}
 
 
@@ -100,6 +101,54 @@ class Continut:
         }
 
 
+# ---------------------------------------------------------------- migrare
+
+def migreaza(brut: dict[str, dict[str, Any]]) -> bool:
+    """Aduce conținutul scris pentru modelul vechi (resursa „buget”) la cel nou (resursa „parteneri”,
+    efectele de buget trec în profit). Întoarce True dacă a schimbat ceva."""
+    schimbat = False
+    cfg = brut.get("config.json", {})
+    res = cfg.get("resurse", {})
+    if "buget" in res and "parteneri" not in res:
+        res["parteneri"] = {"nume": "Parteneri", "start": res["buget"].get("start", 50)}
+        del res["buget"]
+        cfg["resurse"] = {k: res[k] for k in ("parteneri", "bunastare", "legalitate") if k in res} | {k: v for k, v in res.items() if k not in RESURSE}
+        schimbat = True
+    fin = cfg.get("finaluri", {})
+    if "buget" in fin and "parteneri" not in fin:
+        fin["parteneri"] = {"titlu": "Partenerii au plecat", "text": "Furnizorii nu mai livrează, clienții nu mai sună. Ai o firmă, dar n-ai cu cine."}
+        del fin["buget"]
+        schimbat = True
+
+    def muta_ef(o: dict[str, Any]) -> None:
+        nonlocal schimbat
+        ef = o.get("ef")
+        if isinstance(ef, dict) and "buget" in ef:
+            o["profit"] = o.get("profit", 0) + ef.pop("buget") * FACTOR_BUGET_IN_PROFIT
+            if not o["profit"]:
+                del o["profit"]
+            if not ef:
+                del o["ef"]
+            schimbat = True
+
+    for sit in brut.get("situatii.json", {}).get("situatii", []):
+        for o in sit.get("optiuni", []):
+            muta_ef(o)
+    for carte in brut.get("carti.json", {}).get("carti", []):
+        ef = carte.get("efect")
+        if isinstance(ef, dict):
+            if "buget" in ef:
+                ef["profit"] = ef.get("profit", 0) + ef.pop("buget") * FACTOR_BUGET_IN_PROFIT
+                if not ef["profit"]:
+                    del ef["profit"]
+                schimbat = True
+            scut = ef.get("scut")
+            if isinstance(scut, dict) and "buget" in scut.get("resurse", []):
+                scut["resurse"] = ["parteneri" if r == "buget" else r for r in scut["resurse"]]
+                schimbat = True
+    return schimbat
+
+
 # ---------------------------------------------------------------- citire
 
 def citeste_fisier(director: Path, nume: str) -> dict[str, Any]:
@@ -115,6 +164,10 @@ def citeste_fisier(director: Path, nume: str) -> dict[str, Any]:
 def incarca(director: Path | str | None = None) -> Continut:
     director = Path(director) if director else DIR_CONTINUT_IMPLICIT
     brut = {nume: citeste_fisier(director, nume) for nume in FISIERE}
+    if migreaza(brut) and director != DIR_CONTINUT_IMPLICIT:
+        # conținut scris pentru modelul vechi: îl scriem înapoi migrat, ca admin-ul să vadă același lucru
+        for nume, corp in brut.items():
+            (director / nume).write_text(json.dumps(corp, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return construieste(brut)
 
 

@@ -5,7 +5,8 @@ Nu știe nimic de HTTP sau de baza de date. Primește o stare (dict serializabil
 
 Regulile:
 - `ani` ani, `trimestre_pe_an` trimestre, `decizii_pe_trimestru` decizii pe trimestru.
-- Trei resurse 0..100 (buget, bunăstare angajați, legalitate). Una la 0 = partida s-a terminat.
+- Trei resurse 0..100 (parteneri, bunăstare angajați, legalitate). Una la 0 = partida s-a terminat.
+  Banii nu sunt resursă: sunt profitul, care dă nivelul.
 - Fiecare opțiune aduce profit (mii lei). La finalul anului se face bilanțul:
   profitul anului se adună la profitul total, care dă nivelul firmei (1..10).
   Un an pe minus scade profitul total, deci nivelul poate și să scadă.

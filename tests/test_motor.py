@@ -26,15 +26,15 @@ def continut_de_test(**schimbari) -> modul_continut.Continut:
         {"nivel": 3, "nume": "Mare", "prag": 200},
     ]
     brut["carti.json"]["carti"] = [
-        {"id": "pizza", "nume": "Pizza", "efect": {"buget": -2, "bunastare": 10}},
+        {"id": "pizza", "nume": "Pizza", "efect": {"parteneri": -2, "bunastare": 10}},
     ]
 
     def sit(id_, an_min=1, an_max=2, **extra):
         return {
             "id": id_, "titlu": id_, "text": "...", "an_min": an_min, "an_max": an_max,
             "optiuni": [
-                {"text": "bun", "ef": {"buget": 5, "bunastare": 5, "legalitate": 5}, "profit": 30, "teme": {"fisc": -2}},
-                {"text": "rau", "ef": {"buget": -30, "bunastare": -30, "legalitate": -30}, "profit": -40, "teme": {"fisc": 2}},
+                {"text": "bun", "ef": {"parteneri": 5, "bunastare": 5, "legalitate": 5}, "profit": 30, "teme": {"fisc": -2}},
+                {"text": "rau", "ef": {"parteneri": -30, "bunastare": -30, "legalitate": -30}, "profit": -40, "teme": {"fisc": 2}},
             ],
             **extra,
         }
@@ -84,14 +84,14 @@ class Reguli(unittest.TestCase):
         self.assertEqual(s["pas"], motor.PAS_DECIZIE)
         motor.alege(c, s, 1)   # 20 -> 0
         self.assertEqual(s["pas"], motor.PAS_TERMINAT)
-        self.assertEqual(s["final"]["motiv"], "buget")
+        self.assertEqual(s["final"]["motiv"], "parteneri")
         self.assertFalse(s["final"]["mandat_complet"])
-        self.assertEqual(s["resurse"]["buget"], 0)
+        self.assertEqual(s["resurse"]["parteneri"], 0)
         with self.assertRaises(motor.ActiuneInvalida):
             motor.alege(c, s, 0)
 
     def test_fiecare_resursa_la_zero_pierde(self):
-        for res in ("buget", "bunastare", "legalitate"):
+        for res in ("parteneri", "bunastare", "legalitate"):
             c = continut_de_test()
             s = motor.stare_noua(c, {}, seed=1)
             s["resurse"][res] = 10
@@ -102,7 +102,7 @@ class Reguli(unittest.TestCase):
         c = continut_de_test()
         s = motor.stare_noua(c, {}, seed=1)
         s["profit_total"], s["nivel"] = 220, 3
-        s["resurse"] = {"buget": 100, "bunastare": 100, "legalitate": 100}  # să nu pierdem din resurse
+        s["resurse"] = {"parteneri": 100, "bunastare": 100, "legalitate": 100}  # să nu pierdem din resurse
         motor.alege(c, s, 1)
         motor.alege(c, s, 1)
         b = motor.bilant(c, s)
@@ -113,10 +113,10 @@ class Reguli(unittest.TestCase):
     def test_resursele_se_opresc_la_100(self):
         c = continut_de_test()
         s = motor.stare_noua(c, {}, seed=1)
-        s["resurse"]["buget"] = 98
+        s["resurse"]["parteneri"] = 98
         ef = motor.alege(c, s, 0)
-        self.assertEqual(s["resurse"]["buget"], 100)
-        self.assertEqual(ef["delta"]["buget"], 2)
+        self.assertEqual(s["resurse"]["parteneri"], 100)
+        self.assertEqual(ef["delta"]["parteneri"], 2)
 
     def test_acelasi_seed_da_aceeasi_partida(self):
         c = continut_de_test()
@@ -216,7 +216,7 @@ class Carti(unittest.TestCase):
 
         bun = s["resurse"]["bunastare"]
         r = motor.foloseste_carte(c, s, "pizza")
-        self.assertEqual(r["delta"], {"buget": -2, "bunastare": 10})
+        self.assertEqual(r["delta"], {"parteneri": -2, "bunastare": 10})
         self.assertEqual(s["resurse"]["bunastare"], bun + 10)
         self.assertEqual(s["carti"], [], "cartea s-a consumat")
         with self.assertRaises(motor.ActiuneInvalida):
@@ -248,10 +248,10 @@ class Carti(unittest.TestCase):
         self.assertEqual(ef["delta"]["bunastare"], -30, "decizia curentă nu e protejată")
         self.assertEqual(ef["scut_oprit"], {})
         self.assertTrue(motor.pas_curent(c, s)["scuturi"][0]["activ_acum"])
-        s["resurse"] = {"buget": 90, "bunastare": 90, "legalitate": 90}
+        s["resurse"] = {"parteneri": 90, "bunastare": 90, "legalitate": 90}
         ef = motor.alege(c, s, 1)
         self.assertEqual(ef["delta"].get("bunastare", 0), 0, "următoarea decizie e protejată")
-        self.assertEqual(ef["delta"]["buget"], -30, "celelalte resurse nu")
+        self.assertEqual(ef["delta"]["parteneri"], -30, "celelalte resurse nu")
         self.assertEqual(ef["scut_oprit"], {"bunastare": -30})
         self.assertEqual(s["scuturi"], [], "scutul s-a consumat")
 

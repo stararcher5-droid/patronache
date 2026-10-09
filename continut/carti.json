@@ -6,9 +6,9 @@
       "nume": "Petrecere cu pizza",
       "desc": "Vineri, la 5, 12 pizza și două lăzi de bere. Costă puțin, ține o săptămână.",
       "efect": {
-        "buget": -2,
         "bunastare": 6,
-        "legalitate": 0
+        "legalitate": 0,
+        "profit": -10
       }
     },
     {
@@ -16,9 +16,9 @@
       "nume": "Team building",
       "desc": "Un weekend la munte, cu tiroliană și „jocuri de încredere”. Toată lumea vine luni.",
       "efect": {
-        "buget": -6,
         "bunastare": 12,
-        "legalitate": 0
+        "legalitate": 0,
+        "profit": -30
       }
     },
     {
@@ -26,9 +26,9 @@
       "nume": "Petrecere cu stand-up",
       "desc": "Un comediant la sediu. Glumele despre patron sunt incluse în preț.",
       "efect": {
-        "buget": -4,
         "bunastare": 9,
-        "legalitate": 0
+        "legalitate": 0,
+        "profit": -20
       }
     },
     {
@@ -36,9 +36,9 @@
       "nume": "Petrecere cu concert",
       "desc": "Trupă live în curtea firmei. Vecinii sună la poliție, dar angajații nu uită.",
       "efect": {
-        "buget": -10,
         "bunastare": 16,
-        "legalitate": -2
+        "legalitate": -2,
+        "profit": -50
       }
     },
     {

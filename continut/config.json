@@ -1,34 +1,119 @@
 {
-  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json).",
+  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json).",
   "ani": 5,
   "trimestre_pe_an": 4,
   "decizii_pe_trimestru": 2,
   "resurse": {
-    "buget":      { "nume": "Buget",               "start": 50 },
-    "bunastare":  { "nume": "Bunăstare angajați",  "start": 50 },
-    "legalitate": { "nume": "Legalitate",          "start": 50 }
+    "parteneri": {
+      "nume": "Parteneri",
+      "start": 50
+    },
+    "bunastare": {
+      "nume": "Bunăstare angajați",
+      "start": 50
+    },
+    "legalitate": {
+      "nume": "Legalitate",
+      "start": 50
+    }
   },
   "finaluri": {
-    "buget":      { "titlu": "Faliment",                "text": "Lichidatorul a schimbat yala." },
-    "bunastare":  { "titlu": "Toți au plecat",          "text": "Și-au dat demisia în aceeași zi, pe WhatsApp." },
-    "legalitate": { "titlu": "Dosar penal",             "text": "DNA-ul a venit cu mapa. Firma e sub sechestru." },
-    "mandat":     { "titlu": "Cinci ani",               "text": "Ai dus firma cinci ani. Să vedem ce fel de patron ai fost." },
-    "fara_situatii": { "titlu": "S-a terminat povestea", "text": "Nu mai sunt situații pentru drumul ales. Bilanțul e mai jos." }
+    "bunastare": {
+      "titlu": "Toți au plecat",
+      "text": "Și-au dat demisia în aceeași zi, pe WhatsApp."
+    },
+    "legalitate": {
+      "titlu": "Dosar penal",
+      "text": "DNA-ul a venit cu mapa. Firma e sub sechestru."
+    },
+    "mandat": {
+      "titlu": "Cinci ani",
+      "text": "Ai dus firma cinci ani. Să vedem ce fel de patron ai fost."
+    },
+    "fara_situatii": {
+      "titlu": "S-a terminat povestea",
+      "text": "Nu mai sunt situații pentru drumul ales. Bilanțul e mai jos."
+    },
+    "parteneri": {
+      "titlu": "Partenerii au plecat",
+      "text": "Furnizorii nu mai livrează, clienții nu mai sună. Ai o firmă, dar n-ai cu cine."
+    }
   },
   "teme": {
     "_nota": "Opțional. Dacă opțiunile au 'teme', la final jucătorul e comparat cu arhetipurile. Scara -2..+2.",
-    "salarii":  { "nume": "Salarii",           "minus": "Minimul pe economie",        "plus": "Plătești peste piață" },
-    "fisc":     { "nume": "Relația cu ANAF",   "minus": "Totul pe factură",           "plus": "Creativitate fiscală" },
-    "control":  { "nume": "Stil de conducere", "minus": "Delegi",                     "plus": "Controlezi tot" },
-    "risc":     { "nume": "Apetit de risc",    "minus": "Prudent",                    "plus": "Pe credit" },
-    "clienti":  { "nume": "Clienți",           "minus": "Relații lungi",              "plus": "Profitul acum" },
-    "stat":     { "nume": "Relația cu statul", "minus": "Doar privat",                "plus": "Licitații și fonduri" },
-    "angajari": { "nume": "Angajări",          "minus": "Meritocrație",               "plus": "Rude și cumetri" },
-    "imagine":  { "nume": "Imagine",           "minus": "Discret",                    "plus": "Lux și Instagram" },
-    "program":  { "nume": "Program de lucru",  "minus": "Flexibil",                   "plus": "Și sâmbăta" }
+    "salarii": {
+      "nume": "Salarii",
+      "minus": "Minimul pe economie",
+      "plus": "Plătești peste piață"
+    },
+    "fisc": {
+      "nume": "Relația cu ANAF",
+      "minus": "Totul pe factură",
+      "plus": "Creativitate fiscală"
+    },
+    "control": {
+      "nume": "Stil de conducere",
+      "minus": "Delegi",
+      "plus": "Controlezi tot"
+    },
+    "risc": {
+      "nume": "Apetit de risc",
+      "minus": "Prudent",
+      "plus": "Pe credit"
+    },
+    "clienti": {
+      "nume": "Clienți",
+      "minus": "Relații lungi",
+      "plus": "Profitul acum"
+    },
+    "stat": {
+      "nume": "Relația cu statul",
+      "minus": "Doar privat",
+      "plus": "Licitații și fonduri"
+    },
+    "angajari": {
+      "nume": "Angajări",
+      "minus": "Meritocrație",
+      "plus": "Rude și cumetri"
+    },
+    "imagine": {
+      "nume": "Imagine",
+      "minus": "Discret",
+      "plus": "Lux și Instagram"
+    },
+    "program": {
+      "nume": "Program de lucru",
+      "minus": "Flexibil",
+      "plus": "Și sâmbăta"
+    }
   },
   "axe": {
-    "x": { "nume": "Corectitudine", "teme": ["fisc", "clienti", "angajari", "stat"], "minus": "Corect", "plus": "Descurcăreț" },
-    "y": { "nume": "Stil", "teme": ["control", "program", "imagine", "risc", "salarii"], "inverseaza": ["salarii", "risc"], "minus": "Patron nou", "plus": "Patron vechi" }
+    "x": {
+      "nume": "Corectitudine",
+      "teme": [
+        "fisc",
+        "clienti",
+        "angajari",
+        "stat"
+      ],
+      "minus": "Corect",
+      "plus": "Descurcăreț"
+    },
+    "y": {
+      "nume": "Stil",
+      "teme": [
+        "control",
+        "program",
+        "imagine",
+        "risc",
+        "salarii"
+      ],
+      "inverseaza": [
+        "salarii",
+        "risc"
+      ],
+      "minus": "Patron nou",
+      "plus": "Patron vechi"
+    }
   }
 }

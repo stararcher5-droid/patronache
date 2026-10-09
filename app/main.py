@@ -60,7 +60,10 @@ def continut() -> modul_continut.Continut:
 # Hash-uri ale versiunilor livrate înainte să existe markerul; un fișier din
 # dataset identic cu una dintre ele e sigur neatins de admin și se actualizează.
 HASHURI_VECHI = {
-    "config.json": {"2ed2d2e37a7f15c8e5f5d8966efdf1e90bfc4a599e07cb06118e0480340b883e"},
+    "config.json": {
+        "2ed2d2e37a7f15c8e5f5d8966efdf1e90bfc4a599e07cb06118e0480340b883e",
+        "cf3b9e12bdd8409c8325c9aa2feca0cc1e8bd7f7746bfc8ae8b702d9ab300637",
+    },
     "niveluri.json": {"2605c6045f062809f7aa6a4496f11099c21a18e68db5c6418a6e6f7050e56c23"},
 }
 MARKER = ".implicit.json"

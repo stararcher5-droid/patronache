@@ -5,8 +5,9 @@ API-ul, interfața jocului (la `/`) și meniul de admin pentru conținut (la `/a
 
 ## Regulile (cum le implementează motorul)
 
-- **Trei resurse**, 0..100: buget, bunăstare angajați, legalitate. Dacă una
-  ajunge la 0, ai pierdut (faliment / toți au plecat / dosar penal).
+- **Trei resurse**, 0..100: parteneri, bunăstare angajați, legalitate. Dacă una
+  ajunge la 0, ai pierdut (partenerii au plecat / toți au plecat / dosar penal).
+  Banii nu sunt resursă: sunt profitul, care dă nivelul.
 - **5 ani × 4 trimestre × 2 decizii** (configurabil în `continut/config.json`).
 - **Profit și nivel**: fiecare opțiune aduce profit (mii lei). La finalul
   anului profitul se adună la totalul firmei, iar totalul dă **nivelul 1..4**

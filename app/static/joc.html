@@ -8,7 +8,7 @@
 <style>
   :root {
     --hartie:#fbf7ef; --hartie2:#f3ecdd; --cerneala:#2b2419; --mut:#7a6f5f; --linie:#e2d8c3;
-    --accent:#c9472b; --buget:#d9a62b; --bunastare:#e2694f; --legalitate:#3f8f7a; --ok:#3f8f7a; --rau:#c9472b;
+    --accent:#c9472b; --parteneri:#d9a62b; --bunastare:#e2694f; --legalitate:#3f8f7a; --ok:#3f8f7a; --rau:#c9472b;
     --umbra:0 10px 30px rgba(60,40,10,.12);
   }
   * { box-sizing:border-box; }
@@ -33,7 +33,7 @@
   .res .et b { color:var(--cerneala); font-size:14px; }
   .bara { height:8px; border-radius:99px; background:var(--hartie2); margin-top:6px; overflow:hidden; }
   .bara i { display:block; height:100%; border-radius:99px; transition:width .6s ease; }
-  .res.buget i { background:var(--buget); } .res.bunastare i { background:var(--bunastare); } .res.legalitate i { background:var(--legalitate); }
+  .res.parteneri i { background:var(--parteneri); } .res.bunastare i { background:var(--bunastare); } .res.legalitate i { background:var(--legalitate); }
   .res.alarma { border-color:var(--rau); animation:puls 1.2s infinite; }
   @keyframes puls { 50% { box-shadow:0 0 0 4px rgba(201,71,43,.15); } }
   .card { background:#fff; border:1px solid var(--linie); border-radius:16px; padding:22px; box-shadow:var(--umbra); margin-bottom:14px; }
@@ -118,7 +118,7 @@
 <script>
 // ------------------------------------------------------------------ stare
 const RES = [
-  { k: 'buget', nume: 'Buget', icon: '💰' },
+  { k: 'parteneri', nume: 'Parteneri', icon: '🤝' },
   { k: 'bunastare', nume: 'Bunăstare', icon: '👷' },
   { k: 'legalitate', nume: 'Legalitate', icon: '⚖️' },
 ];
@@ -163,7 +163,7 @@ function ecranStart() {
     <div class="card intra start">
       <div class="cand">Registrul Comerțului · formular de înființare</div>
       <h1>Ești patron. Ai ${CONT.ani} ani.</h1>
-      <p class="text">Ține firma pe linia de plutire, oamenii mulțumiți și ANAF-ul departe. Fiecare alegere mișcă bugetul, bunăstarea angajaților și legalitatea. Dacă una ajunge la zero, s-a terminat.</p>
+      <p class="text">Ține partenerii aproape, oamenii mulțumiți și ANAF-ul departe. Fiecare alegere mișcă relația cu partenerii, bunăstarea angajaților și legalitatea, și aduce sau pierde bani. Dacă una din cele trei ajunge la zero, s-a terminat.</p>
       <div class="camp"><label>Numele firmei</label><input type="text" id="f-nume" maxlength="40" placeholder="Patronache SRL"></div>
       <div class="camp"><label>Slogan (opțional)</label><input type="text" id="f-slogan" maxlength="80" placeholder="Ieftin, rapid, aproape legal"></div>
       <div class="camp"><label>Sigla</label><div class="alegeri" id="f-sigle">${SIGLE.map((s, i) => `<button type="button" data-v="${s}" class="${i === 0 ? 'activ' : ''}">${s}</button>`).join('')}</div></div>
@@ -411,7 +411,7 @@ $('#l-cum').addEventListener('click', () => {
   const m = $('#modal');
   m.innerHTML = `<div class="card"><h2>Cum se joacă</h2>
     <p>Ești patronul unei firme, ${CONT.ani} ani. În fiecare trimestru iei ${CONT.decizii_pe_trimestru} decizii: despre angajați, clienți, bani, ANAF, Primărie.</p>
-    <p><b>Trei lucruri de urmărit</b>: bugetul, bunăstarea angajaților și legalitatea. Fiecare e între 0 și 100. Dacă una ajunge la zero, s-a terminat: faliment, toți pleacă sau vine DNA-ul.</p>
+    <p><b>Trei lucruri de urmărit</b>: partenerii (furnizori, clienți, bănci), bunăstarea angajaților și legalitatea. Fiecare e între 0 și 100. Dacă una ajunge la zero, s-a terminat: partenerii te lasă, toți pleacă sau vine DNA-ul.</p><p><b>Banii</b> nu sunt o bară: fiecare alegere aduce sau pierde profit, iar profitul total dă nivelul firmei.</p>
     <p><b>Profit și nivel</b>: fiecare alegere aduce (sau pierde) bani. La finalul anului, profitul se adună la totalul firmei, iar totalul dă nivelul, de la 1 (firmă de apartament) la ${CONT.niveluri.length} (${esc(CONT.niveluri[CONT.niveluri.length - 1].nume)}). Nivelul deblochează alegeri noi, dar poate și să scadă după un an prost.</p>
     <p><b>Cărțile</b>: unele alegeri îți aduc cărți speciale în inventar. Le folosești când vrei, în timpul unei decizii; se consumă pe loc.</p>
     <p><b>Alegerile se leagă</b>: ce faci azi poate aduce o situație nouă mâine. Nepotul angajat azi greșește comanda mâine.</p>

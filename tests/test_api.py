@@ -35,7 +35,7 @@ class API(unittest.TestCase):
         self.assertTrue(r.json()["ok"])
         r = self.client.get("/api/continut")
         d = r.json()
-        self.assertEqual(set(d["resurse"]), {"buget", "bunastare", "legalitate"})
+        self.assertEqual(set(d["resurse"]), {"parteneri", "bunastare", "legalitate"})
         self.assertEqual(len(d["niveluri"]), 4)
         self.assertTrue(all("efect" in c for c in d["carti"]), "jucătorul vede ce face o carte")
 
@@ -108,8 +108,8 @@ class API(unittest.TestCase):
         noua = {
             "id": "test-noua", "titlu": "Situație nouă", "text": "din test", "an_min": 1, "an_max": 4,
             "optiuni": [
-                {"text": "da", "ef": {"buget": 1}, "profit": 5, "urmatoare": [sit["situatii"][0]["id"]]},
-                {"text": "nu", "ef": {"buget": -1}, "profit": 0},
+                {"text": "da", "ef": {"parteneri": 1}, "profit": 5, "urmatoare": [sit["situatii"][0]["id"]]},
+                {"text": "nu", "ef": {"parteneri": -1}, "profit": 0},
             ],
         }
         sit["situatii"].append(noua)
@@ -191,6 +191,24 @@ class API(unittest.TestCase):
         for n in ("niveluri.json", "situatii.json"):
             shutil.copy(RADACINA / "continut" / n, d / n)
         main.Stare.continut = None
+
+    def test_migrarea_continutului_vechi(self):
+        from app import continut as mc
+        brut = {
+            "config.json": {"resurse": {"buget": {"nume": "Buget", "start": 40}, "bunastare": {"start": 50}, "legalitate": {"start": 50}},
+                            "finaluri": {"buget": {"titlu": "Faliment"}}},
+            "situatii.json": {"situatii": [{"optiuni": [{"ef": {"buget": -8, "legalitate": 2}, "profit": 10}, {"ef": {"buget": 4}}]}]},
+            "carti.json": {"carti": [{"efect": {"buget": -2, "bunastare": 6, "scut": {"resurse": ["buget"]}}}]},
+        }
+        self.assertTrue(mc.migreaza(brut))
+        self.assertEqual(brut["config.json"]["resurse"]["parteneri"]["start"], 40)
+        self.assertNotIn("buget", brut["config.json"]["resurse"])
+        self.assertIn("parteneri", brut["config.json"]["finaluri"])
+        o1, o2 = brut["situatii.json"]["situatii"][0]["optiuni"]
+        self.assertEqual(o1, {"ef": {"legalitate": 2}, "profit": 10 - 8 * mc.FACTOR_BUGET_IN_PROFIT})
+        self.assertEqual(o2, {"profit": 4 * mc.FACTOR_BUGET_IN_PROFIT})
+        self.assertEqual(brut["carti.json"]["carti"][0]["efect"], {"bunastare": 6, "profit": -2 * mc.FACTOR_BUGET_IN_PROFIT, "scut": {"resurse": ["parteneri"]}})
+        self.assertFalse(mc.migreaza(brut), "a doua oară nu mai e nimic de migrat")
 
     def test_pagina_joc(self):
         r = self.client.get("/")

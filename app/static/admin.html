@@ -191,8 +191,8 @@
 
 <script>
 // ------------------------------------------------------------------ stare
-const RESURSE = ['buget', 'bunastare', 'legalitate'];
-const NUME_RESURSE = { buget: 'Buget', bunastare: 'Bunăstare', legalitate: 'Legalitate' };
+const RESURSE = ['parteneri', 'bunastare', 'legalitate'];
+const NUME_RESURSE = { parteneri: 'Parteneri', bunastare: 'Bunăstare', legalitate: 'Legalitate' };
 let C = null;             // conținutul brut: { 'situatii.json': {...}, ... }
 let curent = null;        // id-ul situației din editor
 let nesalvat = new Set(); // fișiere modificate și nesalvate
@@ -276,7 +276,7 @@ $('#situatie-noua').addEventListener('click', () => {
   marcheaza('situatii.json'); randeazaLista(); deschide(id);
 });
 $('#salveaza-situatii').addEventListener('click', () => { citesteEditor(); salveaza('situatii.json'); });
-function optiuneGoala() { return { text: '', ef: { buget: 0, bunastare: 0, legalitate: 0 }, profit: 0 }; }
+function optiuneGoala() { return { text: '', ef: {} }; }
 
 // ------------------------------------------------------------------ situații: editor
 function deschide(id) {
@@ -367,7 +367,7 @@ function optiuneHtml(o, i, s) {
     <div class="rand"><div><label>Text</label><input type="text" class="o-text" value="${esc(o.text)}"></div></div>
     <div class="rand r6">
       ${RESURSE.map(r => `<div><label>${NUME_RESURSE[r]} ±</label><input type="number" class="o-ef" data-r="${r}" value="${o.ef?.[r] || ''}" placeholder="0"></div>`).join('')}
-      <div><label>Profit (mii lei)</label><input type="number" class="o-profit" value="${o.profit || ''}" placeholder="0"></div>
+      <div><label>Profit (mii lei; banii, în plus sau în minus)</label><input type="number" class="o-profit" value="${o.profit || ''}" placeholder="0"></div>
       <div><label>Dă cartea</label><select class="o-carte"><option value="">—</option>${carti().map(c => `<option value="${esc(c.id)}" ${o.carte === c.id ? 'selected' : ''}>${esc(c.nume)}</option>`).join('')}</select></div>
       <div><label>Pune flaguri (virgulă)</label><input type="text" class="o-flaguri" value="${esc((o.flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
     </div>
