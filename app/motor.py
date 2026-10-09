@@ -13,6 +13,9 @@ Regulile:
   Un an pe minus scade profitul total, deci nivelul poate și să scadă.
 - Firma are un domeniu (IT, construcții...); situațiile și cărțile cu `domenii`
   apar doar pentru domeniile lor, cele fără `domenii` pentru toate.
+- O situație cu opțiuni care depind de o alegere anterioară (flaguri, `dupa`) așteaptă
+  până când situația care putea face acea alegere a fost jucată; dacă pentru domeniul
+  firmei nu există nicio astfel de situație, opțiunea e ascunsă, nu blocată.
 - Situațiile se leagă: o opțiune poate deschide situații următoare (intră
   într-o coadă) și poate pune flaguri; o situație sau o opțiune poate cere nivel,
   cărți, flaguri sau situații jucate înainte.
@@ -177,6 +180,56 @@ def in_domeniu(stare: dict[str, Any], obiect: dict[str, Any]) -> bool:
     return not dom or stare["firma"].get("domeniu") in dom
 
 
+def _surse(c: Continut, stare: dict[str, Any], cer: dict[str, Any] | None) -> tuple[list[str], list[str]]:
+    """Situațiile care pot îndeplini cerințele de „alegere anterioară” ale unei opțiuni (flaguri, dupa),
+    împărțite în: (încă nejucate, dar posibile pentru firma asta) și (toate, posibile pentru firma asta)."""
+    if not cer:
+        return [], []
+    nevoie = [f for f in cer.get("flaguri", []) if f not in stare["flaguri"]]
+    dupa = [d for d in cer.get("dupa", []) if d not in stare["jucate"]]
+    posibile: list[str] = []
+    nejucate: list[str] = []
+    def accesibila(src: dict[str, Any]) -> bool:
+        # sursa poate apărea acum: în domeniu și de nivelul firmei sau mai mic (dacă e „doar legată”, o poate deschide altcineva)
+        return in_domeniu(stare, src) and _de_nivel(src, stare["nivel"])
+
+    for f in nevoie:
+        for src in c.situatii:
+            if any(f in (o.get("flaguri") or []) for o in src["optiuni"]):
+                if src["id"] in stare["jucate"]:
+                    posibile.append(src["id"])       # jucătorul a avut ocazia
+                elif accesibila(src):
+                    posibile.append(src["id"]); nejucate.append(src["id"])
+    for d in dupa:
+        src = c._situatii.get(d)
+        if src and accesibila(src):
+            posibile.append(d); nejucate.append(d)
+    return nejucate, posibile
+
+
+def optiune_ascunsa(c: Continut, stare: dict[str, Any], o: dict[str, Any]) -> bool:
+    """O opțiune care depinde de o alegere anterioară pe care jucătorul n-a avut cum s-o facă (nicio situație
+    din domeniu sau de nivelul lui nu putea pune flagul) nu se arată deloc, ca să nu pară blocată de ceva ce n-a existat."""
+    cer = o.get("cerinte") or {}
+    if not cer.get("flaguri") and not cer.get("dupa"):
+        return False
+    if cerinte_indeplinite(stare, cer) is None:
+        return False
+    nevoie = [f for f in cer.get("flaguri", []) if f not in stare["flaguri"]] + [d for d in cer.get("dupa", []) if d not in stare["jucate"]]
+    _, posibile = _surse(c, stare, cer)
+    return bool(nevoie) and not posibile
+
+
+def _asteapta_alegerea_anterioara(c: Continut, stare: dict[str, Any], s: dict[str, Any]) -> bool:
+    """Situația are opțiuni care depind de o alegere anterioară ce încă poate fi făcută: așteptăm,
+    ca jucătorul să fi avut ocazia aia înainte (altfel „depindea de o alegere anterioară” n-ar avea sens)."""
+    for o in s["optiuni"]:
+        nejucate, _ = _surse(c, stare, o.get("cerinte"))
+        if nejucate:
+            return True
+    return False
+
+
 def _eligibila(c: Continut, stare: dict[str, Any], s: dict[str, Any], din_coada: bool, nivel: int | None = None) -> bool:
     if s["id"] in stare["jucate"] and not s.get("repetabila"):
         return False
@@ -186,8 +239,11 @@ def _eligibila(c: Continut, stare: dict[str, Any], s: dict[str, Any], din_coada:
         return False
     if not din_coada and (s.get("doar_legata") or not _de_nivel(s, nivel if nivel is not None else stare["nivel"])):
         return False
-    # Trebuie să existe măcar o opțiune pe care o poate alege.
-    return any(cerinte_indeplinite(stare, o.get("cerinte")) is None for o in s["optiuni"])
+    if not din_coada and _asteapta_alegerea_anterioara(c, stare, s):
+        return False
+    # Trebuie să existe măcar o opțiune pe care o poate alege și cel puțin două vizibile (o alegere cu o singură variantă nu e alegere).
+    vizibile = [o for o in s["optiuni"] if not optiune_ascunsa(c, stare, o)]
+    return len(vizibile) >= 2 and any(cerinte_indeplinite(stare, o.get("cerinte")) is None for o in vizibile)
 
 
 def _alege_situatia(c: Continut, stare: dict[str, Any]) -> bool:
@@ -268,6 +324,8 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     blocat = cerinte_indeplinite(stare, o.get("cerinte"))
     if blocat:
         raise ActiuneInvalida(f"opțiunea e blocată: {blocat}")
+    if optiune_ascunsa(c, stare, o):
+        raise ActiuneInvalida("opțiunea nu e disponibilă pentru firma asta")
 
     ef, oprit = _aplica_scuturi(stare, s["id"], o.get("ef", {}))
     delta = _aplica_resurse(stare, ef)
@@ -556,7 +614,8 @@ def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
             "id": s["id"], "titlu": s["titlu"], "text": s["text"],
             "optiuni": [
                 {"text": o["text"], "blocat": (b := cerinte_indeplinite(stare, o.get("cerinte"))),
-                 "deblocat": None if b else motiv_deblocare(o.get("cerinte"))}
+                 "deblocat": None if b else motiv_deblocare(o.get("cerinte")),
+                 "ascunsa": optiune_ascunsa(c, stare, o)}
                 for o in s["optiuni"]
             ],
         })

@@ -359,7 +359,7 @@ function ecranDecizie() {
       <h1>${esc(pas.titlu)}</h1>
       <p class="text">${esc(pas.text)}</p>
       <div class="optiuni">
-        ${pas.optiuni.map((o, i) => `<button class="opt ${ef && ef.ales === i ? 'aleasa' : ''} ${ef ? 'cu-procent' : ''}" data-i="${i}" ${o.blocat || ef ? 'disabled' : ''}>${esc(o.text)}${o.blocat ? `<span class="blocat">🔒 ${esc(o.blocat)}</span>` : o.deblocat ? `<span class="deblocat">🔓 ${esc(o.deblocat)}</span>` : ''}${ef ? `<span class="procent">${ef.procente[i]}%</span>` : ''}</button>`).join('')}
+        ${pas.optiuni.map((o, i) => o.ascunsa ? '' : `<button class="opt ${ef && ef.ales === i ? 'aleasa' : ''} ${ef ? 'cu-procent' : ''}" data-i="${i}" ${o.blocat || ef ? 'disabled' : ''}>${esc(o.text)}${o.blocat ? `<span class="blocat">🔒 ${esc(o.blocat)}</span>` : o.deblocat ? `<span class="deblocat">🔓 ${esc(o.deblocat)}</span>` : ''}${ef ? `<span class="procent">${ef.procente[i]}%</span>` : ''}</button>`).join('')}
       </div>
       ${ef ? efecteHtml(ef) + `<div class="actiuni"><button class="btn" id="mai-departe">Mai departe</button><span class="gol">procentele: câți jucători au ales fiecare variantă</span></div>` : ''}
     </div>

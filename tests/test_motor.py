@@ -205,6 +205,43 @@ class Legaturi(unittest.TestCase):
         self.assertIsNone(motor.pas_curent(c, s)["optiuni"][0]["deblocat"], "fără cerințe, fără notă")
         motor.alege(c, s, 1)
 
+    def test_situatia_asteapta_alegerea_anterioara(self):
+        """„b” are o opțiune care cere flagul pus doar de „a”: „b” nu apare până nu s-a jucat „a”."""
+        c = continut_de_test()
+        c.situatie("a")["optiuni"][0]["flaguri"] = ["cafea"]
+        c.situatie("b")["optiuni"][1]["cerinte"] = {"flaguri": ["cafea"]}
+        for id_ in ("c", "d", "e", "f"):
+            c.situatie(id_)["nivel"] = 4   # rămân doar a și b la nivelul 1
+        s = motor.stare_noua(c, {}, seed=3)
+        self.assertEqual(s["pas_id"], "a", "b așteaptă după a")
+        motor.alege(c, s, 1)   # a, fără cafea
+        self.assertEqual(s["pas_id"], "b")
+        pas = motor.pas_curent(c, s)
+        self.assertEqual(pas["optiuni"][1]["blocat"], "Depindea de o alegere anterioară")
+        self.assertFalse(pas["optiuni"][1]["ascunsa"], "alegerea anterioară a fost posibilă, deci se vede blocată")
+
+    def test_optiunea_fara_sursa_in_domeniu_e_ascunsa(self):
+        c = continut_de_test()
+        c.config["domenii"] = [{"id": "it", "nume": "IT"}, {"id": "horeca", "nume": "Horeca"}]
+        c.situatie("a")["optiuni"][0]["flaguri"] = ["cafea"]; c.situatie("a")["domenii"] = ["horeca"]
+        c.situatie("b")["optiuni"][1]["cerinte"] = {"flaguri": ["cafea"]}
+        s = motor.stare_noua(c, {"domeniu": "it"}, seed=1)
+        s["pas_id"] = "b"
+        pas = motor.pas_curent(c, s)
+        self.assertTrue(pas["optiuni"][1]["ascunsa"], "la IT nimeni nu putea pune flagul: opțiunea nu se arată")
+        with self.assertRaises(motor.ActiuneInvalida):
+            motor.alege(c, s, 1)
+
+    def test_sursa_de_nivel_mai_mare_ascunde_optiunea_fara_sa_amane_situatia(self):
+        c = continut_de_test()
+        c.situatie("a")["optiuni"][0]["flaguri"] = ["cafea"]; c.situatie("a")["nivel"] = 3
+        c.situatie("b")["optiuni"][1]["cerinte"] = {"flaguri": ["cafea"]}
+        for id_ in ("c", "d", "e", "f"):
+            c.situatie(id_)["nivel"] = 3
+        s = motor.stare_noua(c, {}, seed=1)
+        self.assertEqual(s["pas_id"], "b", "b apare la nivelul 1 deși sursa e la nivelul 3")
+        self.assertTrue(motor.pas_curent(c, s)["optiuni"][1]["ascunsa"], "opțiunea dependentă e ascunsă deocamdată")
+
     def test_cerinta_dupa_si_fara_flaguri(self):
         c = continut_de_test()
         c.situatie("b")["cerinte"] = {"dupa": ["a"]}
