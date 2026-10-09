@@ -8,7 +8,7 @@ Regulile:
 - Trei resurse 0..100 (parteneri, bunăstare angajați, legalitate). Una la 0 = partida s-a terminat.
   La fiecare bilanț resursele se uzează cu `uzura_pe_an` din config; alegerile le întrețin.
   Banii nu sunt resursă: sunt profitul, care dă nivelul.
-- După bilanțul fiecărui an (în afară de ultimul) vine un mini-joc scurt, ales la întâmplare
+- După fiecare trimestru (sau, cu `minijocuri.cand = "an"`, doar după bilanțul anual) vine un mini-joc scurt, ales la întâmplare
   dintre cele de nivelul firmei sau mai mic („Mă fură angajații?” verifică răspunsul pe server); scorul lui
   (0..100) dă un efect pe resurse/profit proporțional cu `efect_max` din config.
 - Fiecare opțiune aduce profit (mii lei). Unele, rare, schimbă permanent profitul
@@ -404,11 +404,26 @@ def _inainteaza(c: Continut, stare: dict[str, Any]) -> None:
     if stare["decizia"] < c.decizii_pe_trimestru:
         stare["decizia"] += 1
     elif stare["trimestru"] < c.trimestre_pe_an:
-        stare["trimestru"] += 1
-        stare["decizia"] = 1
+        # S-a terminat trimestrul: dacă mini-jocurile sunt „pe trimestru”, vine unul înainte de următorul.
+        mj = minijocul_anului(c, stare) if (c.config.get("minijocuri") or {}).get("cand", "trimestru") == "trimestru" else None
+        if mj:
+            _pregateste_minijoc(c, stare, mj)
+            stare["minijoc"]["apoi"] = "trimestru"
+            stare["pas"], stare["pas_id"] = PAS_MINIJOC, mj["id"]
+            return
+        _trimestru_urmator(c, stare)
+        return
     else:
         stare["pas"], stare["pas_id"] = PAS_BILANT, None
         return
+    if not _alege_situatia(c, stare):
+        _incheie(c, stare, "fara_situatii")
+
+
+def _trimestru_urmator(c: Continut, stare: dict[str, Any]) -> None:
+    stare["trimestru"] += 1
+    stare["decizia"] = 1
+    stare["pas"] = PAS_DECIZIE
     if not _alege_situatia(c, stare):
         _incheie(c, stare, "fara_situatii")
 
@@ -519,10 +534,14 @@ def minijoc(c: Continut, stare: dict[str, Any], scor: int | None, raspuns: float
     stare["profit_an"] += profit      # intră în bilanțul anului care urmează
     stare["istoric"].append({"tip": PAS_MINIJOC, "id": mj.get("id"), "an": stare["an"], "scor": scor, "delta": delta, "profit": profit})
     rezultat = {"id": mj.get("id"), "nume": mj.get("nume"), "scor": scor, "delta": delta, "profit": profit, "resurse": dict(stare["resurse"]), **extra}
+    apoi = curent.get("apoi", "an")
     stare.pop("minijoc", None)
     if _verifica_terminat(c, stare):
         return rezultat
-    _an_urmator(c, stare)
+    if apoi == "trimestru":
+        _trimestru_urmator(c, stare)
+    else:
+        _an_urmator(c, stare)
     return rezultat
 
 
@@ -718,7 +737,8 @@ def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
         curent = stare.get("minijoc") or {}
         mj = next((j for j in (c.config.get("minijocuri") or {}).get("lista", []) if j.get("id") == curent.get("id")), {})
         baza["minijoc"] = {"id": mj.get("id"), "nume": mj.get("nume"), "desc": mj.get("desc", ""), "efect_max": mj.get("efect_max", {}),
-                           "produs": (curent.get("date") or {}).get("produs")}   # prețul real rămâne pe server
+                           "produs": (curent.get("date") or {}).get("produs"),   # prețul real rămâne pe server
+                           "apoi": curent.get("apoi", "an")}
     else:
         baza["final"] = stare["final"]
     return baza

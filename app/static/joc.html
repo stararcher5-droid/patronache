@@ -158,6 +158,11 @@
   .mj-produs { font-size:24px; font-weight:bold; margin:6px 0 10px; }
   .mj-raspunsuri { display:flex; flex-direction:column; gap:6px; align-items:flex-start; font-family:system-ui, sans-serif; font-size:14px; }
   .mj-gata { font-size:24px; text-align:center; padding:30px 0; font-family:system-ui, sans-serif; }
+  .mj-raft { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px 0; }
+  .mj-cutie { font-size:34px; height:80px; border-radius:12px; border:2px solid var(--linie); background:var(--hartie2); cursor:pointer; }
+  .mj-cutie.inchisa { background:#3a3326; } .mj-cutie.ok { border-color:var(--ok); } .mj-cutie.rau { border-color:var(--rau); }
+  .mj-semn, .mj-cafea { width:100%; min-height:90px; font-size:20px; margin:10px 0; user-select:none; -webkit-user-select:none; touch-action:none; }
+  .mj-semn.apasat { transform:scale(.98); filter:brightness(1.15); }
   /* bilanț & final */
   .mare { font-size:40px; font-weight:bold; line-height:1; margin:6px 0; }
   .tabel { width:100%; border-collapse:collapse; font-family:system-ui, sans-serif; font-size:14px; margin:10px 0; }
@@ -486,7 +491,7 @@ function ecranMinijoc() {
   const ef = Object.entries(m.efect_max || {}).map(([k, v]) => (k === 'profit' ? 'Profit' : numeRes(k)) + ' până la +' + v).join(', ');
   return `
     <div class="card intra">
-      <div class="cand">Sfârșitul anului ${pas.an} · mini-joc</div>
+      <div class="cand">${m.apoi === 'trimestru' ? 'Sfârșitul trimestrului ' + pas.trimestru : 'Sfârșitul anului ' + pas.an} · mini-joc</div>
       <h1>${esc(m.nume)}</h1>
       <p class="text">${esc(m.desc || '')}</p>
       <p class="gol">Scor bun = ${esc(ef)}. Scor slab = puțin în minus. Poți și să sari peste.</p>
@@ -505,7 +510,7 @@ async function trimiteScor(scor, raspuns = null) {
     const pret = r.pret_real != null ? `<p class="text">${esc(r.produs || 'Produsul')} costă <b>${Number(r.pret_real).toLocaleString('ro-RO')} lei</b>. Tu ai zis ${Number(r.raspuns).toLocaleString('ro-RO')} lei${r.scor >= 80 ? '. Pe tine nu te fură nimeni.' : r.scor >= 30 ? '. Aproape.' : '. Ți-ar lua și cămașa.'}</p>` : '';
     $('#ecran').innerHTML = antet() + `<div class="card intra"><div class="cand">${esc(r.nume || 'Mini-joc')}</div><h1>${scor === null ? 'Ai sărit peste' : 'Scor: ' + scor + ' din 100'}</h1>${pret}
       <p class="text">${scor === null ? 'Nimic nu s-a schimbat.' : scor >= 80 ? 'Ca la carte.' : scor >= 50 ? 'Merge, dar se poate și mai bine.' : scor >= 30 ? 'Pe muchie.' : 'A fost o zi proastă.'}</p>${chips}
-      <div class="actiuni"><button class="btn" id="mai-departe">${pas.pas === 'decizie' ? 'Anul ' + pas.an : 'Mai departe'}</button></div></div>`;
+      <div class="actiuni"><button class="btn" id="mai-departe">${pas.pas === 'decizie' ? (pas.trimestru === 1 ? 'Anul ' + pas.an : 'Trimestrul ' + pas.trimestru) : 'Mai departe'}</button></div></div>`;
     $('#mai-departe').addEventListener('click', () => arata());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (e) { eroare(e.message); }
@@ -514,7 +519,7 @@ async function trimiteScor(scor, raspuns = null) {
 function porneste_minijoc(id) {
   const arena = $('#mj-arena'); arena.classList.remove('ascuns'); $('#mj-actiuni').classList.add('ascuns');
   const gata = scor => { arena.innerHTML = `<div class="mj-gata">Scor: <b>${scor}</b> din 100</div>`; setTimeout(() => trimiteScor(Math.max(0, Math.min(100, Math.round(scor)))), 900); };
-  const jocuri = { stampila: mjStampila, telefoanele: mjTelefoanele, pizza: mjPizza, negocierea: mjNegocierea, pretul: mjPretul };
+  const jocuri = { stampila: mjStampila, telefoanele: mjTelefoanele, pizza: mjPizza, negocierea: mjNegocierea, pretul: mjPretul, inventarul: mjInventarul, semnatura: mjSemnatura, cafeaua: mjCafeaua, contabilul: mjContabilul };
   (jocuri[id] || (() => gata(30)))(arena, gata);
 }
 // 1. Ștampila: dosarele apar și dispar; apeși pe ele cât sunt pe masă.
@@ -605,6 +610,70 @@ function mjPretul(arena, gata) {
   const inp = $('#mj-pret'); inp.focus();
   const trimite = () => { const v = +inp.value; if (!(v >= 0)) return; $('#mj-ofer').disabled = true; trimiteScor(null, v); };
   $('#mj-ofer').addEventListener('click', trimite); inp.addEventListener('keydown', e => { if (e.key === 'Enter') trimite(); });
+}
+
+// 6. Inventarul: opt cutii cu obiecte, vizibile 3 secunde; apoi „unde era X?”, trei runde.
+function mjInventarul(arena, gata) {
+  const OB = ['📦', '🧾', '🔧', '🍕', '💻', '🚚', '☕', '🏗️', '🥨', '🔑', '📱', '🪑'];
+  let runda = 0, corecte = 0;
+  const joaca = () => {
+    const ob = OB.slice().sort(() => Math.random() - 0.5).slice(0, 8);
+    arena.innerHTML = `<div class="mj-sus">Runda ${runda + 1} din 3 · ține minte ce e în fiecare cutie</div><div class="mj-raft" id="mj-raft">${ob.map((o, i) => `<button class="mj-cutie" data-i="${i}"><span class="mj-cont">${o}</span></button>`).join('')}</div><div class="mj-sus" id="mj-intrebare">Memorează… 3</div>`;
+    let t = 3; const cnt = setInterval(() => { t--; const q = $('#mj-intrebare'); if (!q) { clearInterval(cnt); return; } if (t > 0) q.textContent = 'Memorează… ' + t; else { clearInterval(cnt); intreaba(ob); } }, 1000);
+  };
+  const intreaba = ob => {
+    $$('.mj-cont').forEach(x => { x.textContent = '📦'; }); $$('.mj-cutie').forEach(b => b.classList.add('inchisa'));
+    const tinta = Math.floor(Math.random() * 8);
+    $('#mj-intrebare').innerHTML = `Unde era <b style="font-size:22px">${ob[tinta]}</b>?`;
+    $$('.mj-cutie').forEach(b => b.addEventListener('click', () => {
+      const ok = +b.dataset.i === tinta; if (ok) corecte++;
+      $$('.mj-cont').forEach((x, i) => { x.textContent = ob[i]; }); b.classList.add(ok ? 'ok' : 'rau');
+      $$('.mj-cutie').forEach(x => x.disabled = true);
+      runda++; setTimeout(() => runda < 3 ? joaca() : gata(corecte / 3 * 100), 900);
+    }, { once: true }));
+  };
+  joaca();
+}
+// 7. Semnătura: ții apăsat exact 2 secunde, de trei ori. Scor după cât de aproape ești.
+function mjSemnatura(arena, gata) {
+  let incercare = 0, scoruri = [];
+  arena.innerHTML = '<div class="mj-sus">Încercarea <b id="mj-inc">1</b> din 3 · ținta: 2,00 secunde</div><button class="btn mj-semn" id="mj-semn"><span>Ține apăsat ca să semnezi</span></button><div class="mj-raspunsuri" id="mj-rez"></div>';
+  const btn = $('#mj-semn'); let t0 = null;
+  const jos = e => { e.preventDefault(); if (t0 || incercare >= 3) return; t0 = performance.now(); btn.querySelector('span').textContent = 'Semnezi…'; btn.classList.add('apasat'); };
+  const sus = () => {
+    if (!t0) return; const d = (performance.now() - t0) / 1000; t0 = null; btn.classList.remove('apasat'); btn.querySelector('span').textContent = 'Ține apăsat ca să semnezi';
+    const err = Math.abs(d - 2); const sc = Math.max(0, 100 - err * 100); scoruri.push(sc); incercare++;
+    $('#mj-rez').insertAdjacentHTML('beforeend', `<span class="chip ${err < 0.15 ? 'plus' : err < 0.5 ? 'scut' : 'minus'}">${d.toFixed(2)} s · ${err < 0.15 ? 'fermă' : err < 0.5 ? 'cam tremurată' : 'ca de doctor'}</span>`);
+    if (incercare >= 3) gata(scoruri.reduce((a, b) => a + b, 0) / 3); else $('#mj-inc').textContent = incercare + 1;
+  };
+  btn.addEventListener('pointerdown', jos); btn.addEventListener('pointerup', sus); btn.addEventListener('pointercancel', sus);
+}
+// 8. Cafeaua: aștepți „Gata!” și apeși cât mai repede; apăsarea înainte costă. Trei runde.
+function mjCafeaua(arena, gata) {
+  let runda = 0, scoruri = [], gataLa = null, timer = null;
+  arena.innerHTML = '<div class="mj-sus">Cafeaua <b id="mj-r">1</b> din 3</div><button class="btn mj-cafea" id="mj-cafea" style="background:var(--hartie2); color:var(--cerneala)">☕ Se face…</button><div class="mj-raspunsuri" id="mj-rez"></div>';
+  const btn = $('#mj-cafea');
+  const porneste = () => { gataLa = null; btn.textContent = '☕ Se face…'; btn.style.background = 'var(--hartie2)'; btn.style.color = 'var(--cerneala)'; timer = setTimeout(() => { if (!document.contains(btn)) return; gataLa = performance.now(); btn.textContent = '☕ Gata!'; btn.style.background = 'var(--ok)'; btn.style.color = '#fff'; }, 1500 + Math.random() * 2500); };
+  btn.addEventListener('pointerdown', e => {
+    e.preventDefault(); if (runda >= 3) return;
+    let sc, txt;
+    if (!gataLa) { clearTimeout(timer); sc = 0; txt = 'prea devreme, s-a vărsat'; } else { const r = performance.now() - gataLa; sc = Math.max(0, 100 - Math.max(0, r - 200) / 6); txt = Math.round(r) + ' ms'; }
+    scoruri.push(sc); runda++;
+    $('#mj-rez').insertAdjacentHTML('beforeend', `<span class="chip ${sc >= 70 ? 'plus' : sc > 0 ? 'scut' : 'minus'}">${txt}</span>`);
+    if (runda >= 3) { btn.disabled = true; gata(scoruri.reduce((a, b) => a + b, 0) / 3); } else { $('#mj-r').textContent = runda + 1; porneste(); }
+  });
+  porneste();
+}
+// 9. Contabilul: cinci calcule cu facturi, 25 de secunde în total.
+function mjContabilul(arena, gata) {
+  const intrebari = []; for (let i = 0; i < 5; i++) { const a = 100 + Math.floor(Math.random() * 90) * 10, b = 50 + Math.floor(Math.random() * 45) * 10; const tip = Math.random() < 0.5 ? '+' : '−'; intrebari.push({ a, b, tip, r: tip === '+' ? a + b : a - b }); }
+  let i = 0, corecte = 0, timp = 25, activ = true;
+  arena.innerHTML = '<div class="mj-sus"><span id="mj-timp">25</span>s · factura <b id="mj-n">1</b> din 5 · corecte: <b id="mj-scor">0</b></div><div class="mj-produs" id="mj-calc"></div><div class="mj-neg"><input type="number" id="mj-rasp" placeholder="rezultatul, în lei"><button class="btn" id="mj-ok">Trec în registru</button></div>';
+  const arata = () => { const q = intrebari[i]; $('#mj-calc').textContent = `Factura: ${q.a} lei ${q.tip} ${q.tip === '+' ? 'TVA' : 'discount'} ${q.b} lei = ?`; $('#mj-rasp').value = ''; $('#mj-rasp').focus(); };
+  const raspunde = () => { if (!activ) return; if (+$('#mj-rasp').value === intrebari[i].r) { corecte++; $('#mj-scor').textContent = corecte; } i++; if (i >= 5) { activ = false; clearInterval(t); gata(corecte / 5 * 100); return; } $('#mj-n').textContent = i + 1; arata(); };
+  $('#mj-ok').addEventListener('click', raspunde); $('#mj-rasp').addEventListener('keydown', e => { if (e.key === 'Enter') raspunde(); });
+  const t = setInterval(() => { if (!document.contains(arena) || !activ) { clearInterval(t); return; } timp--; $('#mj-timp').textContent = timp; if (timp <= 0) { activ = false; clearInterval(t); gata(corecte / 5 * 100); } }, 1000);
+  arata();
 }
 
 function ecranFinal() {
@@ -707,7 +776,7 @@ $('#l-cum').addEventListener('click', () => {
   const m = $('#modal');
   m.innerHTML = `<div class="card"><h2>Cum se joacă</h2>
     <p>Ești patronul unei firme, ${CONT.ani} ani. În fiecare trimestru iei ${CONT.decizii_pe_trimestru} decizii: despre angajați, clienți, bani, ANAF, Primărie.</p>
-    <p><b>Trei lucruri de urmărit</b>: partenerii (furnizori, clienți, bănci), bunăstarea angajaților și legalitatea. Fiecare e între 0 și 100. Dacă una ajunge la zero, s-a terminat: partenerii te lasă, toți pleacă sau vine DNA-ul.</p><p><b>Nimic nu stă pe loc</b>: la fiecare bilanț anual cele trei bare scad puțin de la sine. Le ții sus prin ce alegi.</p><p><b>La final de an</b>, după bilanț, vine un mini-joc scurt, ales la întâmplare: ștampilezi dosare, prinzi telefoane, tai pizza, negociezi un preț sau ghicești cât costă ceva ce cumpără firma ta. Scorul bun ridică o bară; scorul slab o scade puțin.</p><p><b>Banii</b> nu sunt o bară: fiecare alegere aduce sau pierde profit, iar profitul total dă nivelul firmei.</p>
+    <p><b>Trei lucruri de urmărit</b>: partenerii (furnizori, clienți, bănci), bunăstarea angajaților și legalitatea. Fiecare e între 0 și 100. Dacă una ajunge la zero, s-a terminat: partenerii te lasă, toți pleacă sau vine DNA-ul.</p><p><b>Nimic nu stă pe loc</b>: la fiecare bilanț anual cele trei bare scad puțin de la sine. Le ții sus prin ce alegi.</p><p><b>La final de trimestru</b> vine un mini-joc scurt, ales la întâmplare: ștampilezi dosare, prinzi telefoane, tai pizza, negociezi un preț sau ghicești cât costă ceva ce cumpără firma ta. Scorul bun ridică o bară; scorul slab o scade puțin.</p><p><b>Banii</b> nu sunt o bară: fiecare alegere aduce sau pierde profit, iar profitul total dă nivelul firmei.</p>
     <p><b>Profit și nivel</b>: fiecare alegere aduce (sau pierde) bani. La finalul anului, profitul se adună la totalul firmei, iar totalul dă nivelul, de la 1 (firmă de apartament) la ${CONT.niveluri.length} (${esc(CONT.niveluri[CONT.niveluri.length - 1].nume)}). Nivelul deblochează alegeri noi, dar poate și să scadă după un an prost.</p>
     <p><b>Cărțile</b>: unele alegeri îți aduc cărți speciale în inventar. Le folosești când vrei, în timpul unei decizii; se consumă pe loc.</p>
     <p><b>Alegerile se leagă</b>: ce faci azi poate aduce o situație nouă mâine. Nepotul angajat azi greșește comanda mâine.</p>

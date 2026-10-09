@@ -279,6 +279,8 @@ def _valideaza_config(c: dict[str, Any]) -> None:
     if mj is not None:
         if not isinstance(mj, dict) or not isinstance(mj.get("lista", []), list):
             raise ContinutInvalid("config: 'minijocuri' trebuie să fie {'activ': bool, 'lista': [...]}")
+        if mj.get("cand", "trimestru") not in ("trimestru", "an"):
+            raise ContinutInvalid("config: 'minijocuri.cand' trebuie să fie 'trimestru' sau 'an'")
         ids: set[str] = set()
         for j in mj.get("lista", []):
             if not j.get("id") or not j.get("nume") or not isinstance(j.get("efect_max", {}), dict):
