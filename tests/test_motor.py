@@ -235,6 +235,26 @@ class Carti(unittest.TestCase):
         s["pas_id"] = "b"; motor.alege(c, s, 0)
         self.assertEqual(s["carti"], ["pizza", "pizza"], "o primește din nou deși o are deja")
 
+    def test_scutul_sare_decizia_curenta_si_opreste_scaderea_la_urmatoarea(self):
+        c = continut_de_test()
+        c.carti.append({"id": "scut", "nume": "Scut", "efect": {"scut": {"resurse": ["bunastare"], "decizii": 1}}})
+        c._carti["scut"] = c.carti[-1]
+        s = motor.stare_noua(c, {}, seed=1)
+        s["carti"] = ["scut"]
+        r = motor.foloseste_carte(c, s, "scut")
+        self.assertEqual(r["scut"]["resurse"], ["bunastare"])
+        self.assertFalse(motor.pas_curent(c, s)["scuturi"][0]["activ_acum"], "nu se aplică la situația pe care o vezi")
+        ef = motor.alege(c, s, 1)   # opțiunea „rea”: -30 pe toate
+        self.assertEqual(ef["delta"]["bunastare"], -30, "decizia curentă nu e protejată")
+        self.assertEqual(ef["scut_oprit"], {})
+        self.assertTrue(motor.pas_curent(c, s)["scuturi"][0]["activ_acum"])
+        s["resurse"] = {"buget": 90, "bunastare": 90, "legalitate": 90}
+        ef = motor.alege(c, s, 1)
+        self.assertEqual(ef["delta"].get("bunastare", 0), 0, "următoarea decizie e protejată")
+        self.assertEqual(ef["delta"]["buget"], -30, "celelalte resurse nu")
+        self.assertEqual(ef["scut_oprit"], {"bunastare": -30})
+        self.assertEqual(s["scuturi"], [], "scutul s-a consumat")
+
     def test_cartea_nu_se_poate_folosi_la_bilant(self):
         c = continut_de_test()
         s = motor.stare_noua(c, {}, seed=1)

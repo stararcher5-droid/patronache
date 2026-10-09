@@ -53,6 +53,8 @@
   .opt.aleasa { border-color:var(--accent); background:#fff3ef; }
   .efecte { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; font-family:system-ui, sans-serif; font-size:14px; }
   .chip { padding:5px 10px; border-radius:99px; background:var(--hartie2); }
+  .chip.scut { background:#e6ecfa; color:#2b3f7a; }
+  .scuturi { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; font-family:system-ui, sans-serif; font-size:13px; }
   .chip.plus { background:#e3f2ec; color:#245e4f; } .chip.minus { background:#fbe4df; color:#8a2e1c; } .chip.carte { background:#fff0c7; color:#6a4b00; }
   .actiuni { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; align-items:center; }
   .btn { font:inherit; font-size:16px; padding:12px 20px; border-radius:12px; border:0; background:var(--accent); color:#fff; cursor:pointer; box-shadow:var(--umbra); }
@@ -223,6 +225,7 @@ function antet() {
       <div class="nivel">nivelul ${pas.nivel.nivel}<b>${esc(pas.nivel.nume)}</b></div>
     </header>
     ${baraProfit()}
+    ${scuturiHtml()}
     <div class="resurse">
       ${RES.map(x => `<div class="res ${x.k} ${r[x.k] <= 15 ? 'alarma' : ''}"><div class="et"><span>${x.icon} ${x.nume}</span><b>${r[x.k]}</b></div><div class="bara"><i style="width:${r[x.k]}%"></i></div></div>`).join('')}
     </div>`;
@@ -258,14 +261,23 @@ function ecranDecizie() {
         : '<div class="gol">Nimic încă. Unele alegeri îți aduc cărți: petreceri, team building, lucruri care ridică moralul când ai nevoie.</div>'}
     </div>`;
 }
+function numeRes(k) { return (RES.find(x => x.k === k) || { nume: k }).nume; }
 function efectCarte(ef) {
   if (!ef) return '';
-  return RES.filter(x => ef[x.k]).map(x => `<span class="chip ${ef[x.k] > 0 ? 'plus' : 'minus'}">${x.nume} ${semn(ef[x.k])}</span>`).join('') + (ef.profit ? `<span class="chip ${ef.profit > 0 ? 'plus' : 'minus'}">Profit ${semn(ef.profit)}</span>` : '');
+  return RES.filter(x => ef[x.k]).map(x => `<span class="chip ${ef[x.k] > 0 ? 'plus' : 'minus'}">${x.nume} ${semn(ef[x.k])}</span>`).join('')
+    + (ef.profit ? `<span class="chip ${ef.profit > 0 ? 'plus' : 'minus'}">Profit ${semn(ef.profit)}</span>` : '')
+    + (ef.scut ? `<span class="chip scut">🛡️ ${ef.scut.resurse.map(numeRes).join(' și ')} nu scade la următoarea${(ef.scut.decizii || 1) > 1 ? 'le ' + ef.scut.decizii : ''} decizi${(ef.scut.decizii || 1) > 1 ? 'i' : 'e'}</span>` : '');
+}
+function scuturiHtml() {
+  const sc = pas.scuturi || [];
+  if (!sc.length) return '';
+  return `<div class="scuturi">${sc.map(x => `<span class="chip scut">🛡️ ${esc(x.carte || 'Scut')}: ${x.resurse.map(numeRes).join(', ')} nu poate scădea ${x.activ_acum ? 'la decizia asta' : 'de la următoarea decizie'}${x.ramase > 1 ? ' (' + x.ramase + ' decizii)' : ''}</span>`).join('')}</div>`;
 }
 function efecteHtml(ef) {
   const chips = RES.filter(x => ef.delta[x.k]).map(x => `<span class="chip ${ef.delta[x.k] > 0 ? 'plus' : 'minus'}">${x.icon} ${x.nume} ${semn(ef.delta[x.k])}</span>`);
   if (ef.profit) chips.push(`<span class="chip ${ef.profit > 0 ? 'plus' : 'minus'}">Profit ${semn(ef.profit)} mii</span>`);
   if (ef.carte) chips.push(`<span class="chip carte">🃏 Ai primit: ${esc(ef.carte.nume)}</span>`);
+  for (const [k, v] of Object.entries(ef.scut_oprit || {})) chips.push(`<span class="chip scut">🛡️ Scutul a oprit: ${numeRes(k)} ${semn(v)}</span>`);
   if (!chips.length) chips.push('<span class="chip">Nimic nu s-a schimbat. Deocamdată.</span>');
   return `<div class="efecte">${chips.join('')}</div>`;
 }
@@ -372,7 +384,9 @@ async function folosesteCarte(id) {
   try {
     const d = await api('POST', '/api/partida/' + joc.id + '/carte', { carte: id });
     pas = d.pas; arata();
-    const chips = $('.card .cand'); if (chips) chips.insertAdjacentHTML('afterend', efecteHtml({ delta: d.efect.delta, profit: d.efect.profit, carte: null }).replace('class="efecte"', 'class="efecte" style="margin:0 0 10px"'));
+    let extra = '';
+    if (d.efect.scut) extra = `<span class="chip scut">🛡️ Activ de la următoarea decizie: ${d.efect.scut.resurse.map(numeRes).join(', ')} nu poate scădea</span>`;
+    const chips = $('.card .cand'); if (chips) chips.insertAdjacentHTML('afterend', efecteHtml({ delta: d.efect.delta, profit: d.efect.profit, carte: null }).replace('class="efecte"', 'class="efecte" style="margin:0 0 10px"').replace('</div>', extra + '</div>'));
   } catch (e) { eroare(e.message); }
   ocupat = false;
 }

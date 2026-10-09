@@ -590,7 +590,7 @@ function randeazaCarti() {
   for (const c of carti()) {
     if (q && !(c.id + ' ' + c.nume + ' ' + (c.desc || '')).toLowerCase().includes(q)) continue;
     const ef = c.efect || {};
-    const rezumat = [...RESURSE.map(r => ef[r] ? `${NUME_RESURSE[r]} ${ef[r] > 0 ? '+' : ''}${ef[r]}` : ''), ef.profit ? `profit ${ef.profit > 0 ? '+' : ''}${ef.profit}` : ''].filter(Boolean).join(', ') || 'fără efect';
+    const rezumat = [...RESURSE.map(r => ef[r] ? `${NUME_RESURSE[r]} ${ef[r] > 0 ? '+' : ''}${ef[r]}` : ''), ef.profit ? `profit ${ef.profit > 0 ? '+' : ''}${ef.profit}` : '', ef.scut ? `scut: ${ef.scut.resurse.map(r => NUME_RESURSE[r]).join(', ')} (${ef.scut.decizii || 1} dec.)` : ''].filter(Boolean).join(', ') || 'fără efect';
     const li = document.createElement('li');
     li.className = c.id === carteCurenta ? 'activ' : '';
     li.innerHTML = `<div><b>${esc(c.icon ? c.icon + ' ' : '')}${esc(c.nume)}</b><small>${esc(c.id)} · ${esc(rezumat)} · dată de ${undeSePrimeste(c.id).length} opțiuni</small></div><button class="mic pericol sterge" title="Șterge cartea">×</button>`;
@@ -633,6 +633,12 @@ function deschideCarte(id) {
       <div class="rand r4">
         ${RESURSE.map(r => `<div><label>${NUME_RESURSE[r]} ±</label><input type="number" class="k-ef" data-r="${r}" value="${ef[r] ?? 0}"></div>`).join('')}
         <div><label>Profit (mii lei, intră în bilanțul anului)</label><input type="number" class="k-ef" data-r="profit" value="${ef.profit ?? 0}"></div>
+      </div>
+      <h3>Scut (opțional)</h3>
+      <p class="nota">De la <b>următoarea</b> decizie (nu cea pe care jucătorul o vede când folosește cartea), scăderile pe resursele bifate sunt anulate, pentru numărul de decizii de mai jos.</p>
+      <div class="rand r4">
+        ${RESURSE.map(r => `<div class="bifa"><input type="checkbox" class="k-scut" value="${r}" ${(ef.scut?.resurse || []).includes(r) ? 'checked' : ''}> ${NUME_RESURSE[r]} nu poate scădea</div>`).join('')}
+        <div><label>Pe câte decizii</label><input type="number" id="k-scut-decizii" min="1" value="${ef.scut?.decizii ?? 1}"></div>
       </div>
 
       <h3>Se primește la</h3>
@@ -693,6 +699,8 @@ function citesteEditorCarte() {
   c.desc = $('#k-desc', el).value;
   c.efect = {};
   for (const x of $$('.k-ef', el)) { const v = numar(x.value); if (v) c.efect[x.dataset.r] = v; }
+  const scut = $$('.k-scut:checked', el).map(x => x.value);
+  if (scut.length) c.efect.scut = { resurse: scut, decizii: Math.max(1, numar($('#k-scut-decizii', el).value, 1)) };
   randeazaCarti();
 }
 function stergeCarte(id) {

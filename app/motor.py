@@ -17,6 +17,8 @@ Regulile:
   curent și nemarcate `doar_legata`.
 - Cărțile speciale intră în inventar când alegi opțiunea care le dă; le poți
   folosi oricând în timpul unei decizii, se consumă și aplică efectul pe loc.
+  O carte poate avea și un „scut”: de la următoarea decizie (nu cea pe care o
+  vezi), scăderile pe resursele alese sunt anulate, pentru N decizii.
 - La final, dacă opțiunile au `teme`, jucătorul e comparat cu arhetipurile.
 """
 from __future__ import annotations
@@ -56,6 +58,7 @@ def stare_noua(c: Continut, firma: dict[str, Any], seed: int | None = None) -> d
         "profit_total": 0,
         "nivel": 1,
         "carti": [],             # inventarul, în ordinea primirii
+        "scuturi": [],           # cărți de tip scut active: {resurse, ramase, sare}
         "flaguri": [],
         "jucate": [],            # id-urile situațiilor jucate
         "coada": [],             # situații deschise de opțiuni, încă nejucate
@@ -189,7 +192,8 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     if blocat:
         raise ActiuneInvalida(f"opțiunea e blocată: {blocat}")
 
-    delta = _aplica_resurse(stare, o.get("ef", {}))
+    ef, oprit = _aplica_scuturi(stare, s["id"], o.get("ef", {}))
+    delta = _aplica_resurse(stare, ef)
     profit = o.get("profit", 0)
     stare["profit_an"] += profit
 
@@ -214,7 +218,7 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
 
     efect = {
         "delta": delta, "profit": profit, "resurse": dict(stare["resurse"]),
-        "carte": carte_noua, "teme": dict(o.get("teme", {})),
+        "carte": carte_noua, "teme": dict(o.get("teme", {})), "scut_oprit": oprit,
     }
     if _verifica_terminat(c, stare):
         return efect
@@ -270,6 +274,28 @@ def bilant(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     return rezultat
 
 
+def _aplica_scuturi(stare: dict[str, Any], id_situatie: str, ef: dict[str, float]) -> tuple[dict[str, float], dict[str, int]]:
+    """Scuturile active anulează scăderile pe resursele lor. Un scut folosit în timpul situației X
+    nu se aplică la X (jucătorul o vede deja), ci de la următoarea decizie. Întoarce efectul filtrat
+    și ce a fost oprit."""
+    oprit: dict[str, int] = {}
+    ramase = []
+    ef = dict(ef)
+    for scut in stare.get("scuturi", []):
+        if scut.get("sare") == id_situatie:
+            ramase.append(scut)
+            continue
+        for r in scut["resurse"]:
+            if ef.get(r, 0) < 0:
+                oprit[r] = oprit.get(r, 0) + int(round(ef[r]))
+                ef[r] = 0
+        scut["ramase"] -= 1
+        if scut["ramase"] > 0:
+            ramase.append(scut)
+    stare["scuturi"] = ramase
+    return ef, oprit
+
+
 def foloseste_carte(c: Continut, stare: dict[str, Any], id_carte: str) -> dict[str, Any]:
     """Jucătorul folosește o carte din inventar. Se consumă și efectul se aplică pe loc."""
     if stare["pas"] != PAS_DECIZIE:
@@ -283,10 +309,14 @@ def foloseste_carte(c: Continut, stare: dict[str, Any], id_carte: str) -> dict[s
     delta = _aplica_resurse(stare, ef)
     profit = ef.get("profit", 0)
     stare["profit_an"] += profit
+    scut = None
+    if ef.get("scut"):
+        scut = {"carte": id_carte, "resurse": list(ef["scut"]["resurse"]), "ramase": int(ef["scut"].get("decizii", 1)), "sare": stare["pas_id"]}
+        stare.setdefault("scuturi", []).append(scut)
     stare["carti"].remove(id_carte)
-    stare["istoric"].append({"tip": PAS_CARTE, "id": id_carte, "an": stare["an"], "trimestru": stare["trimestru"], "delta": delta, "profit": profit})
+    stare["istoric"].append({"tip": PAS_CARTE, "id": id_carte, "an": stare["an"], "trimestru": stare["trimestru"], "delta": delta, "profit": profit, "scut": scut})
     _verifica_terminat(c, stare)
-    return {"carte": carte, "delta": delta, "profit": profit, "resurse": dict(stare["resurse"])}
+    return {"carte": carte, "delta": delta, "profit": profit, "scut": scut, "resurse": dict(stare["resurse"])}
 
 
 # ---------------------------------------------------------------- rezultat
@@ -369,6 +399,11 @@ def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
         "profit_an": stare["profit_an"], "profit_total": stare["profit_total"],
         "nivel": {"nivel": stare["nivel"], "nume": nivel["nume"]},
         "carti": [c.carte(x) or {"id": x, "nume": x} for x in stare["carti"]],
+        "scuturi": [
+            {"carte": (c.carte(sc.get("carte", "")) or {}).get("nume", sc.get("carte")), "resurse": sc["resurse"], "ramase": sc["ramase"],
+             "activ_acum": sc.get("sare") != stare["pas_id"]}
+            for sc in stare.get("scuturi", [])
+        ],
     }
     if pas == PAS_DECIZIE:
         s = c.situatie(stare["pas_id"])

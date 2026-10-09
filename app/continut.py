@@ -198,8 +198,14 @@ def _valideaza_carti(carti: list[dict[str, Any]]) -> set[str]:
         if not isinstance(ef, dict):
             raise ContinutInvalid(f"{unde}: 'efect' trebuie să fie dict")
         for k, v in ef.items():
+            if k == "scut":
+                if not isinstance(v, dict) or not isinstance(v.get("resurse"), list) or not v["resurse"] \
+                        or any(r not in RESURSE for r in v["resurse"]) \
+                        or ("decizii" in v and (not isinstance(v["decizii"], int) or v["decizii"] < 1)):
+                    raise ContinutInvalid(f"{unde}: 'scut' trebuie să fie {{'resurse': [...din {RESURSE}], 'decizii': >= 1}}")
+                continue
             if k not in (*RESURSE, "profit") or not _numar(v):
-                raise ContinutInvalid(f"{unde}: 'efect' acceptă doar {RESURSE} și 'profit', cu valori numerice")
+                raise ContinutInvalid(f"{unde}: 'efect' acceptă doar {RESURSE}, 'profit' și 'scut'")
     return ids
 
 
