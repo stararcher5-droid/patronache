@@ -135,6 +135,63 @@ class API(unittest.TestCase):
 
         self.assertEqual(self.client.put("/api/admin/continut/altceva.json", json={}, headers=h).status_code, 404)
 
+    def test_reseteaza_la_implicit(self):
+        h = {"X-Parola": "secret"}
+        niv = self.client.get("/api/admin/continut", headers=h).json()["niveluri.json"]
+        niv["niveluri"][0]["nume"] = "Modificat"
+        self.assertEqual(self.client.put("/api/admin/continut/niveluri.json", json=niv, headers=h).status_code, 200)
+        self.assertEqual(self.client.get("/api/continut").json()["niveluri"][0]["nume"], "Modificat")
+        r = self.client.post("/api/admin/reseteaza/niveluri.json", headers=h)
+        self.assertEqual(r.status_code, 200, r.text)
+        self.assertNotEqual(self.client.get("/api/continut").json()["niveluri"][0]["nume"], "Modificat")
+        self.assertEqual(self.client.post("/api/admin/reseteaza/altceva.json", headers=h).status_code, 404)
+
+    def test_sincronizare_cu_imaginea(self):
+        """Fișierele needitate se actualizează; cele editate rămân."""
+        import hashlib
+        d = TMP / "continut"
+        marker = json.loads((d / main.MARKER).read_text(encoding="utf-8")) if (d / main.MARKER).exists() else {}
+        # fișier vechi dar needitat: diferit de imagine, cu hash-ul lui notat în marker
+        (d / "arhetipuri.json").write_text('{"arhetipuri": []}', encoding="utf-8")
+        marker["arhetipuri.json"] = hashlib.sha256(b'{"arhetipuri": []}').hexdigest()
+        # fișier editat din admin: diferit și de imagine, și de marker
+        (d / "carti.json").write_text('{"carti": []}', encoding="utf-8")
+        marker["carti.json"] = "altceva"
+        (d / main.MARKER).write_text(json.dumps(marker), encoding="utf-8")
+        actualizate = main._seamana_continutul()
+        self.assertIn("arhetipuri.json", actualizate)
+        self.assertNotIn("carti.json", actualizate)
+        self.assertEqual((d / "carti.json").read_text(encoding="utf-8"), '{"carti": []}')
+        self.assertIn('"arhetipuri": [', (d / "arhetipuri.json").read_text(encoding="utf-8"))
+        shutil.copy(RADACINA / "continut" / "carti.json", d / "carti.json")   # restaurăm pentru celelalte teste
+        main.Stare.continut = None
+
+    def test_actualizarea_automata_se_anuleaza_daca_nu_se_potriveste(self):
+        """Niveluri noi (needitate) + situații editate care cer un nivel inexistent: nivelurile revin la ce erau."""
+        import hashlib
+        d = TMP / "continut"
+        marker = json.loads((d / main.MARKER).read_text(encoding="utf-8"))
+        # nivelurile din dataset: o versiune veche cu 10 niveluri, needitată (hash notat în marker)
+        zece = {"niveluri": [{"nivel": i, "nume": f"N{i}", "prag": (i - 1) * 100} for i in range(1, 11)]}
+        text_zece = json.dumps(zece)
+        (d / "niveluri.json").write_text(text_zece, encoding="utf-8")
+        marker["niveluri.json"] = hashlib.sha256(text_zece.encode("utf-8")).hexdigest()
+        # situațiile: editate de admin, cer nivelul 10
+        sit = json.loads((d / "situatii.json").read_text(encoding="utf-8"))
+        sit["situatii"][0]["cerinte"] = {"nivel_min": 10}
+        (d / "situatii.json").write_text(json.dumps(sit, ensure_ascii=False), encoding="utf-8")
+        marker["situatii.json"] = "altceva"
+        (d / main.MARKER).write_text(json.dumps(marker), encoding="utf-8")
+
+        main.Stare.continut = None
+        c = main.continut()   # nu trebuie să arunce
+        self.assertEqual(len(c.niveluri), 10, "nivelurile au revenit la versiunea dinainte")
+        self.assertEqual(json.loads((d / "niveluri.json").read_text(encoding="utf-8")), zece)
+        # curățăm pentru celelalte teste
+        for n in ("niveluri.json", "situatii.json"):
+            shutil.copy(RADACINA / "continut" / n, d / n)
+        main.Stare.continut = None
+
     def test_pagina_joc(self):
         r = self.client.get("/")
         self.assertEqual(r.status_code, 200)

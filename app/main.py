@@ -19,6 +19,8 @@ Admin (meniul de editat conținutul, la /admin; vezi admin.py):
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import shutil
 from contextlib import asynccontextmanager
@@ -43,19 +45,95 @@ class Stare:
 
 def continut() -> modul_continut.Continut:
     if Stare.continut is None:
-        _seamana_continutul()
-        Stare.continut = modul_continut.incarca(DIR_CONTINUT)
+        actualizate = _seamana_continutul()
+        try:
+            Stare.continut = modul_continut.incarca(DIR_CONTINUT)
+        except modul_continut.ContinutInvalid:
+            if not actualizate:
+                raise
+            # Versiunea nouă din imagine nu se potrivește cu ce a editat adminul: dăm înapoi actualizarea.
+            _anuleaza_actualizarea(actualizate)
+            Stare.continut = modul_continut.incarca(DIR_CONTINUT)
     return Stare.continut
 
 
-def _seamana_continutul() -> None:
-    """Pe un volum gol (prima pornire în Docker) copiază conținutul din imagine, ca admin-ul să aibă ce edita."""
-    if DIR_CONTINUT == modul_continut.DIR_CONTINUT_IMPLICIT or (DIR_CONTINUT / "config.json").exists():
-        return
+# Hash-uri ale versiunilor livrate înainte să existe markerul; un fișier din
+# dataset identic cu una dintre ele e sigur neatins de admin și se actualizează.
+HASHURI_VECHI = {
+    "config.json": {"2ed2d2e37a7f15c8e5f5d8966efdf1e90bfc4a599e07cb06118e0480340b883e"},
+    "niveluri.json": {"2605c6045f062809f7aa6a4496f11099c21a18e68db5c6418a6e6f7050e56c23"},
+}
+MARKER = ".implicit.json"
+
+
+def _hash(cale: Path) -> str:
+    return hashlib.sha256(cale.read_bytes()).hexdigest()
+
+
+def _citeste_marker() -> dict[str, str]:
+    try:
+        return json.loads((DIR_CONTINUT / MARKER).read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def _scrie_marker(marker: dict[str, str]) -> None:
+    (DIR_CONTINUT / MARKER).write_text(json.dumps(marker, indent=2) + "\n", encoding="utf-8")
+
+
+def _seamana_continutul() -> list[str]:
+    """Ține conținutul din volumul de date în pas cu cel din imagine, fără să strice editările.
+
+    - fișier lipsă: se copiază din imagine;
+    - fișier identic cu versiunea din imagine de la ultima copiere (deci needitat din admin):
+      se înlocuiește cu versiunea nouă din imagine;
+    - fișier editat din admin: rămâne așa cum e.
+    Întoarce numele fișierelor actualizate.
+    """
+    if DIR_CONTINUT == modul_continut.DIR_CONTINUT_IMPLICIT:
+        return []
     DIR_CONTINUT.mkdir(parents=True, exist_ok=True)
+    marker = _citeste_marker()
+    actualizate: list[str] = []
     for nume in modul_continut.FISIERE:
-        if not (DIR_CONTINUT / nume).exists():
-            shutil.copy(modul_continut.DIR_CONTINUT_IMPLICIT / nume, DIR_CONTINUT / nume)
+        sursa, tinta = modul_continut.DIR_CONTINUT_IMPLICIT / nume, DIR_CONTINUT / nume
+        hash_nou = _hash(sursa)
+        if not tinta.exists():
+            shutil.copy(sursa, tinta)
+            actualizate.append(nume)
+        else:
+            hash_curent = _hash(tinta)
+            neatins = hash_curent == marker.get(nume) or hash_curent in HASHURI_VECHI.get(nume, set())
+            if neatins and hash_curent != hash_nou:
+                shutil.copy(tinta, tinta.with_suffix(".json.inainte"))   # ca să putem da înapoi
+                shutil.copy(sursa, tinta)
+                actualizate.append(nume)
+            elif not neatins and hash_curent != hash_nou:
+                continue  # editat din admin, nu ne atingem și nu notăm
+        marker[nume] = hash_nou
+    _scrie_marker(marker)
+    return actualizate
+
+
+def _anuleaza_actualizarea(nume_fisiere: list[str]) -> None:
+    """Pune la loc versiunile dinainte ale fișierelor actualizate automat și scoate notarea lor din marker."""
+    marker = _citeste_marker()
+    for nume in nume_fisiere:
+        inainte = (DIR_CONTINUT / nume).with_suffix(".json.inainte")
+        if inainte.exists():
+            inainte.replace(DIR_CONTINUT / nume)
+            marker[nume] = _hash(DIR_CONTINUT / nume)   # rămâne „neatins”, încercăm iar la versiunea următoare
+    _scrie_marker(marker)
+
+
+def reseteaza_fisier(nume: str) -> None:
+    """Admin: aduce un fișier la versiunea din imagine și reîncarcă motorul."""
+    if DIR_CONTINUT != modul_continut.DIR_CONTINUT_IMPLICIT:
+        shutil.copy(modul_continut.DIR_CONTINUT_IMPLICIT / nume, DIR_CONTINUT / nume)
+        marker = _citeste_marker()
+        marker[nume] = _hash(DIR_CONTINUT / nume)
+        _scrie_marker(marker)
+    Stare.continut = modul_continut.incarca(DIR_CONTINUT)
 
 
 @asynccontextmanager

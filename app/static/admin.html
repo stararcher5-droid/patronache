@@ -141,7 +141,7 @@
       <h2>Nivelurile firmei</h2>
       <p class="nota">Nivelul e cel mai mare al cărui prag (profit total acumulat, mii lei) e atins. Dacă un an iese pe minus, profitul total scade și nivelul poate coborî.</p>
       <table id="tabel-niveluri"><thead><tr><th>Nivel</th><th>Nume</th><th>Descriere</th><th>Prag profit total</th></tr></thead><tbody></tbody></table>
-      <div style="margin-top:10px; display:flex; gap:8px"><button id="nivel-adauga">+ Nivel</button><button class="pericol" id="nivel-sterge">− Ultimul nivel</button><button class="primar" id="salveaza-niveluri">Salvează nivelurile</button></div>
+      <div style="margin-top:10px; display:flex; gap:8px"><button id="nivel-adauga">+ Nivel</button><button class="pericol" id="nivel-sterge">− Ultimul nivel</button><button class="primar" id="salveaza-niveluri">Salvează nivelurile</button><button data-reset="niveluri.json">Revino la nivelurile implicite</button></div>
       <p class="nota" style="margin-top:8px">Numărul de ani se schimbă în tab-ul Reguli. Când ștergi un nivel, cerințele de nivel din situații care depășesc noul maxim sunt coborâte la maxim.</p>
     </div>
   </section>
@@ -159,7 +159,7 @@
       <div class="rand r3" id="cfg-resurse"></div>
       <h3>Finaluri</h3>
       <div id="cfg-finaluri"></div>
-      <div style="margin-top:10px"><button class="primar" id="salveaza-reguli">Salvează regulile</button></div>
+      <div style="margin-top:10px; display:flex; gap:8px"><button class="primar" id="salveaza-reguli">Salvează regulile</button><button data-reset="config.json">Revino la regulile implicite</button></div>
     </div>
   </section>
 
@@ -180,6 +180,11 @@
       <p class="nota">Avertismente despre conținutul salvat pe server: situații puține pe un an, legături la care nu ajunge nimeni, flaguri sau cărți cerute pe care nu le dă nimeni.</p>
       <button id="verifica">Verifică acum</button>
       <div id="avertismente" style="margin-top:12px"></div>
+      <h3>Conținutul implicit</h3>
+      <p class="nota">Fișierele pe care nu le-ai editat se actualizează singure la fiecare versiune nouă a aplicației. Cele editate rămân ale tale; de aici le poți aduce la versiunea livrată cu aplicația (editările din fișierul respectiv se pierd).</p>
+      <div class="etichete">
+        <button data-reset="config.json">Reguli</button><button data-reset="niveluri.json">Niveluri</button><button data-reset="carti.json">Cărți</button><button data-reset="situatii.json">Situații</button><button data-reset="arhetipuri.json">Arhetipuri</button>
+      </div>
     </div>
   </section>
 </main>
@@ -792,6 +797,15 @@ async function verifica() {
     $$('[data-sare]', el).forEach(a => a.addEventListener('click', () => deschide(a.dataset.sare)));
   } catch (e) { el.innerHTML = `<div class="eroare">${esc(e.message)}</div>`; }
 }
+
+// ------------------------------------------------------------------ revenire la implicit
+$$('[data-reset]').forEach(b => b.addEventListener('click', async () => {
+  const f = b.dataset.reset;
+  if (!confirm(`Aduci ${f} la versiunea livrată cu aplicația? Ce ai editat în fișierul ăsta se pierde.`)) return;
+  eroare(null);
+  try { await api('POST', '/api/admin/reseteaza/' + f); nesalvat.delete(f); await incarca(); arataStare('readus la implicit: ' + f); }
+  catch (e) { eroare('Nu s-a putut: ' + e.message); }
+}));
 
 // ------------------------------------------------------------------ start
 incarca().catch(e => eroare('Nu s-a putut încărca conținutul: ' + e.message));

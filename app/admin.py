@@ -74,3 +74,16 @@ def scrie(nume: str, corp: dict[str, Any], x_parola: str | None = Header(default
     from . import main
     main.Stare.continut = nou
     return {"ok": True, "fisier": nume, "avertismente": modul_continut.verifica(nou)}
+
+
+@router.post("/reseteaza/{nume}")
+def reseteaza(nume: str, x_parola: str | None = Header(default=None)) -> dict[str, Any]:
+    """Aduce fișierul la versiunea livrată cu aplicația (din imagine). Editările din el se pierd."""
+    _verifica_parola(x_parola)
+    nume = _fisier(nume)
+    from . import main
+    try:
+        main.reseteaza_fisier(nume)
+    except modul_continut.ContinutInvalid as e:
+        raise HTTPException(422, f"versiunea implicită nu se potrivește cu restul conținutului: {e}")
+    return {"ok": True, "fisier": nume, "avertismente": modul_continut.verifica(main.continut())}

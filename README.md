@@ -88,7 +88,11 @@ cu un token care are `read:packages`, sau fă pachetul public din GitHub:
 Packages → patronache → Package settings → Change visibility.
 
 **Update**: Apps → patronache → Stop, apoi Start; cu `pull_policy: always`
-trage imaginea nouă. Datele și conținutul editat din admin rămân în dataset.
+trage imaginea nouă. Datele rămân în dataset. Conținutul: fișierele pe care
+nu le-ai editat din admin se actualizează singure cu versiunea din imagine;
+cele editate rămân ale tale (dacă o actualizare automată nu se potrivește cu
+ce ai editat, se anulează singură). Din Admin → Verificare → „Conținutul
+implicit” poți aduce oricând un fișier la versiunea livrată.
 
 Alternativ, fără GitHub Actions, din shell-ul NAS:
 
