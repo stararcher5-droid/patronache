@@ -69,7 +69,7 @@
     },
     {
       "id": "demisia-cto",
-      "nume": "Demisia",
+      "nume": "Demisia CTO-ului",
       "icon": "🚪",
       "surpriza": true,
       "desc": "CTO-ul intră cu un plic și o față de om care a semnat deja în altă parte. Pleacă vineri, cu doi oameni după el.",
@@ -77,7 +77,10 @@
         "bunastare": -8,
         "parteneri": -4,
         "profit": -30
-      }
+      },
+      "domenii": [
+        "it"
+      ]
     },
     {
       "id": "mail-de-la-anaf",
@@ -169,6 +172,25 @@
       "efect": {
         "parteneri": 5,
         "profit": 15
+      }
+    },
+    {
+      "id": "demisia-omului-de-baza",
+      "nume": "Demisia",
+      "icon": "🚪",
+      "surpriza": true,
+      "domenii": [
+        "constructii",
+        "horeca",
+        "transport",
+        "comert",
+        "agricultura"
+      ],
+      "desc": "Omul pe care te bazai cel mai mult intră cu un plic și o față de om care a semnat deja în altă parte. Pleacă vineri, cu doi oameni după el.",
+      "efect": {
+        "bunastare": -8,
+        "parteneri": -4,
+        "profit": -30
       }
     }
   ]

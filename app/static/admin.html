@@ -298,6 +298,7 @@ $('#situatie-noua').addEventListener('click', () => {
   marcheaza('situatii.json'); randeazaLista(); deschide(id);
 });
 $('#salveaza-situatii').addEventListener('click', () => { citesteEditor(); salveaza('situatii.json'); });
+function cartiOptiunii(o) { const c = o && o.carte; return !c ? [] : Array.isArray(c) ? [...c] : [c]; }
 function optiuneGoala() { return { text: '', ef: {} }; }
 
 // ------------------------------------------------------------------ situații: editor
@@ -379,6 +380,8 @@ function deschide(id) {
     $('.o-sus', div).addEventListener('click', () => { if (i === 0) return; citesteEditor(); [s.optiuni[i - 1], s.optiuni[i]] = [s.optiuni[i], s.optiuni[i - 1]]; marcheaza('situatii.json'); deschide(id); });
     $('.o-urm-adauga', div).addEventListener('change', e => { if (!e.target.value) return; citesteEditor(); const o = s.optiuni[i]; o.urmatoare = [...(o.urmatoare || []), e.target.value]; marcheaza('situatii.json'); deschide(id); });
     $$('.o-urm .eticheta button', div).forEach(b => b.addEventListener('click', () => { citesteEditor(); const o = s.optiuni[i]; o.urmatoare = o.urmatoare.filter(x => x !== b.dataset.val); marcheaza('situatii.json'); deschide(id); }));
+    $('.o-carte', div).addEventListener('change', e => { if (!e.target.value) return; citesteEditor(); const o = s.optiuni[i]; const l = cartiOptiunii(o); if (!l.includes(e.target.value)) l.push(e.target.value); o.carte = l.length === 1 ? l[0] : l; marcheaza('situatii.json'); deschide(id); });
+    $$('.o-carti .eticheta button', div).forEach(b => b.addEventListener('click', () => { citesteEditor(); const o = s.optiuni[i]; const l = cartiOptiunii(o).filter(x => x !== b.dataset.val); if (l.length) o.carte = l.length === 1 ? l[0] : l; else delete o.carte; marcheaza('situatii.json'); deschide(id); }));
     $$('.o-urm a[data-sare]', div).forEach(a => a.addEventListener('click', () => { citesteEditor(); deschide(a.dataset.sare); }));
   });
   $$('input, textarea, select', el).forEach(x => x.addEventListener('input', () => marcheaza('situatii.json')));
@@ -395,7 +398,9 @@ function optiuneHtml(o, i, s) {
       ${RESURSE.map(r => `<div><label>${NUME_RESURSE[r]} ±</label><input type="number" class="o-ef" data-r="${r}" value="${o.ef?.[r] || ''}" placeholder="0"></div>`).join('')}
       <div><label>Profit (mii lei; banii, în plus sau în minus)</label><input type="number" class="o-profit" value="${o.profit || ''}" placeholder="0"></div>
       <div><label>Profit de bază pe an ± (permanent, până la final)</label><input type="number" class="o-profit-baza" value="${o.profit_baza || ''}" placeholder="0" title="Rar: schimbă venitul anual din activitatea firmei de la alegerea asta până la finalul jocului"></div>
-      <div><label>Dă cartea</label><select class="o-carte"><option value="">—</option>${carti().map(c => `<option value="${esc(c.id)}" ${o.carte === c.id ? 'selected' : ''}>${esc(c.nume)}</option>`).join('')}</select></div>
+      <div><label>Dă cartea (mai multe = prima potrivită domeniului firmei)</label>
+        <div class="etichete o-carti">${cartiOptiunii(o).map(id => { const c = carti().find(x => x.id === id); return `<span class="eticheta carte">${esc(c ? (c.icon ? c.icon + ' ' : '') + c.nume : id)}<button data-val="${esc(id)}" title="scoate">×</button></span>`; }).join('')}</div>
+        <select class="o-carte" style="margin-top:6px"><option value="">+ adaugă o carte…</option>${carti().map(c => `<option value="${esc(c.id)}">${esc(c.nume)}${c.domenii ? ' (' + c.domenii.join(', ') + ')' : ''}</option>`).join('')}</select></div>
       <div><label>Ia din inventar</label><select class="o-ia-carte"><option value="">—</option><option value="oricare" ${o.ia_carte === 'oricare' ? 'selected' : ''}>oricare carte vizibilă</option>${carti().filter(c => !c.surpriza).map(c => `<option value="${esc(c.id)}" ${o.ia_carte === c.id ? 'selected' : ''}>${esc(c.nume)}</option>`).join('')}</select></div>
       <div><label>Pune flaguri (virgulă)</label><input type="text" class="o-flaguri" value="${esc((o.flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
     </div>
@@ -483,7 +488,7 @@ function citesteEditor() {
     for (const x of $$('.o-ef', div)) { const v = numar(x.value); if (v) o.ef[x.dataset.r] = v; }   // doar ce se schimbă; o opțiune poate mișca o singură resursă sau niciuna
     if (!o.profit) delete o.profit;
     const pb = numar($('.o-profit-baza', div).value); if (pb) o.profit_baza = pb;
-    const carte = $('.o-carte', div).value; if (carte) o.carte = carte;
+    const lc = cartiOptiunii(vechi); if (lc.length) o.carte = lc.length === 1 ? lc[0] : lc;
     const ia = $('.o-ia-carte', div).value; if (ia) o.ia_carte = ia;
     const f = lista($('.o-flaguri', div).value); if (f.length) o.flaguri = f;
     if (vechi.urmatoare && vechi.urmatoare.length) o.urmatoare = vechi.urmatoare;
@@ -699,7 +704,7 @@ function randeazaCarti() {
 }
 function undeSePrimeste(id) {
   const out = [];
-  for (const s of sit()) s.optiuni.forEach((o, i) => { if (o.carte === id) out.push({ id: s.id, titlu: s.titlu, optiune: i, text: o.text }); });
+  for (const s of sit()) s.optiuni.forEach((o, i) => { if (cartiOptiunii(o).includes(id)) out.push({ id: s.id, titlu: s.titlu, optiune: i, text: o.text }); });
   return out;
 }
 function undeECeruta(id) {
@@ -764,18 +769,19 @@ function deschideCarte(id) {
   // legarea cărții la opțiuni, din partea cărții
   $$('#k-primita button', el).forEach(b => b.addEventListener('click', () => {
     const o = sit().find(x => x.id === b.dataset.sit)?.optiuni[+b.dataset.opt]; if (!o) return;
-    delete o.carte; marcheaza('situatii.json'); citesteEditorCarte(); deschideCarte(carteCurenta);
+    const l = cartiOptiunii(o).filter(x => x !== carteCurenta); if (l.length) o.carte = l.length === 1 ? l[0] : l; else delete o.carte;
+    marcheaza('situatii.json'); citesteEditorCarte(); deschideCarte(carteCurenta);
   }));
   $('#k-sit', el).addEventListener('change', e => {
     const x = sit().find(z => z.id === e.target.value); const so = $('#k-opt', el);
     so.disabled = !x; $('#k-adauga', el).disabled = !x;
-    so.innerHTML = x ? x.optiuni.map((o, i) => `<option value="${i}">${i + 1}. ${esc(o.text || '(fără text)')}${o.carte ? ' · dă deja: ' + esc(o.carte) : ''}</option>`).join('') : '<option value="">întâi situația</option>';
+    so.innerHTML = x ? x.optiuni.map((o, i) => `<option value="${i}">${i + 1}. ${esc(o.text || '(fără text)')}${cartiOptiunii(o).length ? ' · dă deja: ' + esc(cartiOptiunii(o).join(', ')) : ''}</option>`).join('') : '<option value="">întâi situația</option>';
   });
   $('#k-adauga', el).addEventListener('click', () => {
     const x = sit().find(z => z.id === $('#k-sit', el).value); if (!x) return;
     const o = x.optiuni[+$('#k-opt', el).value]; if (!o) return;
-    if (o.carte && o.carte !== c.id && !confirm(`Opțiunea dă deja cartea „${o.carte}”. O înlocuiești cu „${c.nume}”?`)) return;
-    o.carte = c.id; marcheaza('situatii.json'); citesteEditorCarte(); deschideCarte(carteCurenta);
+    const l = cartiOptiunii(o); if (!l.includes(c.id)) l.push(c.id); o.carte = l.length === 1 ? l[0] : l;
+    marcheaza('situatii.json'); citesteEditorCarte(); deschideCarte(carteCurenta);
   });
   $('#k-salveaza', el).addEventListener('click', salveazaCarti);
   $('#k-sterge', el).addEventListener('click', () => stergeCarte(c.id));
@@ -813,7 +819,7 @@ function stergeCarte(id) {
   if (primita.length || ceruta.length) mesaj += `\n\nE folosită în ${primita.length + ceruta.length} locuri; referințele vor fi scoase de la situații.`;
   if (!confirm(mesaj)) return;
   for (const s of sit()) {
-    for (const o of s.optiuni) { if (o.carte === id) delete o.carte; if (o.cerinte?.carti) { o.cerinte.carti = o.cerinte.carti.filter(x => x !== id); if (!o.cerinte.carti.length) delete o.cerinte.carti; if (!Object.keys(o.cerinte).length) delete o.cerinte; } }
+    for (const o of s.optiuni) { if (cartiOptiunii(o).includes(id)) { const l = cartiOptiunii(o).filter(x => x !== id); if (l.length) o.carte = l.length === 1 ? l[0] : l; else delete o.carte; } if (o.cerinte?.carti) { o.cerinte.carti = o.cerinte.carti.filter(x => x !== id); if (!o.cerinte.carti.length) delete o.cerinte.carti; if (!Object.keys(o.cerinte).length) delete o.cerinte; } }
     for (const k of ['carti', 'fara_carti']) if (s.cerinte?.[k]) { s.cerinte[k] = s.cerinte[k].filter(x => x !== id); if (!s.cerinte[k].length) delete s.cerinte[k]; }
   }
   if (primita.length || ceruta.length) marcheaza('situatii.json');
@@ -825,7 +831,7 @@ function redenumesteCarte(vechi, nou) {
   const c = carti().find(x => x.id === vechi); if (!c || !nou || vechi === nou) return;
   c.id = nou;
   for (const s of sit()) {
-    for (const o of s.optiuni) { if (o.carte === vechi) o.carte = nou; if (o.cerinte?.carti) o.cerinte.carti = o.cerinte.carti.map(x => x === vechi ? nou : x); }
+    for (const o of s.optiuni) { if (cartiOptiunii(o).includes(vechi)) { const l = cartiOptiunii(o).map(x => x === vechi ? nou : x); o.carte = l.length === 1 ? l[0] : l; } if (o.cerinte?.carti) o.cerinte.carti = o.cerinte.carti.map(x => x === vechi ? nou : x); }
     for (const k of ['carti', 'fara_carti']) if (s.cerinte?.[k]) s.cerinte[k] = s.cerinte[k].map(x => x === vechi ? nou : x);
   }
   marcheaza('situatii.json');

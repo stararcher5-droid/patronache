@@ -163,6 +163,14 @@ def _carte_garantata(c: Continut, stare: dict[str, Any], o: dict[str, Any]) -> s
     return None
 
 
+def carti_optiunii(o: dict[str, Any]) -> list[str]:
+    """Cărțile pe care le poate da o opțiune, în ordinea preferinței."""
+    carte = o.get("carte")
+    if not carte:
+        return []
+    return list(carte) if isinstance(carte, list) else [carte]
+
+
 def in_domeniu(stare: dict[str, Any], obiect: dict[str, Any]) -> bool:
     """O situație sau o carte fără 'domenii' e pentru toate firmele; altfel doar pentru domeniile listate."""
     dom = obiect.get("domenii")
@@ -277,10 +285,17 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
         if tinta:
             stare["carti"].remove(tinta)
             carte_luata = c.carte(tinta) or {"id": tinta, "nume": tinta}
-    if o.get("carte") and in_domeniu(stare, c.carte(o["carte"]) or {}):
-        # Aceeași carte poate fi primită la mai multe alegeri; inventarul ține fiecare exemplar.
-        stare["carti"].append(o["carte"])
-        carte_noua = vedere_carte(stare, c.carte(o["carte"]), o["carte"])
+    # `carte` poate fi un id sau o listă de id-uri: se dă prima carte potrivită domeniului firmei
+    # (ex. „Demisia CTO-ului” la IT, „Demisia omului de bază” în rest). Aceeași carte poate fi
+    # primită la mai multe alegeri; inventarul ține fiecare exemplar.
+    id_dat = None
+    for cand in carti_optiunii(o):
+        if in_domeniu(stare, c.carte(cand) or {}):
+            id_dat = cand
+            break
+    if id_dat:
+        stare["carti"].append(id_dat)
+        carte_noua = vedere_carte(stare, c.carte(id_dat), id_dat)
     garantata = False
     if carte_noua is None:
         stare["fara_carte"] = int(stare.get("fara_carte", 0)) + 1
@@ -302,7 +317,7 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     stare["istoric"].append({
         "tip": PAS_DECIZIE, "id": s["id"], "an": stare["an"], "trimestru": stare["trimestru"],
         "optiune": optiune, "delta": delta, "profit": profit, "teme": dict(o.get("teme", {})),
-        "carte": o.get("carte"), "carte_garantata": garantata,
+        "carte": id_dat, "carte_garantata": garantata,
     })
 
     efect = {

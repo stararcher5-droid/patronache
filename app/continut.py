@@ -375,8 +375,11 @@ def _valideaza_situatii(situatii: list[dict[str, Any]], ids_carti: set[str], tem
                 raise ContinutInvalid(f"{u}: 'profit' trebuie să fie număr")
             if o.get("ia_carte") and o["ia_carte"] != "oricare" and o["ia_carte"] not in ids_carti:
                 raise ContinutInvalid(f"{u}: 'ia_carte' trebuie să fie 'oricare' sau id-ul unei cărți existente, nu {o['ia_carte']!r}")
-            if o.get("carte") and o["carte"] not in ids_carti:
-                raise ContinutInvalid(f"{u}: cartea necunoscută {o['carte']!r}")
+            carte = o.get("carte")
+            if carte:
+                lista = carte if isinstance(carte, list) else [carte]
+                if not lista or any(not isinstance(x, str) or x not in ids_carti for x in lista):
+                    raise ContinutInvalid(f"{u}: 'carte' trebuie să fie id-ul unei cărți existente sau o listă de id-uri, nu {carte!r}")
             for k in ("flaguri", "urmatoare"):
                 if k in o and not (isinstance(o[k], list) and all(isinstance(x, str) for x in o[k])):
                     raise ContinutInvalid(f"{u}: '{k}' trebuie să fie listă de text")
@@ -452,7 +455,7 @@ def verifica(c: Continut) -> list[dict[str, str]]:
                     avertismente.append({"tip": "flag", "id": s["id"], "mesaj": f"O opțiune din {s['id']!r} cere flagul {f!r}, dar nicio opțiune nu îl pune."})
 
     # Cărți cerute pe care nu le dă nimeni.
-    date = {o["carte"] for s in c.situatii for o in s["optiuni"] if o.get("carte")}
+    date = {x for s in c.situatii for o in s["optiuni"] for x in ((o["carte"] if isinstance(o["carte"], list) else [o["carte"]]) if o.get("carte") else [])}
     for s in c.situatii:
         cerute = set((s.get("cerinte") or {}).get("carti", []))
         for o in s["optiuni"]:

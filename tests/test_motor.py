@@ -263,6 +263,18 @@ class Domenii(unittest.TestCase):
         motor.alege(c, s2, 0)
         self.assertEqual(sorted(x["id"] for x in motor.potrivire(c, s2)["clasament"]), ["x", "y"])
 
+    def test_lista_de_carti_da_prima_potrivita_domeniului(self):
+        c = continut_de_test()
+        c.config["domenii"] = [{"id": "it", "nume": "IT"}, {"id": "horeca", "nume": "Horeca"}]
+        c.carti += [{"id": "cto", "nume": "CTO", "domenii": ["it"], "efect": {"bunastare": -8}},
+                    {"id": "om", "nume": "Omul de bază", "domenii": ["horeca"], "efect": {"bunastare": -8}}]
+        for x in c.carti[-2:]: c._carti[x["id"]] = x
+        c.situatie("a")["optiuni"][0]["carte"] = ["om", "cto"]
+        for dom, asteptat in (("it", "cto"), ("horeca", "om")):
+            s = motor.stare_noua(c, {"domeniu": dom}, seed=1); s["pas_id"] = "a"
+            ef = motor.alege(c, s, 0)
+            self.assertEqual(s["carti"], [asteptat]); self.assertEqual(ef["carte"]["id"], asteptat)
+
     def test_domeniu_necunoscut_devine_primul(self):
         c = continut_de_test()
         c.config["domenii"] = [{"id": "it", "nume": "IT"}]
