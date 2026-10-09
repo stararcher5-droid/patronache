@@ -221,6 +221,19 @@ class Carti(unittest.TestCase):
         with self.assertRaises(motor.ActiuneInvalida):
             motor.foloseste_carte(c, s, "pizza")
 
+    def test_aceeasi_carte_de_mai_multe_ori(self):
+        c = continut_de_test()
+        c.situatie("a")["optiuni"][0]["carte"] = "pizza"
+        c.situatie("b")["optiuni"][0]["carte"] = "pizza"
+        s = motor.stare_noua(c, {}, seed=1)
+        s["pas_id"] = "a"; motor.alege(c, s, 0)
+        s["carti"].append("pizza")   # ca și cum ar fi primit-o și la o alegere anterioară
+        self.assertEqual(s["carti"], ["pizza", "pizza"])
+        motor.foloseste_carte(c, s, "pizza")
+        self.assertEqual(s["carti"], ["pizza"], "se consumă un singur exemplar")
+        s["pas_id"] = "b"; motor.alege(c, s, 0)
+        self.assertEqual(s["carti"], ["pizza", "pizza"], "o primește din nou deși o are deja")
+
     def test_cartea_nu_se_poate_folosi_la_bilant(self):
         c = continut_de_test()
         s = motor.stare_noua(c, {}, seed=1)

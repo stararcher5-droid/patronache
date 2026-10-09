@@ -184,7 +184,8 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     stare["profit_an"] += profit
 
     carte_noua = None
-    if o.get("carte") and o["carte"] not in stare["carti"]:
+    if o.get("carte"):
+        # Aceeași carte poate fi primită la mai multe alegeri; inventarul ține fiecare exemplar.
         stare["carti"].append(o["carte"])
         carte_noua = c.carte(o["carte"])
     for f in o.get("flaguri", []):

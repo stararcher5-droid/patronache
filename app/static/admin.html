@@ -628,9 +628,14 @@ function deschideCarte(id) {
         <div><label>Profit (mii lei, intră în bilanțul anului)</label><input type="number" class="k-ef" data-r="profit" value="${ef.profit ?? 0}"></div>
       </div>
 
-      <h3>Unde se primește</h3>
-      ${primita.length ? `<ul class="nota" style="margin:0; padding-left:18px">${primita.map(l => `<li><a data-sare="${esc(l.id)}" style="color:var(--accent);cursor:pointer">${esc(l.titlu)}</a>, opțiunea ${l.optiune + 1}: „${esc(l.text)}”</li>`).join('')}</ul>`
-        : '<p class="nota">Nicio opțiune nu dă cartea asta încă. O setezi la o situație, la opțiune, în câmpul „Dă cartea”.</p>'}
+      <h3>Se primește la</h3>
+      <p class="nota">Aceeași carte poate fi dată de mai multe alegeri; jucătorul primește câte un exemplar de fiecare dată. O opțiune dă o singură carte.</p>
+      <div class="etichete" id="k-primita">${primita.map(l => `<span class="eticheta carte"><a data-sare="${esc(l.id)}" style="cursor:pointer">${esc(l.titlu)}</a> · opț. ${l.optiune + 1}: „${esc(l.text.slice(0, 40))}${l.text.length > 40 ? '…' : ''}”<button data-sit="${esc(l.id)}" data-opt="${l.optiune}" title="nu mai dă cartea">×</button></span>`).join('') || '<span class="nota">nicio opțiune nu dă cartea asta încă</span>'}</div>
+      <div class="rand r3" style="margin-top:8px; align-items:end">
+        <div><label>Situația</label><select id="k-sit"><option value="">alege…</option>${sit().map(x => `<option value="${esc(x.id)}">${esc(x.titlu)} (${esc(x.id)})</option>`).join('')}</select></div>
+        <div><label>Opțiunea care dă cartea</label><select id="k-opt" disabled><option value="">întâi situația</option></select></div>
+        <div><button id="k-adauga" disabled>+ Adaugă</button></div>
+      </div>
       ${ceruta.length ? `<h3>Unde e cerută</h3><ul class="nota" style="margin:0; padding-left:18px">${ceruta.map(l => `<li><a data-sare="${esc(l.id)}" style="color:var(--accent);cursor:pointer">${esc(l.titlu)}</a>: ${esc(l.cum)}</li>`).join('')}</ul>` : ''}
 
       <div style="display:flex; gap:8px; margin-top:16px">
@@ -642,6 +647,22 @@ function deschideCarte(id) {
     </div>`;
   $$('[data-sare]', el).forEach(a => a.addEventListener('click', () => { citesteEditorCarte(); deschide(a.dataset.sare); }));
   $$('input, textarea', el).forEach(x => x.addEventListener('input', () => { citesteEditorCarte(); marcheaza('carti.json'); }));
+  // legarea cărții la opțiuni, din partea cărții
+  $$('#k-primita button', el).forEach(b => b.addEventListener('click', () => {
+    const o = sit().find(x => x.id === b.dataset.sit)?.optiuni[+b.dataset.opt]; if (!o) return;
+    delete o.carte; marcheaza('situatii.json'); citesteEditorCarte(); deschideCarte(carteCurenta);
+  }));
+  $('#k-sit', el).addEventListener('change', e => {
+    const x = sit().find(z => z.id === e.target.value); const so = $('#k-opt', el);
+    so.disabled = !x; $('#k-adauga', el).disabled = !x;
+    so.innerHTML = x ? x.optiuni.map((o, i) => `<option value="${i}">${i + 1}. ${esc(o.text || '(fără text)')}${o.carte ? ' · dă deja: ' + esc(o.carte) : ''}</option>`).join('') : '<option value="">întâi situația</option>';
+  });
+  $('#k-adauga', el).addEventListener('click', () => {
+    const x = sit().find(z => z.id === $('#k-sit', el).value); if (!x) return;
+    const o = x.optiuni[+$('#k-opt', el).value]; if (!o) return;
+    if (o.carte && o.carte !== c.id && !confirm(`Opțiunea dă deja cartea „${o.carte}”. O înlocuiești cu „${c.nume}”?`)) return;
+    o.carte = c.id; marcheaza('situatii.json'); citesteEditorCarte(); deschideCarte(carteCurenta);
+  });
   $('#k-salveaza', el).addEventListener('click', salveazaCarti);
   $('#k-sterge', el).addEventListener('click', () => stergeCarte(c.id));
   $('#k-dubleaza', el).addEventListener('click', () => {
