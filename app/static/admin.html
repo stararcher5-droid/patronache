@@ -141,7 +141,8 @@
       <h2>Nivelurile firmei</h2>
       <p class="nota">Nivelul e cel mai mare al cărui prag (profit total acumulat, mii lei) e atins. Dacă un an iese pe minus, profitul total scade și nivelul poate coborî.</p>
       <table id="tabel-niveluri"><thead><tr><th>Nivel</th><th>Nume</th><th>Descriere</th><th>Prag profit total</th></tr></thead><tbody></tbody></table>
-      <div style="margin-top:10px"><button class="primar" id="salveaza-niveluri">Salvează nivelurile</button></div>
+      <div style="margin-top:10px; display:flex; gap:8px"><button id="nivel-adauga">+ Nivel</button><button class="pericol" id="nivel-sterge">− Ultimul nivel</button><button class="primar" id="salveaza-niveluri">Salvează nivelurile</button></div>
+      <p class="nota" style="margin-top:8px">Numărul de ani se schimbă în tab-ul Reguli. Când ștergi un nivel, cerințele de nivel din situații care depășesc noul maxim sunt coborâte la maxim.</p>
     </div>
   </section>
 
@@ -736,7 +737,27 @@ function randeazaNiveluri() {
     tb.appendChild(tr);
   });
 }
-$('#salveaza-niveluri').addEventListener('click', () => salveaza('niveluri.json'));
+$('#salveaza-niveluri').addEventListener('click', async () => {
+  // situațiile pleacă primele: validarea nivelurilor se face față de situațiile de pe server
+  if (nesalvat.has('situatii.json')) { citesteEditor(); await salveaza('situatii.json'); }
+  await salveaza('niveluri.json');
+});
+$('#nivel-adauga').addEventListener('click', () => {
+  const ultim = niveluri()[niveluri().length - 1];
+  niveluri().push({ nivel: ultim.nivel + 1, nume: 'Nivel ' + (ultim.nivel + 1), desc: '', prag: ultim.prag + Math.max(100, ultim.prag) });
+  marcheaza('niveluri.json'); randeazaNiveluri();
+});
+$('#nivel-sterge').addEventListener('click', () => {
+  if (niveluri().length <= 1) return alert('Trebuie să rămână cel puțin un nivel.');
+  const max = niveluri().length - 1;
+  if (!confirm(`Ștergi nivelul ${niveluri().length}? Cerințele de nivel mai mari de ${max} din situații vor fi coborâte la ${max}.`)) return;
+  niveluri().pop();
+  let atinse = false;
+  const taie = cer => { if (!cer) return; for (const k of ['nivel_min', 'nivel_max']) if (cer[k] > max) { cer[k] = max; atinse = true; } };
+  for (const s of sit()) { taie(s.cerinte); for (const o of s.optiuni) taie(o.cerinte); }
+  if (atinse) marcheaza('situatii.json');
+  marcheaza('niveluri.json'); randeazaNiveluri();
+});
 
 // ------------------------------------------------------------------ reguli
 function randeazaReguli() {

@@ -1,6 +1,6 @@
 {
   "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json).",
-  "ani": 4,
+  "ani": 5,
   "trimestre_pe_an": 4,
   "decizii_pe_trimestru": 2,
   "resurse": {
@@ -12,7 +12,7 @@
     "buget":      { "titlu": "Faliment",                "text": "Lichidatorul a schimbat yala." },
     "bunastare":  { "titlu": "Toți au plecat",          "text": "Și-au dat demisia în aceeași zi, pe WhatsApp." },
     "legalitate": { "titlu": "Dosar penal",             "text": "DNA-ul a venit cu mapa. Firma e sub sechestru." },
-    "mandat":     { "titlu": "Patru ani",               "text": "Ai dus firma patru ani. Să vedem ce fel de patron ai fost." },
+    "mandat":     { "titlu": "Cinci ani",               "text": "Ai dus firma cinci ani. Să vedem ce fel de patron ai fost." },
     "fara_situatii": { "titlu": "S-a terminat povestea", "text": "Nu mai sunt situații pentru drumul ales. Bilanțul e mai jos." }
   },
   "teme": {

@@ -234,7 +234,7 @@
       "titlu": "Licitația de la Primărie",
       "text": "Primăria scoate la licitație exact ce faci tu. Un cunoscut îți șoptește că viceprimarul „bea cafeaua la 10 la Ambasador”.",
       "an_min": 2,
-      "an_max": 4,
+      "an_max": 5,
       "greutate": 2,
       "cerinte": {
         "nivel_min": 3
@@ -292,7 +292,7 @@
           },
           "profit": 200,
           "cerinte": {
-            "nivel_min": 10
+            "nivel_min": 4
           },
           "teme": {
             "stat": 2,
@@ -306,7 +306,7 @@
       "titlu": "Controlul ANAF",
       "text": "Doi inspectori la ușă, cu mapă. „Avem o sesizare.”",
       "an_min": 2,
-      "an_max": 4,
+      "an_max": 5,
       "greutate": 2,
       "cerinte": {
         "fara_flaguri": [
@@ -365,7 +365,7 @@
       "titlu": "Măriri",
       "text": "Inflația a mâncat 10% și trei oameni au trecut „întâmplător” pe lângă biroul tău cu o față anume.",
       "an_min": 2,
-      "an_max": 4,
+      "an_max": 5,
       "greutate": 2,
       "cerinte": {},
       "optiuni": [
@@ -428,7 +428,7 @@
       "titlu": "Sediul nou",
       "text": "Ați crescut și nu mai încăpeți. Banca îți oferă credit pe 15 ani, agentul imobiliar îți arată o clădire de sticlă „cu vizibilitate”.",
       "an_min": 2,
-      "an_max": 4,
+      "an_max": 5,
       "greutate": 1,
       "cerinte": {
         "nivel_min": 2

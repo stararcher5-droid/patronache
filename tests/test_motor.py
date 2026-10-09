@@ -250,7 +250,7 @@ class Validare(unittest.TestCase):
     def test_continutul_din_repo_e_valid(self):
         c = modul_continut.incarca(RADACINA / "continut")
         self.assertGreater(len(c.situatii), 0)
-        self.assertEqual(len(c.niveluri), 10)
+        self.assertEqual(len(c.niveluri), 4)
 
     def test_legatura_moarta_e_respinsa(self):
         with self.assertRaises(modul_continut.ContinutInvalid) as cm:

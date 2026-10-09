@@ -36,7 +36,7 @@ class API(unittest.TestCase):
         r = self.client.get("/api/continut")
         d = r.json()
         self.assertEqual(set(d["resurse"]), {"buget", "bunastare", "legalitate"})
-        self.assertEqual(len(d["niveluri"]), 10)
+        self.assertEqual(len(d["niveluri"]), 4)
         self.assertTrue(all("efect" in c for c in d["carti"]), "jucătorul vede ce face o carte")
 
     def test_partida_prin_http(self):

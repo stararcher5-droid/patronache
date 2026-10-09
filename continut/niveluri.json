@@ -1,15 +1,29 @@
 {
-  "_nota": "Nivelul firmei, de la 1 la 10. Nivelul e cel mai mare al cărui 'prag' (profit total acumulat, în mii de lei) e atins. Poate și scădea dacă profitul total scade. Numele și descrierile sunt de ajustat.",
+  "_nota": "Nivelul firmei, de la 1 la 4. Nivelul e cel mai mare al cărui 'prag' (profit total acumulat, în mii de lei) e atins. Poate și scădea dacă profitul total scade. Numele, descrierile și pragurile sunt de ajustat.",
   "niveluri": [
-    { "nivel": 1,  "nume": "Firmă de apartament",      "desc": "Sediul e bucătăria. Imprimanta e și scanner.",                 "prag": 0 },
-    { "nivel": 2,  "nume": "Sediu bun",                 "desc": "Un birou adevărat, cu firmă pe ușă și cafea la capsule.",     "prag": 100 },
-    { "nivel": 3,  "nume": "Echipă stabilă",            "desc": "Zece oameni, un contabil și o mașină de firmă.",              "prag": 250 },
-    { "nivel": 4,  "nume": "Nume în oraș",              "desc": "Lumea a auzit de voi. Primiți oferte fără să cereți.",        "prag": 450 },
-    { "nivel": 5,  "nume": "Firmă regională",           "desc": "Două sedii, un depozit și un director de vânzări.",           "prag": 700 },
-    { "nivel": 6,  "nume": "Jucător național",          "desc": "Contracte în toată țara. Apari la conferințe.",               "prag": 1000 },
-    { "nivel": 7,  "nume": "Brand cunoscut",            "desc": "Reclame la radio, sponsor la festival.",                      "prag": 1400 },
-    { "nivel": 8,  "nume": "Grup de firme",             "desc": "Holding, consiliu de administrație, avocați pe retainer.",    "prag": 1900 },
-    { "nivel": 9,  "nume": "Lider de piață",            "desc": "Concurența se uită la voi când stabilește prețurile.",        "prag": 2500 },
-    { "nivel": 10, "nume": "Imperiu",                   "desc": "Ai număr direct la minister. Statul vrea să lucreze cu tine.", "prag": 3200 }
+    {
+      "nivel": 1,
+      "nume": "Firmă de apartament",
+      "desc": "Sediul e bucătăria. Imprimanta e și scanner.",
+      "prag": 0
+    },
+    {
+      "nivel": 2,
+      "nume": "Sediu bun",
+      "desc": "Un birou adevărat, cu firmă pe ușă și cafea la capsule.",
+      "prag": 150
+    },
+    {
+      "nivel": 3,
+      "nume": "Firmă regională",
+      "desc": "Două sedii, un depozit și un director de vânzări.",
+      "prag": 500
+    },
+    {
+      "nivel": 4,
+      "nume": "Imperiu",
+      "desc": "Ai număr direct la minister. Statul vrea să lucreze cu tine.",
+      "prag": 1200
+    }
   ]
 }

@@ -23,6 +23,10 @@
   header.top .firma small { color:var(--mut); }
   .nivel { text-align:right; font-family:system-ui, sans-serif; font-size:12px; color:var(--mut); }
   .nivel b { display:block; font-size:15px; color:var(--cerneala); }
+  .profit { background:#fff; border:1px solid var(--linie); border-radius:12px; padding:8px 12px; margin-bottom:10px; font-family:system-ui, sans-serif; }
+  .profit .et { display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--mut); flex-wrap:wrap; }
+  .profit .et b { color:var(--cerneala); font-size:14px; }
+  .profit .bara i { background:linear-gradient(90deg, #7fb3a3, var(--legalitate)); }
   .resurse { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; font-family:system-ui, sans-serif; }
   .res { background:#fff; border:1px solid var(--linie); border-radius:12px; padding:8px 10px; }
   .res .et { display:flex; justify-content:space-between; font-size:12px; color:var(--mut); }
@@ -218,9 +222,21 @@ function antet() {
       <div class="firma"><b>${esc(f.nume)}</b><small>${esc(f.slogan || 'Anul ' + pas.an + ', trimestrul ' + pas.trimestru)}</small></div>
       <div class="nivel">nivelul ${pas.nivel.nivel}<b>${esc(pas.nivel.nume)}</b></div>
     </header>
+    ${baraProfit()}
     <div class="resurse">
       ${RES.map(x => `<div class="res ${x.k} ${r[x.k] <= 15 ? 'alarma' : ''}"><div class="et"><span>${x.icon} ${x.nume}</span><b>${r[x.k]}</b></div><div class="bara"><i style="width:${r[x.k]}%"></i></div></div>`).join('')}
     </div>`;
+}
+
+function baraProfit() {
+  const niv = CONT.niveluri, curent = niv[pas.nivel.nivel - 1], urm = niv[pas.nivel.nivel];
+  const total = pas.profit_total + (pas.profit_an || 0);
+  let procent = 100, tinta = 'nivel maxim';
+  if (urm) {
+    procent = Math.max(0, Math.min(100, (total - curent.prag) / (urm.prag - curent.prag) * 100));
+    tinta = `nivelul ${urm.nivel} la ${urm.prag} mii`;
+  }
+  return `<div class="profit"><div class="et"><span>📈 Profit total <b>${semn(total)} mii</b>${pas.profit_an ? ` <small>(${semn(pas.profit_an)} anul ăsta, se închide la bilanț)</small>` : ''}</span><span>${tinta}</span></div><div class="bara"><i style="width:${procent}%"></i></div></div>`;
 }
 
 function ecranDecizie() {

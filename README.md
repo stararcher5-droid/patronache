@@ -1,15 +1,15 @@
 # Patronache
 
-Joc în care ești patronul unei firme românești, patru ani. Motorul jocului,
+Joc în care ești patronul unei firme românești, cinci ani. Motorul jocului,
 API-ul, interfața jocului (la `/`) și meniul de admin pentru conținut (la `/admin`).
 
 ## Regulile (cum le implementează motorul)
 
 - **Trei resurse**, 0..100: buget, bunăstare angajați, legalitate. Dacă una
   ajunge la 0, ai pierdut (faliment / toți au plecat / dosar penal).
-- **4 ani × 4 trimestre × 2 decizii** (configurabil în `continut/config.json`).
+- **5 ani × 4 trimestre × 2 decizii** (configurabil în `continut/config.json`).
 - **Profit și nivel**: fiecare opțiune aduce profit (mii lei). La finalul
-  anului profitul se adună la totalul firmei, iar totalul dă **nivelul 1..10**
+  anului profitul se adună la totalul firmei, iar totalul dă **nivelul 1..4**
   (praguri în `continut/niveluri.json`). Un an pe minus poate coborî nivelul.
 - **Nivelul deblochează alegeri**: o situație sau o singură opțiune poate cere
   `nivel_min` (ex. contractele cu ministerul doar la nivel 10). Opțiunile
