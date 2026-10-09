@@ -37,7 +37,13 @@ class API(unittest.TestCase):
         d = r.json()
         self.assertEqual(set(d["resurse"]), {"parteneri", "bunastare", "legalitate"})
         self.assertEqual(len(d["niveluri"]), 4)
-        self.assertTrue(all("efect" in c for c in d["carti"]), "jucătorul vede ce face o carte")
+        for c in d["carti"]:
+            if c.get("surpriza"):
+                self.assertNotIn("efect", c, "o carte surpriză nu-și arată efectul")
+                self.assertNotIn("desc", c)
+            else:
+                self.assertIn("efect", c, "jucătorul vede ce face o carte obișnuită")
+        self.assertTrue(any(c.get("surpriza") for c in d["carti"]), "exemplele au și surprize")
 
     def test_partida_prin_http(self):
         r = self.client.post("/api/partida", json={"nume": "Test SRL", "slogan": "merge"})

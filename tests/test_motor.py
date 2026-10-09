@@ -255,6 +255,21 @@ class Carti(unittest.TestCase):
         self.assertEqual(ef["scut_oprit"], {"bunastare": -30})
         self.assertEqual(s["scuturi"], [], "scutul s-a consumat")
 
+    def test_cartea_surpriza_isi_ascunde_efectul_pana_e_folosita(self):
+        c = continut_de_test()
+        c.carti.append({"id": "plic", "nume": "Plicul", "surpriza": True, "desc": "secret", "efect": {"profit": 40, "legalitate": -6}})
+        c._carti["plic"] = c.carti[-1]
+        c.situatie("a")["optiuni"][0]["carte"] = "plic"
+        s = motor.stare_noua(c, {}, seed=1)
+        s["pas_id"] = "a"
+        ef = motor.alege(c, s, 0)
+        self.assertEqual(ef["carte"], {"id": "plic", "nume": "Plicul", "icon": None, "surpriza": True})
+        vazuta = motor.pas_curent(c, s)["carti"][0]
+        self.assertNotIn("efect", vazuta); self.assertNotIn("desc", vazuta)
+        r = motor.foloseste_carte(c, s, "plic")
+        self.assertEqual(r["carte"]["efect"], {"profit": 40, "legalitate": -6}, "la folosire se dezvăluie")
+        self.assertEqual(r["delta"], {"legalitate": -6})
+
     def test_cartea_nu_se_poate_folosi_la_bilant(self):
         c = continut_de_test()
         s = motor.stare_noua(c, {}, seed=1)

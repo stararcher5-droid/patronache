@@ -243,7 +243,7 @@
             "parteneri": 5
           },
           "profit": 165,
-          "carte": "petrecere-concert",
+          "carte": "plicul",
           "flaguri": [
             "cafea-la-primarie"
           ],
@@ -329,7 +329,8 @@
           "teme": {
             "fisc": 0,
             "control": 0
-          }
+          },
+          "carte": "mail-de-la-anaf"
         }
       ]
     },
@@ -362,7 +363,8 @@
           "teme": {
             "salarii": 0,
             "control": 2
-          }
+          },
+          "carte": "zvonul"
         },
         {
           "text": "Nicio mărire, „e un an greu”.",
@@ -410,7 +412,8 @@
           "teme": {
             "risc": 2,
             "imagine": 1
-          }
+          },
+          "carte": "demisia-cto"
         },
         {
           "text": "Rămâi în chirie.",

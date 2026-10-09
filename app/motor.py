@@ -202,7 +202,7 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     if o.get("carte"):
         # Aceeași carte poate fi primită la mai multe alegeri; inventarul ține fiecare exemplar.
         stare["carti"].append(o["carte"])
-        carte_noua = c.carte(o["carte"])
+        carte_noua = vedere_carte(c.carte(o["carte"]), o["carte"])
     for f in o.get("flaguri", []):
         if f not in stare["flaguri"]:
             stare["flaguri"].append(f)
@@ -378,7 +378,7 @@ def rezultat(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
         "resurse": dict(stare["resurse"]),
         "profit_total": stare["profit_total"],
         "nivel": {"nivel": stare["nivel"], "nume": nivel["nume"], "desc": nivel.get("desc", "")},
-        "carti": [c.carte(x) or {"id": x, "nume": x} for x in stare["carti"]],
+        "carti": [vedere_carte(c.carte(x), x) for x in stare["carti"]],
         "carti_folosite": [i["id"] for i in stare["istoric"] if i["tip"] == PAS_CARTE],
         "ani_jucati": stare["an"] if stare["final"]["mandat_complet"] else stare["an"],
         "decizii": len([i for i in stare["istoric"] if i["tip"] == PAS_DECIZIE]),
@@ -387,6 +387,15 @@ def rezultat(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------- vedere pentru client
+
+def vedere_carte(carte: dict[str, Any] | None, id_: str) -> dict[str, Any]:
+    """Cartea așa cum o vede jucătorul în inventar: o carte surpriză își ascunde descrierea și efectul."""
+    if carte is None:
+        return {"id": id_, "nume": id_}
+    if carte.get("surpriza"):
+        return {"id": carte["id"], "nume": carte["nume"], "icon": carte.get("icon"), "surpriza": True}
+    return carte
+
 
 def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     """Ce trebuie să afișeze clientul acum. Nu dezvăluie efectele opțiunilor înainte de alegere."""
@@ -399,7 +408,7 @@ def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
         "resurse": dict(stare["resurse"]),
         "profit_an": stare["profit_an"], "profit_total": stare["profit_total"],
         "nivel": {"nivel": stare["nivel"], "nume": nivel["nume"]},
-        "carti": [c.carte(x) or {"id": x, "nume": x} for x in stare["carti"]],
+        "carti": [vedere_carte(c.carte(x), x) for x in stare["carti"]],
         "scuturi": [
             {"carte": (c.carte(sc.get("carte", "")) or {}).get("nume", sc.get("carte")), "resurse": sc["resurse"], "ramase": sc["ramase"],
              "activ_acum": sc.get("sare") != stare["pas_id"]}

@@ -593,7 +593,7 @@ function randeazaCarti() {
     const rezumat = [...RESURSE.map(r => ef[r] ? `${NUME_RESURSE[r]} ${ef[r] > 0 ? '+' : ''}${ef[r]}` : ''), ef.profit ? `profit ${ef.profit > 0 ? '+' : ''}${ef.profit}` : '', ef.scut ? `scut: ${ef.scut.resurse.map(r => NUME_RESURSE[r]).join(', ')} (${ef.scut.decizii || 1} dec.)` : ''].filter(Boolean).join(', ') || 'fără efect';
     const li = document.createElement('li');
     li.className = c.id === carteCurenta ? 'activ' : '';
-    li.innerHTML = `<div><b>${esc(c.icon ? c.icon + ' ' : '')}${esc(c.nume)}</b><small>${esc(c.id)} · ${esc(rezumat)} · dată de ${undeSePrimeste(c.id).length} opțiuni</small></div><button class="mic pericol sterge" title="Șterge cartea">×</button>`;
+    li.innerHTML = `<div><b>${esc(c.icon ? c.icon + ' ' : '')}${esc(c.nume)}${c.surpriza ? ' <span class="eticheta carte">surpriză</span>' : ''}</b><small>${esc(c.id)} · ${esc(rezumat)} · dată de ${undeSePrimeste(c.id).length} opțiuni</small></div><button class="mic pericol sterge" title="Șterge cartea">×</button>`;
     li.addEventListener('click', () => deschideCarte(c.id));
     $('.sterge', li).addEventListener('click', e => { e.stopPropagation(); stergeCarte(c.id); });
     ul.appendChild(li);
@@ -628,6 +628,7 @@ function deschideCarte(id) {
         <div><label>Iconiță (emoji, opțional)</label><input type="text" id="k-icon" value="${esc(c.icon || '')}" placeholder="🍕"></div>
       </div>
       <div class="rand"><div><label>Descriere (ce vede jucătorul)</label><textarea id="k-desc">${esc(c.desc || '')}</textarea></div></div>
+      <div class="bifa"><input type="checkbox" id="k-surpriza" ${c.surpriza ? 'checked' : ''}> <b>Carte surpriză</b>: stă cu spatele în sus în inventar, jucătorul vede doar numele; ce face află când o folosește.</div>
 
       <h3>Efect când e folosită</h3>
       <div class="rand r4">
@@ -697,6 +698,7 @@ function citesteEditorCarte() {
   c.nume = $('#k-nume', el).value;
   const icon = $('#k-icon', el).value.trim(); if (icon) c.icon = icon; else delete c.icon;
   c.desc = $('#k-desc', el).value;
+  if ($('#k-surpriza', el).checked) c.surpriza = true; else delete c.surpriza;
   c.efect = {};
   for (const x of $$('.k-ef', el)) { const v = numar(x.value); if (v) c.efect[x.dataset.r] = v; }
   const scut = $$('.k-scut:checked', el).map(x => x.value);

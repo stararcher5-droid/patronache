@@ -1,5 +1,5 @@
 {
-  "_nota": "Cărțile speciale intră în inventar când jucătorul alege o opțiune care are 'carte': <id>. Le folosește oricând în timpul unei decizii; cartea se consumă și aplică 'efect' pe loc: delte pe parteneri / bunastare / legalitate și 'profit' (mii lei, în plus sau în minus, intră în bilanțul anului). O carte poate avea și 'scut': {'resurse': ['bunastare'], 'decizii': 1}: de la următoarea decizie (nu cea pe care o vezi), scăderile pe resursele alese sunt anulate, pentru atâtea decizii.",
+  "_nota": "Cărțile speciale intră în inventar când jucătorul alege o opțiune care are 'carte': <id>. Le folosește oricând în timpul unei decizii; cartea se consumă și aplică 'efect' pe loc: delte pe parteneri / bunastare / legalitate și 'profit' (mii lei, în plus sau în minus, intră în bilanțul anului). O carte poate avea și 'scut': {'resurse': ['bunastare'], 'decizii': 1}: de la următoarea decizie (nu cea pe care o vezi), scăderile pe resursele alese sunt anulate, pentru atâtea decizii. 'surpriza': true = cartea stă cu spatele în sus în inventar: jucătorul îi vede doar numele, nu și ce face; află când o folosește.",
   "carti": [
     {
       "id": "petrecere-cu-pizza",
@@ -8,7 +8,8 @@
       "efect": {
         "bunastare": 6,
         "profit": -10
-      }
+      },
+      "icon": "🍕"
     },
     {
       "id": "team-building",
@@ -17,7 +18,8 @@
       "efect": {
         "bunastare": 12,
         "profit": -30
-      }
+      },
+      "icon": "🏕️"
     },
     {
       "id": "petrecere-cu-standup",
@@ -26,7 +28,8 @@
       "efect": {
         "bunastare": 9,
         "profit": -20
-      }
+      },
+      "icon": "🎤"
     },
     {
       "id": "petrecere-concert",
@@ -36,7 +39,8 @@
         "bunastare": 16,
         "legalitate": -2,
         "profit": -50
-      }
+      },
+      "icon": "🎸"
     },
     {
       "id": "cafea-cu-echipa",
@@ -49,6 +53,52 @@
           ],
           "decizii": 1
         }
+      },
+      "icon": "☕"
+    },
+    {
+      "id": "plicul",
+      "nume": "Plicul",
+      "icon": "✉️",
+      "surpriza": true,
+      "desc": "Un plic gros, lipit, lăsat pe birou. Nu scrie de la cine.",
+      "efect": {
+        "profit": 40,
+        "legalitate": -6
+      }
+    },
+    {
+      "id": "demisia-cto",
+      "nume": "Demisia",
+      "icon": "🚪",
+      "surpriza": true,
+      "desc": "CTO-ul intră cu un plic și o față de om care a semnat deja în altă parte. Pleacă vineri, cu doi oameni după el.",
+      "efect": {
+        "bunastare": -8,
+        "parteneri": -4,
+        "profit": -30
+      }
+    },
+    {
+      "id": "mail-de-la-anaf",
+      "nume": "Mailul",
+      "icon": "📧",
+      "surpriza": true,
+      "desc": "Subiect: „Notificare”. Expeditor: ANAF. Ai citit-o de trei ori și tot nu știi ce vor.",
+      "efect": {
+        "legalitate": -5,
+        "profit": -15
+      }
+    },
+    {
+      "id": "zvonul",
+      "nume": "Zvonul",
+      "icon": "🗣️",
+      "surpriza": true,
+      "desc": "Cineva a auzit ceva despre un concurent. Îl dai mai departe.",
+      "efect": {
+        "parteneri": 5,
+        "bunastare": -3
       }
     }
   ]

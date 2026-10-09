@@ -63,11 +63,33 @@
   .inventar { margin-top:4px; }
   .inventar h3 { font-family:system-ui, sans-serif; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--mut); margin:0 0 8px; }
   .carti { display:flex; gap:10px; flex-wrap:wrap; }
-  .carte { background:linear-gradient(160deg, #fff6d6, #ffe8a3); border:1px solid #e8cf7a; border-radius:12px; padding:10px 12px; width:200px; font-family:system-ui, sans-serif; font-size:13px; }
-  .carte b { display:block; font-size:14px; margin-bottom:2px; }
-  .carte .d { color:#6a4b00; margin-bottom:8px; }
-  .carte button { font:inherit; font-size:13px; padding:6px 10px; border-radius:8px; border:0; background:#6a4b00; color:#fff; cursor:pointer; }
+  .carti { display:flex; gap:14px; flex-wrap:wrap; perspective:1000px; }
+  .carte { width:150px; height:220px; border-radius:14px; position:relative; font-family:system-ui, sans-serif; font-size:12px;
+    background:linear-gradient(160deg, #fffaf0, #ffe8a3); border:1px solid #e3c977; box-shadow:0 6px 16px rgba(80,50,0,.18), inset 0 0 0 4px #fff, inset 0 0 0 5px #e8cf7a;
+    display:flex; flex-direction:column; align-items:center; padding:12px 10px 10px; transition:transform .18s, box-shadow .18s; }
+  .carte:hover { transform:translateY(-6px) rotate(-1deg); box-shadow:0 14px 26px rgba(80,50,0,.25), inset 0 0 0 4px #fff, inset 0 0 0 5px #e8cf7a; }
+  .carte .colt { position:absolute; font-size:13px; color:#8a6a1a; }
+  .carte .colt.ss { top:8px; left:10px; } .carte .colt.dj { bottom:8px; right:10px; transform:rotate(180deg); }
+  .carte .mare { font-size:44px; line-height:1; margin:14px 0 8px; filter:drop-shadow(0 3px 2px rgba(0,0,0,.15)); }
+  .carte b { display:block; font-size:14px; text-align:center; line-height:1.2; color:#3b2a00; }
+  .carte .d { color:#6a4b00; text-align:center; margin:4px 0; font-size:11px; line-height:1.3; flex:1; overflow:hidden; }
+  .carte .efecte { margin:0 0 6px; justify-content:center; gap:4px; }
+  .carte .efecte .chip { padding:2px 7px; font-size:11px; }
+  .carte button { font:inherit; font-size:12px; padding:6px 10px; border-radius:8px; border:0; background:#6a4b00; color:#fff; cursor:pointer; width:100%; }
   .carte button:disabled { opacity:.5; cursor:default; }
+  .carte.spate { background:#2f3650; border-color:#1c2130; color:#e8e1cf; box-shadow:0 6px 16px rgba(0,0,0,.3), inset 0 0 0 4px #2f3650, inset 0 0 0 5px #8a93b8;
+    background-image:repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 6px, transparent 6px 12px), repeating-linear-gradient(-45deg, rgba(255,255,255,.05) 0 6px, transparent 6px 12px); }
+  .carte.spate .colt { color:#aeb6d6; } .carte.spate b { color:#fff; } .carte.spate .d { color:#aeb6d6; font-style:italic; }
+  .carte.spate .mare { color:#fff; }
+  .carte.spate button { background:#f6c445; color:#2b2419; }
+  /* dezvăluirea unei cărți folosite */
+  .dezvaluire { position:fixed; inset:0; background:rgba(30,25,15,.6); display:grid; place-items:center; z-index:20; padding:16px; }
+  .dezvaluire .scena { perspective:1200px; text-align:center; font-family:system-ui, sans-serif; color:#fff; }
+  .dezvaluire .carte { width:190px; height:280px; margin:0 auto 14px; font-size:13px; animation:intoarce .7s ease; transform-style:preserve-3d; }
+  .dezvaluire .carte .mare { font-size:60px; }
+  .dezvaluire .carte b { font-size:16px; }
+  @keyframes intoarce { from { transform:rotateY(180deg) scale(.8); } 60% { transform:rotateY(-10deg) scale(1.03); } to { transform:rotateY(0) scale(1); } }
+  .dezvaluire .btn { margin-top:6px; }
   .gol { color:var(--mut); font-family:system-ui, sans-serif; font-size:13px; }
   /* start */
   .start h1 { font-size:34px; }
@@ -99,7 +121,7 @@
   .modal { position:fixed; inset:0; background:rgba(40,30,10,.5); display:grid; place-items:center; padding:16px; z-index:10; }
   .modal .card { max-width:560px; max-height:90vh; overflow:auto; }
   .ascuns { display:none !important; }
-  @media (max-width:520px) { .resurse { gap:6px; } .res { padding:6px 8px; } h1 { font-size:24px; } .card { padding:16px; } .carte { width:100%; } }
+  @media (max-width:520px) { .resurse { gap:6px; } .res { padding:6px 8px; } h1 { font-size:24px; } .card { padding:16px; } .carti { gap:10px; } .carte { width:calc(50% - 5px); } }
 </style>
 </head>
 <body>
@@ -257,9 +279,26 @@ function ecranDecizie() {
     </div>
     <div class="card inventar">
       <h3>Inventar · cărți speciale</h3>
-      ${pas.carti.length ? `<div class="carti">${pas.carti.map((c, i) => `<div class="carte"><b>${esc(c.icon ? c.icon + ' ' : '')}${esc(c.nume)}</b><div class="d">${esc(c.desc || '')}</div><div class="efecte" style="margin:0 0 8px">${efectCarte(c.efect)}</div><button data-carte="${esc(c.id)}" ${ef ? 'disabled' : ''}>Folosește acum</button></div>`).join('')}</div>`
+      ${pas.carti.length ? `<div class="carti">${pas.carti.map(c => carteHtml(c, `<button data-carte="${esc(c.id)}" ${ef ? 'disabled' : ''}>${c.surpriza ? 'Întoarce-o' : 'Folosește acum'}</button>`)).join('')}</div>`
         : '<div class="gol">Nimic încă. Unele alegeri îți aduc cărți: petreceri, team building, lucruri care ridică moralul când ai nevoie.</div>'}
     </div>`;
+}
+function carteHtml(c, buton = '') {
+  const icon = c.icon || '🃏';
+  if (c.surpriza) {
+    return `<div class="carte spate"><span class="colt ss">?</span><span class="colt dj">?</span><div class="mare">❔</div><b>${esc(c.nume)}</b><div class="d">Carte surpriză. Nu știi ce face până n-o întorci.</div>${buton}</div>`;
+  }
+  return `<div class="carte"><span class="colt ss">${esc(icon)}</span><span class="colt dj">${esc(icon)}</span><div class="mare">${esc(icon)}</div><b>${esc(c.nume)}</b><div class="d">${esc(c.desc || '')}</div><div class="efecte">${efectCarte(c.efect)}</div>${buton}</div>`;
+}
+function dezvaluie(carte, efect) {
+  const d = document.createElement('div'); d.className = 'dezvaluire';
+  const chips = efecteHtml({ delta: efect.delta || {}, profit: efect.profit || 0, carte: null })
+    + (efect.scut ? `<div class="efecte" style="justify-content:center"><span class="chip scut">🛡️ De la următoarea decizie: ${efect.scut.resurse.map(numeRes).join(', ')} nu poate scădea</span></div>` : '');
+  d.innerHTML = `<div class="scena">${carteHtml({ ...carte, surpriza: false })}<div style="font-size:14px; margin-bottom:6px">${carte.surpriza ? 'Ai întors cartea.' : 'Ai folosit cartea.'}</div><div style="display:inline-block; text-align:left">${chips.replace('class="efecte"', 'class="efecte" style="margin:0; justify-content:center"')}</div><div><button class="btn">Mai departe</button></div></div>`;
+  document.body.appendChild(d);
+  const inchide = () => d.remove();
+  $('.btn', d).addEventListener('click', inchide);
+  d.addEventListener('click', e => { if (e.target === d) inchide(); });
 }
 function numeRes(k) { return (RES.find(x => x.k === k) || { nume: k }).nume; }
 function efectCarte(ef) {
@@ -276,7 +315,7 @@ function scuturiHtml() {
 function efecteHtml(ef) {
   const chips = RES.filter(x => ef.delta[x.k]).map(x => `<span class="chip ${ef.delta[x.k] > 0 ? 'plus' : 'minus'}">${x.icon} ${x.nume} ${semn(ef.delta[x.k])}</span>`);
   if (ef.profit) chips.push(`<span class="chip ${ef.profit > 0 ? 'plus' : 'minus'}">Profit ${semn(ef.profit)} mii</span>`);
-  if (ef.carte) chips.push(`<span class="chip carte">🃏 Ai primit: ${esc(ef.carte.nume)}</span>`);
+  if (ef.carte) chips.push(`<span class="chip carte">🃏 Ai primit: ${esc(ef.carte.nume)}${ef.carte.surpriza ? ' (surpriză)' : ''}</span>`);
   for (const [k, v] of Object.entries(ef.scut_oprit || {})) chips.push(`<span class="chip scut">🛡️ Scutul a oprit: ${numeRes(k)} ${semn(v)}</span>`);
   if (!chips.length) chips.push('<span class="chip">Nimic nu s-a schimbat. Deocamdată.</span>');
   return `<div class="efecte">${chips.join('')}</div>`;
@@ -384,9 +423,7 @@ async function folosesteCarte(id) {
   try {
     const d = await api('POST', '/api/partida/' + joc.id + '/carte', { carte: id });
     pas = d.pas; arata();
-    let extra = '';
-    if (d.efect.scut) extra = `<span class="chip scut">🛡️ Activ de la următoarea decizie: ${d.efect.scut.resurse.map(numeRes).join(', ')} nu poate scădea</span>`;
-    const chips = $('.card .cand'); if (chips) chips.insertAdjacentHTML('afterend', efecteHtml({ delta: d.efect.delta, profit: d.efect.profit, carte: null }).replace('class="efecte"', 'class="efecte" style="margin:0 0 10px"').replace('</div>', extra + '</div>'));
+    dezvaluie(d.efect.carte, d.efect);
   } catch (e) { eroare(e.message); }
   ocupat = false;
 }
