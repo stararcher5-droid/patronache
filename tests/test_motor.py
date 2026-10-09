@@ -19,7 +19,8 @@ def continut_de_test(**schimbari) -> modul_continut.Continut:
     """Conținut mic și controlat: 2 ani x 1 trimestru x 2 decizii = 4 decizii."""
     brut = {n: modul_continut.citeste_fisier(RADACINA / "continut", n) for n in modul_continut.FISIERE}
     brut = copy.deepcopy(brut)
-    brut["config.json"].update({"ani": 2, "trimestre_pe_an": 1, "decizii_pe_trimestru": 2, "profit_de_baza_pe_an": 0, "garantie_carte": {"dupa": 0, "reguli": []}})
+    for k in brut["config.json"]["resurse"]: brut["config.json"]["resurse"][k]["start"] = 50
+    brut["config.json"].update({"ani": 2, "trimestre_pe_an": 1, "decizii_pe_trimestru": 2, "profit_de_baza_pe_an": 0, "garantie_carte": {"dupa": 0, "reguli": []}, "uzura_pe_an": {}})
     brut["niveluri.json"]["niveluri"] = [
         {"nivel": 1, "nume": "Apartament", "prag": 0},
         {"nivel": 2, "nume": "Sediu", "prag": 50},
@@ -101,6 +102,15 @@ class Reguli(unittest.TestCase):
         motor.alege(c, s, 0); motor.alege(c, s, 0)
         b = motor.bilant(c, s)
         self.assertEqual(b["profit_baza"], 95, "și anii următori, până la final")
+
+    def test_uzura_anuala_scade_resursele_la_bilant(self):
+        c = continut_de_test()
+        c.config["uzura_pe_an"] = {"parteneri": 4, "bunastare": 5, "legalitate": 3}
+        s = motor.stare_noua(c, {}, seed=1)
+        motor.alege(c, s, 0); motor.alege(c, s, 0)      # +5 pe fiecare, de două ori: 60
+        b = motor.bilant(c, s)
+        self.assertEqual(b["uzura"], {"parteneri": -4, "bunastare": -5, "legalitate": -3})
+        self.assertEqual(s["resurse"], {"parteneri": 56, "bunastare": 55, "legalitate": 57})
 
     def test_resursa_la_zero_termina_partida(self):
         c = continut_de_test()

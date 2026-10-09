@@ -104,6 +104,7 @@ class Continut:
             "resurse": self.resurse,
             "domenii": self.domenii,
             "profit_de_baza_pe_an": int(self.config.get("profit_de_baza_pe_an", 0)),
+            "uzura_pe_an": {k: -abs(int(v)) for k, v in (self.config.get("uzura_pe_an") or {}).items()},
             "niveluri": self.niveluri,
             # cărțile surpriză nu apar deloc în lista publică: nici numele n-ar trebui să se vadă
             "carti": [c for c in self.carti if not c.get("surpriza")],
@@ -252,6 +253,9 @@ def _valideaza_config(c: dict[str, Any]) -> None:
         if dom["id"] in ids:
             raise ContinutInvalid(f"config: domeniul {dom['id']!r} apare de două ori")
         ids.add(dom["id"])
+    uz = c.get("uzura_pe_an")
+    if uz is not None and (not isinstance(uz, dict) or any(k not in RESURSE or not _numar(v) for k, v in uz.items())):
+        raise ContinutInvalid(f"config: 'uzura_pe_an' trebuie să fie dict cu chei din {RESURSE} și valori numerice")
     g = c.get("garantie_carte")
     if g is not None:
         if not isinstance(g, dict) or not isinstance(g.get("dupa"), int) or g["dupa"] < 0:

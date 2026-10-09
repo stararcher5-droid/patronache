@@ -1,20 +1,20 @@
 {
-  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json). 'profit_de_baza_pe_an' = ce aduce activitatea curentă a firmei în fiecare an (mii lei), peste efectele alegerilor; se adaugă la bilanț. 'garantie_carte': dacă 'dupa' decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză, aleasă după felul alegerii (prima regulă care se potrivește).",
+  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json). 'profit_de_baza_pe_an' = ce aduce activitatea curentă a firmei în fiecare an (mii lei), peste efectele alegerilor; se adaugă la bilanț. 'garantie_carte': dacă 'dupa' decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză, aleasă după felul alegerii (prima regulă care se potrivește). 'uzura_pe_an': cât scade fiecare resursă la fiecare bilanț anual dacă nu e întreținută prin alegeri.",
   "ani": 5,
   "trimestre_pe_an": 4,
   "decizii_pe_trimestru": 2,
   "resurse": {
     "parteneri": {
       "nume": "Parteneri",
-      "start": 50
+      "start": 40
     },
     "bunastare": {
       "nume": "Bunăstare angajați",
-      "start": 50
+      "start": 40
     },
     "legalitate": {
       "nume": "Legalitate",
-      "start": 50
+      "start": 40
     }
   },
   "finaluri": {
@@ -217,5 +217,10 @@
         ]
       }
     ]
+  },
+  "uzura_pe_an": {
+    "parteneri": 5,
+    "bunastare": 6,
+    "legalitate": 4
   }
 }

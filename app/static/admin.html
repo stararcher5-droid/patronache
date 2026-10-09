@@ -169,6 +169,8 @@
       <div class="rand r3"><div><label>Profit de bază pe an (mii lei, din activitatea curentă, peste alegeri)</label><input type="number" id="cfg-profit-baza"></div></div>
       <h3>Resurse (valoarea de start, 0..100)</h3>
       <div class="rand r3" id="cfg-resurse"></div>
+      <h3>Uzura pe an (cât scade fiecare resursă la bilanț dacă nu e întreținută)</h3>
+      <div class="rand r3" id="cfg-uzura"></div>
       <h3>Garanția de carte</h3>
       <p class="nota">Dacă atâtea decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză. Cartea se alege după felul alegerii: prima regulă de mai jos care se potrivește cu efectul opțiunii alese; „oricând” e rezerva. Doar cărțile surpriză intră aici.</p>
       <div class="rand r3"><div><label>După câte decizii fără carte (0 = oprit)</label><input type="number" id="cfg-garantie-dupa" min="0"></div></div>
@@ -890,6 +892,8 @@ function randeazaReguli() {
   $('#cfg-garantie-dupa').value = (c.garantie_carte || {}).dupa ?? 0;
   randeazaGarantie();
   $('#cfg-resurse').innerHTML = RESURSE.map(r => `<div><label>${esc(c.resurse[r].nume)}</label><input type="number" min="1" max="100" data-r="${r}" value="${c.resurse[r].start}"></div>`).join('');
+  c.uzura_pe_an = c.uzura_pe_an || {};
+  $('#cfg-uzura').innerHTML = RESURSE.map(r => `<div><label>${esc(c.resurse[r].nume)} −</label><input type="number" min="0" max="50" data-uz="${r}" value="${Math.abs(c.uzura_pe_an[r] || 0)}"></div>`).join('');
   randeazaDomenii();
   $('#cfg-finaluri').innerHTML = Object.entries(c.finaluri).map(([k, f]) => `<div class="rand r2"><div><label>${k} · titlu</label><input type="text" data-f="${k}" data-k="titlu" value="${esc(f.titlu)}"></div><div><label>text</label><input type="text" data-f="${k}" data-k="text" value="${esc(f.text || '')}"></div></div>`).join('');
   $$('#tab-reguli input').forEach(x => x.addEventListener('input', () => {
@@ -897,6 +901,7 @@ function randeazaReguli() {
     else if (x.closest('#tabel-garantie')) return;
     else if (x.id === 'cfg-profit-baza') c.profit_de_baza_pe_an = numar(x.value, 0);
     else if (x.id === 'cfg-ani') c.ani = numar(x.value, 4); else if (x.id === 'cfg-trimestre') c.trimestre_pe_an = numar(x.value, 4); else if (x.id === 'cfg-decizii') c.decizii_pe_trimestru = numar(x.value, 2);
+    else if (x.dataset.uz) { const v = Math.abs(numar(x.value, 0)); if (v) c.uzura_pe_an[x.dataset.uz] = v; else delete c.uzura_pe_an[x.dataset.uz]; }
     else if (x.dataset.r) c.resurse[x.dataset.r].start = numar(x.value, 50);
     else if (x.dataset.f) c.finaluri[x.dataset.f][x.dataset.k] = x.value;
     marcheaza('config.json');

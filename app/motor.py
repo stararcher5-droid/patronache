@@ -6,6 +6,7 @@ Nu știe nimic de HTTP sau de baza de date. Primește o stare (dict serializabil
 Regulile:
 - `ani` ani, `trimestre_pe_an` trimestre, `decizii_pe_trimestru` decizii pe trimestru.
 - Trei resurse 0..100 (parteneri, bunăstare angajați, legalitate). Una la 0 = partida s-a terminat.
+  La fiecare bilanț resursele se uzează cu `uzura_pe_an` din config; alegerile le întrețin.
   Banii nu sunt resursă: sunt profitul, care dă nivelul.
 - Fiecare opțiune aduce profit (mii lei). Unele, rare, schimbă permanent profitul
   de bază anual al firmei (`profit_baza`), de atunci până la final. La finalul anului se face bilanțul:
@@ -416,13 +417,17 @@ def bilant(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     baza = int(c.config.get("profit_de_baza_pe_an", 0)) + int(stare.get("profit_baza_delta", 0))
     net = stare["profit_an"] + baza
 
+    # Uzura anului: partenerii uită, oamenii se plictisesc, hârtiile se învechesc. Se întreține prin alegeri.
+    uzura = {k: -abs(int(v)) for k, v in (c.config.get("uzura_pe_an") or {}).items() if k in RESURSE and v}
+    delta_uzura = _aplica_resurse(stare, uzura)
+
     nivel_vechi = stare["nivel"]
     stare["profit_total"] += net
     nivel_nou = c.nivel_pentru(stare["profit_total"])
     stare["nivel"] = int(nivel_nou["nivel"])
 
     rezultat = {
-        "an": stare["an"], "profit_an": net, "profit_alegeri": stare["profit_an"], "profit_baza": baza,
+        "an": stare["an"], "profit_an": net, "profit_alegeri": stare["profit_an"], "profit_baza": baza, "uzura": delta_uzura,
         "profit_total": stare["profit_total"],
         "nivel_vechi": nivel_vechi, "nivel": stare["nivel"], "nivel_nume": nivel_nou["nume"],
         "nivel_desc": nivel_nou.get("desc", ""), "resurse": dict(stare["resurse"]),
