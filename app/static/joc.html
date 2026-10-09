@@ -393,6 +393,7 @@ function ecranBilant() {
       <h1>Bilanțul</h1>
       <p class="text">Contabilul pune hârtiile pe masă. Profitul pe anul ăsta:</p>
       <div class="mare" style="color:${pas.profit_an >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(pas.profit_an)} mii lei</div>
+      <p class="gol">din alegerile tale${CONT.profit_de_baza_pe_an ? '; activitatea curentă mai aduce ' + semn(CONT.profit_de_baza_pe_an) + ' mii la închiderea anului' : ''}.</p>
       <p class="gol">Profit total până acum: ${semn(pas.profit_total)} mii lei. Nivelul se recalculează din totalul firmei; un an pe minus îl poate coborî.</p>
       <div class="actiuni"><button class="btn" id="inchide-anul">Închide anul</button></div>
     </div>`;
@@ -408,6 +409,7 @@ function ecranBilantRezultat(b) {
       <h1>${dir}</h1>
       <div class="nivel-salt"><div class="n">${b.nivel_vechi}</div><span>→</span><div class="n nou">${b.nivel}</div><div><b>${esc(nivelNou.nume)}</b><br><span class="gol">${esc(nivelNou.desc || '')}</span></div></div>
       <table class="tabel">
+        ${b.profit_baza ? `<tr><td>Activitatea curentă a firmei</td><td>${semn(b.profit_baza)} mii</td></tr><tr><td>Efectul alegerilor tale</td><td style="color:${b.profit_alegeri >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(b.profit_alegeri)} mii</td></tr>` : ''}
         <tr><td>Profitul anului</td><td style="color:${b.profit_an >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(b.profit_an)} mii</td></tr>
         <tr><td>Profit total</td><td>${semn(b.profit_total)} mii</td></tr>
       </table>

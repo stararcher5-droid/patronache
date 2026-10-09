@@ -1,5 +1,5 @@
 {
-  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json).",
+  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json). 'profit_de_baza_pe_an' = ce aduce activitatea curentă a firmei în fiecare an (mii lei), peste efectele alegerilor; se adaugă la bilanț.",
   "ani": 5,
   "trimestre_pe_an": 4,
   "decizii_pe_trimestru": 2,
@@ -153,5 +153,6 @@
       "icon": "🚜",
       "desc": "Subvenții APIA, tractoare, vremea și oameni din sat."
     }
-  ]
+  ],
+  "profit_de_baza_pe_an": 70
 }

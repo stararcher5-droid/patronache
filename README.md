@@ -16,9 +16,10 @@ API-ul, interfața jocului (la `/`) și meniul de admin pentru conținut (la `/a
   construcții, restaurant, transport, comerț, agricultură; editabile în Reguli).
   Situațiile și cărțile marcate cu `domenii` apar doar la acele domenii; cele
   nemarcate, la toate.
-- **Nivelul deblochează alegeri**: o situație sau o singură opțiune poate cere
-  `nivel_min` (ex. contractele cu ministerul doar la nivel 10). Opțiunile
-  blocate se văd, dar cu motivul, și nu pot fi alese.
+- **Situațiile sunt legate de nivel, nu de ani**: fiecare are un `nivel` și
+  apare de la nivelul ăla al firmei în sus (la nivelul 3 primești din 1, 2 și 3).
+  O singură opțiune poate cere și ea un nivel (`cerinte.nivel_min`); opțiunile
+  blocate se văd, cu motivul, dar nu pot fi alese.
 - **Situații legate**: o opțiune poate deschide alte situații (`urmatoare`),
   care vin la rând imediat; poate pune flaguri; o situație poate cere flaguri,
   cărți, nivel sau situații jucate înainte (`cerinte`). Situațiile marcate

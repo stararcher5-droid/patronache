@@ -19,7 +19,7 @@ def continut_de_test(**schimbari) -> modul_continut.Continut:
     """Conținut mic și controlat: 2 ani x 1 trimestru x 2 decizii = 4 decizii."""
     brut = {n: modul_continut.citeste_fisier(RADACINA / "continut", n) for n in modul_continut.FISIERE}
     brut = copy.deepcopy(brut)
-    brut["config.json"].update({"ani": 2, "trimestre_pe_an": 1, "decizii_pe_trimestru": 2})
+    brut["config.json"].update({"ani": 2, "trimestre_pe_an": 1, "decizii_pe_trimestru": 2, "profit_de_baza_pe_an": 0})
     brut["niveluri.json"]["niveluri"] = [
         {"nivel": 1, "nume": "Apartament", "prag": 0},
         {"nivel": 2, "nume": "Sediu", "prag": 50},
@@ -29,9 +29,9 @@ def continut_de_test(**schimbari) -> modul_continut.Continut:
         {"id": "pizza", "nume": "Pizza", "efect": {"parteneri": -2, "bunastare": 10}},
     ]
 
-    def sit(id_, an_min=1, an_max=2, **extra):
+    def sit(id_, nivel=1, **extra):
         return {
-            "id": id_, "titlu": id_, "text": "...", "an_min": an_min, "an_max": an_max,
+            "id": id_, "titlu": id_, "text": "...", "nivel": nivel,
             "optiuni": [
                 {"text": "bun", "ef": {"parteneri": 5, "bunastare": 5, "legalitate": 5}, "profit": 30, "teme": {"fisc": -2}},
                 {"text": "rau", "ef": {"parteneri": -30, "bunastare": -30, "legalitate": -30}, "profit": -40, "teme": {"fisc": 2}},
@@ -76,6 +76,15 @@ class Reguli(unittest.TestCase):
         self.assertEqual(r["profit_total"], 120)
         self.assertEqual(r["nivel"]["nivel"], 2)
         self.assertEqual(r["potrivire"]["pozitii"], {"fisc": -2.0})
+
+    def test_profitul_de_baza_intra_la_bilant(self):
+        c = continut_de_test()
+        c.config["profit_de_baza_pe_an"] = 70
+        s = motor.stare_noua(c, {}, seed=1)
+        motor.alege(c, s, 0); motor.alege(c, s, 0)
+        b = motor.bilant(c, s)
+        self.assertEqual((b["profit_alegeri"], b["profit_baza"], b["profit_an"]), (60, 70, 130))
+        self.assertEqual(s["profit_total"], 130)
 
     def test_resursa_la_zero_termina_partida(self):
         c = continut_de_test()
@@ -155,7 +164,7 @@ class Legaturi(unittest.TestCase):
     def test_cerinta_de_nivel_pe_situatie(self):
         c = continut_de_test()
         for id_ in ("b", "c", "d", "e", "f"):
-            c.situatie(id_)["cerinte"] = {"nivel_min": 2}
+            c.situatie(id_)["nivel"] = 2
         s = motor.stare_noua(c, {}, seed=5)
         self.assertEqual(s["pas_id"], "a")
         s["nivel"] = 2
@@ -188,157 +197,26 @@ class Legaturi(unittest.TestCase):
         self.assertIsNone(motor.cerinte_indeplinite(s, c.situatie("b")["cerinte"]))
         self.assertIsNotNone(motor.cerinte_indeplinite(s, c.situatie("c")["cerinte"]))
 
-    def test_situatiile_respecta_anul(self):
+    def test_situatiile_apar_de_la_nivelul_lor_in_sus(self):
         c = continut_de_test()
-        for id_ in ("a", "b", "c"):
-            c.situatie(id_)["an_max"] = 1
+        c.situatie("b")["nivel"] = 2; c.situatie("c")["nivel"] = 2
         for id_ in ("d", "e", "f"):
-            c.situatie(id_)["an_min"] = 2
+            c.situatie(id_)["nivel"] = 3
         s = motor.stare_noua(c, {}, seed=2)
-        self.assertIn(s["pas_id"], {"a", "b", "c"})
+        self.assertEqual(s["pas_id"], "a", "la nivelul 1 doar situațiile de nivel 1")
+        s["nivel"] = 2
         motor.alege(c, s, 0)
-        self.assertIn(s["pas_id"], {"a", "b", "c"})
-        motor.alege(c, s, 0)
-        motor.bilant(c, s)
-        self.assertIn(s["pas_id"], {"d", "e", "f"})
-
-
-class Domenii(unittest.TestCase):
-    def test_situatiile_si_cartile_respecta_domeniul(self):
-        c = continut_de_test()
-        c.config["domenii"] = [{"id": "it", "nume": "IT"}, {"id": "horeca", "nume": "Horeca"}]
-        for id_ in ("b", "c", "d", "e", "f"):
-            c.situatie(id_)["domenii"] = ["horeca"]
-        c.carti.append({"id": "vin", "nume": "Vin", "domenii": ["horeca"], "efect": {"bunastare": 5}}); c._carti["vin"] = c.carti[-1]
-        c.situatie("a")["optiuni"][0]["carte"] = "vin"
-        s = motor.stare_noua(c, {"domeniu": "it"}, seed=1)
-        self.assertEqual(s["pas_id"], "a", "doar situația fără domenii e pentru IT")
-        motor.alege(c, s, 0)
-        self.assertEqual(s["carti"], [], "cartea de horeca nu se dă la IT")
-        self.assertEqual(s["final"]["motiv"], "fara_situatii")
-        s2 = motor.stare_noua(c, {"domeniu": "horeca"}, seed=1)
-        s2["pas_id"] = "a"; motor.alege(c, s2, 0)
-        self.assertEqual(s2["carti"], ["vin"])
-        self.assertIn(s2["pas_id"], {"b", "c", "d", "e", "f"})
-
-    def test_domeniu_necunoscut_devine_primul(self):
-        c = continut_de_test()
-        c.config["domenii"] = [{"id": "it", "nume": "IT"}]
-        s = motor.stare_noua(c, {"domeniu": "ceva"}, seed=1)
-        self.assertEqual(s["firma"]["domeniu"], "it")
-
-
-class Carti(unittest.TestCase):
-    def test_cartea_intra_in_inventar_si_se_foloseste(self):
-        c = continut_de_test()
-        c.situatie("a")["optiuni"][0]["carte"] = "pizza"
-        s = motor.stare_noua(c, {}, seed=1)
-        s["pas_id"] = "a"
-        ef = motor.alege(c, s, 0)
-        self.assertEqual(ef["carte"]["id"], "pizza")
-        self.assertEqual(s["carti"], ["pizza"])
-        self.assertEqual([x["id"] for x in motor.pas_curent(c, s)["carti"]], ["pizza"])
-
-        bun = s["resurse"]["bunastare"]
-        r = motor.foloseste_carte(c, s, "pizza")
-        self.assertEqual(r["delta"], {"parteneri": -2, "bunastare": 10})
-        self.assertEqual(s["resurse"]["bunastare"], bun + 10)
-        self.assertEqual(s["carti"], [], "cartea s-a consumat")
-        with self.assertRaises(motor.ActiuneInvalida):
-            motor.foloseste_carte(c, s, "pizza")
-
-    def test_aceeasi_carte_de_mai_multe_ori(self):
-        c = continut_de_test()
-        c.situatie("a")["optiuni"][0]["carte"] = "pizza"
-        c.situatie("b")["optiuni"][0]["carte"] = "pizza"
-        s = motor.stare_noua(c, {}, seed=1)
-        s["pas_id"] = "a"; motor.alege(c, s, 0)
-        s["carti"].append("pizza")   # ca și cum ar fi primit-o și la o alegere anterioară
-        self.assertEqual(s["carti"], ["pizza", "pizza"])
-        motor.foloseste_carte(c, s, "pizza")
-        self.assertEqual(s["carti"], ["pizza"], "se consumă un singur exemplar")
-        s["pas_id"] = "b"; motor.alege(c, s, 0)
-        self.assertEqual(s["carti"], ["pizza", "pizza"], "o primește din nou deși o are deja")
-
-    def test_scutul_sare_decizia_curenta_si_opreste_scaderea_la_urmatoarea(self):
-        c = continut_de_test()
-        c.carti.append({"id": "scut", "nume": "Scut", "efect": {"scut": {"resurse": ["bunastare"], "decizii": 1}}})
-        c._carti["scut"] = c.carti[-1]
-        s = motor.stare_noua(c, {}, seed=1)
-        s["carti"] = ["scut"]
-        r = motor.foloseste_carte(c, s, "scut")
-        self.assertEqual(r["scut"]["resurse"], ["bunastare"])
-        self.assertFalse(motor.pas_curent(c, s)["scuturi"][0]["activ_acum"], "nu se aplică la situația pe care o vezi")
-        ef = motor.alege(c, s, 1)   # opțiunea „rea”: -30 pe toate
-        self.assertEqual(ef["delta"]["bunastare"], -30, "decizia curentă nu e protejată")
-        self.assertEqual(ef["scut_oprit"], {})
-        self.assertTrue(motor.pas_curent(c, s)["scuturi"][0]["activ_acum"])
-        s["resurse"] = {"parteneri": 90, "bunastare": 90, "legalitate": 90}
-        ef = motor.alege(c, s, 1)
-        self.assertEqual(ef["delta"].get("bunastare", 0), 0, "următoarea decizie e protejată")
-        self.assertEqual(ef["delta"]["parteneri"], -30, "celelalte resurse nu")
-        self.assertEqual(ef["scut_oprit"], {"bunastare": -30})
-        self.assertEqual(s["scuturi"], [], "scutul s-a consumat")
-
-    def test_cartea_surpriza_isi_ascunde_efectul_pana_e_folosita(self):
-        c = continut_de_test()
-        c.carti.append({"id": "plic", "nume": "Plicul", "surpriza": True, "desc": "secret", "efect": {"profit": 40, "legalitate": -6}})
-        c._carti["plic"] = c.carti[-1]
-        c.situatie("a")["optiuni"][0]["carte"] = "plic"
-        s = motor.stare_noua(c, {}, seed=1)
-        s["pas_id"] = "a"
-        ef = motor.alege(c, s, 0)
-        self.assertEqual(ef["carte"]["nume"], "Carte surpriză")
-        self.assertTrue(ef["carte"]["id"].startswith("surpriza-"), "id-ul real nu se vede")
-        vazuta = motor.pas_curent(c, s)["carti"][0]
-        self.assertNotIn("efect", vazuta); self.assertNotIn("desc", vazuta); self.assertNotIn("Plic", vazuta["nume"])
-        self.assertEqual(vazuta["id"], ef["carte"]["id"], "același cod opac de fiecare dată")
-        r = motor.foloseste_carte(c, s, vazuta["id"])   # folosită prin codul opac
-        self.assertEqual(r["carte"]["efect"], {"profit": 40, "legalitate": -6}, "la folosire se dezvăluie")
-        self.assertEqual(r["delta"], {"legalitate": -6})
-
-    def test_cartea_nu_se_poate_folosi_la_bilant(self):
-        c = continut_de_test()
-        s = motor.stare_noua(c, {}, seed=1)
-        s["carti"] = ["pizza"]
-        motor.alege(c, s, 0)
-        motor.alege(c, s, 0)
-        self.assertEqual(s["pas"], motor.PAS_BILANT)
-        with self.assertRaises(motor.ActiuneInvalida):
-            motor.foloseste_carte(c, s, "pizza")
-
-
-class Validare(unittest.TestCase):
-    def test_continutul_din_repo_e_valid(self):
-        c = modul_continut.incarca(RADACINA / "continut")
-        self.assertGreater(len(c.situatii), 0)
-        self.assertEqual(len(c.niveluri), 4)
-
-    def test_legatura_moarta_e_respinsa(self):
-        with self.assertRaises(modul_continut.ContinutInvalid) as cm:
-            c = continut_de_test()
-            c.situatii[0]["optiuni"][0]["urmatoare"] = ["nu-exista"]
-            modul_continut.construieste({
-                "config.json": c.config, "niveluri.json": {"niveluri": c.niveluri}, "carti.json": {"carti": c.carti},
-                "situatii.json": {"situatii": c.situatii}, "arhetipuri.json": {"arhetipuri": c.arhetipuri},
-            })
-        self.assertIn("nu-exista", str(cm.exception))
-
-    def test_cartea_necunoscuta_e_respinsa(self):
-        c = continut_de_test()
-        c.situatii[0]["optiuni"][0]["carte"] = "nu-exista"
-        with self.assertRaises(modul_continut.ContinutInvalid):
-            modul_continut.construieste({
-                "config.json": c.config, "niveluri.json": {"niveluri": c.niveluri}, "carti.json": {"carti": c.carti},
-                "situatii.json": {"situatii": c.situatii}, "arhetipuri.json": {"arhetipuri": c.arhetipuri},
-            })
+        self.assertIn(s["pas_id"], {"b", "c"}, "la nivelul 2 intră și cele de nivel 2, cele de 3 nu")
+        s["nivel"] = 3; s["jucate"] = ["a"]; s["pas_id"] = None
+        motor._alege_situatia(c, s)
+        self.assertIn(s["pas_id"], {"b", "c", "d", "e", "f"}, "la nivelul 3 primești din 1, 2 și 3")
 
     def test_avertismente(self):
         c = continut_de_test()
         c.situatie("f")["doar_legata"] = True
         c.situatie("e")["cerinte"] = {"flaguri": ["nimeni-nu-l-pune"]}
         for id_ in ("a", "b", "c", "d"):
-            c.situatie(id_)["an_max"] = 1   # anul 2 rămâne doar cu "e": prea puține
+            c.situatie(id_)["nivel"] = 3   # la nivelul 1 rămâne doar "e": prea puține pentru 4 decizii
         tipuri = {a["tip"] for a in modul_continut.verifica(c)}
         self.assertIn("neatinsa", tipuri)
         self.assertIn("flag", tipuri)

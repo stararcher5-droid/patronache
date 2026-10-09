@@ -113,6 +113,63 @@
         "bunastare": 10,
         "profit": -8
       }
+    },
+    {
+      "id": "comanda-mare",
+      "nume": "Comanda",
+      "icon": "📦",
+      "surpriza": true,
+      "desc": "Un client de care n-ai auzit vrea tot stocul. Plătește în avans. Nu întreabă de preț.",
+      "efect": {
+        "profit": 60,
+        "parteneri": 3
+      }
+    },
+    {
+      "id": "premiul",
+      "nume": "Premiul",
+      "icon": "🏆",
+      "surpriza": true,
+      "desc": "„Antreprenorul anului” la gala Camerei de Comerț. Nu știai că ai fost nominalizat. Clienții au văzut poza.",
+      "efect": {
+        "parteneri": 6,
+        "bunastare": 4,
+        "profit": 10
+      }
+    },
+    {
+      "id": "procesul",
+      "nume": "Citația",
+      "icon": "⚖️",
+      "surpriza": true,
+      "desc": "Un plic de la judecătorie. Un fost angajat te dă în judecată pentru ore suplimentare neplătite. Are dovezi.",
+      "efect": {
+        "legalitate": -6,
+        "profit": -25,
+        "bunastare": -2
+      }
+    },
+    {
+      "id": "hackerul",
+      "nume": "Mailul ciudat",
+      "icon": "🔐",
+      "surpriza": true,
+      "desc": "Contabila a dat click pe un link. Toate fișierele firmei sunt criptate. Cer bitcoin.",
+      "efect": {
+        "parteneri": -5,
+        "profit": -20,
+        "bunastare": -3
+      }
+    },
+    {
+      "id": "clientul-fidel",
+      "nume": "Clientul fidel",
+      "icon": "🤝",
+      "desc": "Un client vechi te recomandă la toată lumea pe care o știe. Nu ți-a spus.",
+      "efect": {
+        "parteneri": 5,
+        "profit": 15
+      }
     }
   ]
 }

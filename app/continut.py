@@ -101,6 +101,7 @@ class Continut:
             "decizii_pe_trimestru": self.decizii_pe_trimestru,
             "resurse": self.resurse,
             "domenii": self.domenii,
+            "profit_de_baza_pe_an": int(self.config.get("profit_de_baza_pe_an", 0)),
             "niveluri": self.niveluri,
             # cărțile surpriză nu apar deloc în lista publică: nici numele n-ar trebui să se vadă
             "carti": [c for c in self.carti if not c.get("surpriza")],
@@ -145,6 +146,16 @@ def migreaza(brut: dict[str, dict[str, Any]]) -> bool:
     for sit in brut.get("situatii.json", {}).get("situatii", []):
         for o in sit.get("optiuni", []):
             muta_ef(o)
+        # modelul vechi lega situațiile de ani; acum sunt legate de nivelul firmei
+        if "an_min" in sit or "an_max" in sit or "nivel_min" in (sit.get("cerinte") or {}):
+            cer = sit.get("cerinte") or {}
+            if "nivel" not in sit:
+                sit["nivel"] = int(cer.get("nivel_min", 1))
+            cer.pop("nivel_min", None)
+            if not cer:
+                sit.pop("cerinte", None)
+            sit.pop("an_min", None); sit.pop("an_max", None)
+            schimbat = True
     for carte in brut.get("carti.json", {}).get("carti", []):
         ef = carte.get("efect")
         if isinstance(ef, dict):
@@ -322,9 +333,8 @@ def _valideaza_situatii(situatii: list[dict[str, Any]], ids_carti: set[str], tem
         if s["id"] in ids:
             raise ContinutInvalid(f"{unde}: id duplicat")
         ids.add(s["id"])
-        for k in ("an_min", "an_max"):
-            if k in s and (not isinstance(s[k], int) or s[k] < 1):
-                raise ContinutInvalid(f"{unde}: '{k}' trebuie să fie întreg >= 1")
+        if "nivel" in s and (not isinstance(s["nivel"], int) or not 1 <= s["nivel"] <= nr_niveluri):
+            raise ContinutInvalid(f"{unde}: 'nivel' trebuie să fie între 1 și {nr_niveluri}")
         if "greutate" in s and (not _numar(s["greutate"]) or s["greutate"] <= 0):
             raise ContinutInvalid(f"{unde}: 'greutate' trebuie să fie > 0")
         _valideaza_cerinte(s.get("cerinte"), unde, ids_carti, nr_niveluri)
@@ -381,19 +391,21 @@ def verifica(c: Continut) -> list[dict[str, str]]:
     avertismente: list[dict[str, str]] = []
     necesare = c.decizii_pe_an
 
-    # Câte situații pot apărea la întâmplare în fiecare an (fără cele doar legate), pentru fiecare domeniu.
+    # Situațiile se consumă pe parcurs. Un jucător care rămâne la nivelul L vede doar situațiile de nivel <= L,
+    # deci pentru fiecare nivel și domeniu trebuie să existe destule pentru toată partida.
+    total_necesar = c.ani * necesare
     domenii = c.domenii or [{"id": None, "nume": "toate"}]
     for dom in domenii:
-        for an in range(1, c.ani + 1):
+        for niv in c.niveluri:
             n = sum(
                 1 for s in c.situatii
-                if not s.get("doar_legata") and s.get("an_min", 1) <= an <= s.get("an_max", c.ani)
+                if not s.get("doar_legata") and int(s.get("nivel", 1)) <= niv["nivel"]
                 and (not s.get("domenii") or dom["id"] in s["domenii"])
             )
-            if n < necesare:
+            if n < total_necesar:
                 avertismente.append({
-                    "tip": "putine", "id": f"an-{an}",
-                    "mesaj": f"{dom['nume']}, anul {an}: doar {n} situații pot apărea la întâmplare, sunt nevoie de {necesare}. Partida se poate termina devreme.",
+                    "tip": "putine", "id": f"nivel-{niv['nivel']}",
+                    "mesaj": f"{dom['nume']}, nivelul {niv['nivel']}: doar {n} situații de nivel {niv['nivel']} sau mai mic, sunt nevoie de {total_necesar} pentru o partidă întreagă (situațiile nu se repetă).",
                 })
 
     # Situații marcate 'doar_legata' pe care nu le deschide nimeni.

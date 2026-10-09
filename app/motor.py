@@ -15,9 +15,10 @@ Regulile:
 - Situațiile se leagă: o opțiune poate deschide situații următoare (intră
   într-o coadă) și poate pune flaguri; o situație sau o opțiune poate cere nivel,
   cărți, flaguri sau situații jucate înainte.
+- Fiecare situație are un `nivel` (1..N): apare de la nivelul ăla al firmei în sus.
 - Următoarea situație: prima din coadă care îndeplinește cerințele; altfel una
-  la întâmplare (ponderat cu `greutate`) dintre cele nejucate, eligibile pe anul
-  curent și nemarcate `doar_legata`.
+  la întâmplare (ponderat cu `greutate`) dintre cele nejucate, de nivelul firmei
+  sau mai mic, și nemarcate `doar_legata`.
 - Cărțile speciale intră în inventar când alegi opțiunea care le dă; le poți
   folosi oricând în timpul unei decizii, se consumă și aplică efectul pe loc.
   O carte poate avea și un „scut”: de la următoarea decizie (nu cea pe care o
@@ -109,8 +110,9 @@ def cerinte_indeplinite(stare: dict[str, Any], cer: dict[str, Any] | None) -> st
     return None
 
 
-def _in_an(c: Continut, s: dict[str, Any], an: int) -> bool:
-    return s.get("an_min", 1) <= an <= s.get("an_max", c.ani)
+def _de_nivel(s: dict[str, Any], nivel: int) -> bool:
+    """O situație de nivel N apare de la nivelul N în sus: la nivelul 3 primești din 1, 2 și 3."""
+    return int(s.get("nivel", 1)) <= nivel
 
 
 def in_domeniu(stare: dict[str, Any], obiect: dict[str, Any]) -> bool:
@@ -126,7 +128,7 @@ def _eligibila(c: Continut, stare: dict[str, Any], s: dict[str, Any], din_coada:
         return False
     if cerinte_indeplinite(stare, s.get("cerinte")) is not None:
         return False
-    if not din_coada and (s.get("doar_legata") or not _in_an(c, s, stare["an"])):
+    if not din_coada and (s.get("doar_legata") or not _de_nivel(s, stare["nivel"])):
         return False
     # Trebuie să existe măcar o opțiune pe care o poate alege.
     return any(cerinte_indeplinite(stare, o.get("cerinte")) is None for o in s["optiuni"])
@@ -259,7 +261,8 @@ def bilant(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     if stare["pas"] != PAS_BILANT:
         raise ActiuneInvalida(f"nu e momentul bilanțului, pasul curent e {stare['pas']!r}")
 
-    net = stare["profit_an"]
+    baza = int(c.config.get("profit_de_baza_pe_an", 0))
+    net = stare["profit_an"] + baza
 
     nivel_vechi = stare["nivel"]
     stare["profit_total"] += net
@@ -267,7 +270,7 @@ def bilant(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     stare["nivel"] = int(nivel_nou["nivel"])
 
     rezultat = {
-        "an": stare["an"], "profit_an": net,
+        "an": stare["an"], "profit_an": net, "profit_alegeri": stare["profit_an"], "profit_baza": baza,
         "profit_total": stare["profit_total"],
         "nivel_vechi": nivel_vechi, "nivel": stare["nivel"], "nivel_nume": nivel_nou["nume"],
         "nivel_desc": nivel_nou.get("desc", ""), "resurse": dict(stare["resurse"]),

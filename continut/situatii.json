@@ -1,14 +1,12 @@
 {
-  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație apare dacă îi sunt îndeplinite 'cerinte' (nivel, cărți, flaguri, situații jucate înainte) și dacă anul curent e între 'an_min' și 'an_max'. O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe parteneri / bunastare / legalitate (doar ce se schimbă). 'profit' = banii, în plus sau în minus (mii lei), intră în bilanțul anual. 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație. 'domenii': ['it', 'horeca'] = situația apare doar la firmele din domeniile listate; fără 'domenii' apare la toate.",
+  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație are un 'nivel' (1..4) și apare de la nivelul ăla al firmei în sus (la nivelul 3 jucătorul primește situații de nivel 1, 2 și 3), dacă îi sunt îndeplinite și 'cerinte' (cărți, flaguri, situații jucate înainte, nivel maxim). O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe parteneri / bunastare / legalitate (doar ce se schimbă). 'profit' = banii, în plus sau în minus (mii lei), intră în bilanțul anual. 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație. 'domenii': ['it', 'horeca'] = situația apare doar la firmele din domeniile listate; fără 'domenii' apare la toate.",
   "situatii": [
     {
       "id": "primul-angajat",
       "titlu": "Primul angajat",
       "text": "Ai prea mult de lucru pentru un singur om. Mama zice că nepotul tău „e băiat bun și n-are serviciu”.",
-      "an_min": 1,
-      "an_max": 1,
+      "nivel": 1,
       "greutate": 3,
-      "cerinte": {},
       "optiuni": [
         {
           "text": "Angajezi nepotul.",
@@ -68,6 +66,7 @@
       "id": "nepotul-greseste",
       "titlu": "Nepotul a greșit comanda",
       "text": "Nepotul a trimis marfa la adresa greșită. Clientul e furios, iar mama te-a sunat deja să nu te superi pe el.",
+      "nivel": 1,
       "doar_legata": true,
       "cerinte": {
         "flaguri": [
@@ -115,10 +114,8 @@
       "id": "fara-factura",
       "titlu": "Fără factură?",
       "text": "Clientul se uită în stânga și-n dreapta: „Nu se poate și fără TVA? Cash, acum.”",
-      "an_min": 1,
-      "an_max": 2,
+      "nivel": 1,
       "greutate": 2,
-      "cerinte": {},
       "optiuni": [
         {
           "text": "Accepți. E început.",
@@ -153,7 +150,7 @@
             "parteneri": 4
           },
           "profit": 20,
-          "carte": "team-building",
+          "carte": "clientul-fidel",
           "teme": {
             "fisc": -1,
             "clienti": -2
@@ -165,10 +162,8 @@
       "id": "contabilul",
       "titlu": "Contabilul",
       "text": "Primul decont de TVA bate la ușă. Vecinul zice că are „o doamnă care face contabilitate, 300 de lei și e în regulă”.",
-      "an_min": 1,
-      "an_max": 2,
+      "nivel": 1,
       "greutate": 2,
-      "cerinte": {},
       "optiuni": [
         {
           "text": "O iei pe doamna de la vecinul.",
@@ -216,12 +211,8 @@
       "id": "licitatia",
       "titlu": "Licitația de la Primărie",
       "text": "Primăria scoate la licitație exact ce faci tu. Un cunoscut îți șoptește că viceprimarul „bea cafeaua la 10 la Ambasador”.",
-      "an_min": 2,
-      "an_max": 5,
+      "nivel": 3,
       "greutate": 2,
-      "cerinte": {
-        "nivel_min": 3
-      },
       "optiuni": [
         {
           "text": "Participi corect, cu oferta cea mai bună.",
@@ -284,8 +275,7 @@
       "id": "controlul-anaf",
       "titlu": "Controlul ANAF",
       "text": "Doi inspectori la ușă, cu mapă. „Avem o sesizare.”",
-      "an_min": 2,
-      "an_max": 5,
+      "nivel": 1,
       "greutate": 2,
       "cerinte": {
         "fara_flaguri": [
@@ -338,10 +328,8 @@
       "id": "mariri",
       "titlu": "Măriri",
       "text": "Inflația a mâncat 10% și trei oameni au trecut „întâmplător” pe lângă biroul tău cu o față anume.",
-      "an_min": 2,
-      "an_max": 5,
+      "nivel": 1,
       "greutate": 2,
-      "cerinte": {},
       "optiuni": [
         {
           "text": "Mărești tuturor cu 15%.",
@@ -395,12 +383,8 @@
       "id": "sediul-nou",
       "titlu": "Sediul nou",
       "text": "Ați crescut și nu mai încăpeți. Banca îți oferă credit pe 15 ani, agentul imobiliar îți arată o clădire de sticlă „cu vizibilitate”.",
-      "an_min": 2,
-      "an_max": 5,
+      "nivel": 2,
       "greutate": 1,
-      "cerinte": {
-        "nivel_min": 2
-      },
       "optiuni": [
         {
           "text": "Cumperi clădire cu credit pe 15 ani.",
@@ -438,14 +422,13 @@
     },
     {
       "id": "it-senior-pleaca",
+      "titlu": "Senior-ul vrea remote din Bali",
+      "text": "Cel mai bun programator al tău anunță că se mută în Bali și lucrează de acolo „la fel de bine, doar cu alt fus orar”.",
+      "nivel": 1,
+      "greutate": 2,
       "domenii": [
         "it"
       ],
-      "titlu": "Senior-ul vrea remote din Bali",
-      "text": "Cel mai bun programator al tău anunță că se mută în Bali și lucrează de acolo „la fel de bine, doar cu alt fus orar”.",
-      "an_min": 1,
-      "an_max": 5,
-      "greutate": 2,
       "optiuni": [
         {
           "text": "Îl lași. Contează ce livrează.",
@@ -484,14 +467,13 @@
     },
     {
       "id": "constructii-inspectia",
+      "titlu": "Inspectoratul pe șantier",
+      "text": "ISC-ul a venit pe șantier și trei oameni n-au cască. Unul n-are nici contract.",
+      "nivel": 1,
+      "greutate": 2,
       "domenii": [
         "constructii"
       ],
-      "titlu": "Inspectoratul pe șantier",
-      "text": "ISC-ul a venit pe șantier și trei oameni n-au cască. Unul n-are nici contract.",
-      "an_min": 1,
-      "an_max": 5,
-      "greutate": 2,
       "optiuni": [
         {
           "text": "Plătești amenda și faci contractele a doua zi.",
@@ -530,14 +512,13 @@
     },
     {
       "id": "horeca-recenzia",
+      "titlu": "Recenzia de o stea",
+      "text": "„Ciorba rece, ospătar obraznic, 2 ore de așteptat.” E prima recenzie care apare când cauți localul pe Google.",
+      "nivel": 1,
+      "greutate": 2,
       "domenii": [
         "horeca"
       ],
-      "titlu": "Recenzia de o stea",
-      "text": "„Ciorba rece, ospătar obraznic, 2 ore de așteptat.” E prima recenzie care apare când cauți localul pe Google.",
-      "an_min": 1,
-      "an_max": 5,
-      "greutate": 2,
       "optiuni": [
         {
           "text": "Răspunzi public, calm, și inviți clientul la o masă din partea casei.",
@@ -548,7 +529,8 @@
           "teme": {
             "clienti": -2,
             "imagine": 0
-          }
+          },
+          "carte": "seara-cu-casa-inchisa"
         },
         {
           "text": "Îi răspunzi că „nici noi nu vrem clienți ca dumneavoastră”.",
@@ -577,14 +559,13 @@
     },
     {
       "id": "transport-soferul-din-germania",
+      "titlu": "Telefon de la 3 noaptea",
+      "text": "Șoferul sună din parcarea de la Nürnberg: camionul s-a oprit, marfa trebuie livrată la 8, iar el n-a mai dormit de 20 de ore.",
+      "nivel": 1,
+      "greutate": 2,
       "domenii": [
         "transport"
       ],
-      "titlu": "Telefon de la 3 noaptea",
-      "text": "Șoferul sună din parcarea de la Nürnberg: camionul s-a oprit, marfa trebuie livrată la 8, iar el n-a mai dormit de 20 de ore.",
-      "an_min": 1,
-      "an_max": 5,
-      "greutate": 2,
       "optiuni": [
         {
           "text": "Chemi service mobil, oricât costă, și anunți clientul că întârzii.",
@@ -627,14 +608,13 @@
     },
     {
       "id": "comert-returul",
+      "titlu": "Returul de Black Friday",
+      "text": "După Black Friday, 40% din comenzi vin înapoi. Jumătate din cutii sunt deschise, câteva goale.",
+      "nivel": 1,
+      "greutate": 2,
       "domenii": [
         "comert"
       ],
-      "titlu": "Returul de Black Friday",
-      "text": "După Black Friday, 40% din comenzi vin înapoi. Jumătate din cutii sunt deschise, câteva goale.",
-      "an_min": 1,
-      "an_max": 5,
-      "greutate": 2,
       "optiuni": [
         {
           "text": "Rambursezi tot, fără întrebări. Clientul are mereu dreptate.",
@@ -674,14 +654,13 @@
     },
     {
       "id": "agricultura-seceta",
+      "titlu": "Seceta",
+      "text": "N-a plouat de două luni. Grâul e la jumătate, iar vecinul zice că „se dă ceva de la stat, dacă ai pe cineva la APIA”.",
+      "nivel": 1,
+      "greutate": 2,
       "domenii": [
         "agricultura"
       ],
-      "titlu": "Seceta",
-      "text": "N-a plouat de două luni. Grâul e la jumătate, iar vecinul zice că „se dă ceva de la stat, dacă ai pe cineva la APIA”.",
-      "an_min": 1,
-      "an_max": 5,
-      "greutate": 2,
       "optiuni": [
         {
           "text": "Depui dosarul de despăgubire, corect, și aștepți.",
@@ -715,6 +694,2642 @@
           "teme": {
             "risc": 2,
             "stat": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "primul-client-mare",
+      "titlu": "Primul client mare",
+      "text": "O firmă de trei ori cât tine vrea să lucreze cu tine. Comanda e uriașă, dar plătesc la 90 de zile și au un „template de contract” de 40 de pagini.",
+      "nivel": 1,
+      "greutate": 3,
+      "optiuni": [
+        {
+          "text": "Accepți tot. Te întinzi, dar e șansa vieții.",
+          "ef": {
+            "parteneri": 6,
+            "bunastare": -3
+          },
+          "profit": 60,
+          "flaguri": [
+            "client-mare"
+          ],
+          "urmatoare": [
+            "clientul-mare-intarzie"
+          ],
+          "teme": {
+            "clienti": -1,
+            "risc": 2
+          }
+        },
+        {
+          "text": "Negociezi avans 30%, altfel nu semnezi.",
+          "ef": {
+            "parteneri": 2
+          },
+          "profit": 35,
+          "teme": {
+            "clienti": -1,
+            "risc": -1
+          }
+        },
+        {
+          "text": "Le faci preț dublu, că oricum nu știu prețurile.",
+          "ef": {
+            "parteneri": -4,
+            "legalitate": -2
+          },
+          "profit": 80,
+          "teme": {
+            "clienti": 2,
+            "risc": 1
+          }
+        },
+        {
+          "text": "Refuzi, e prea mare pentru tine acum.",
+          "ef": {
+            "parteneri": -2,
+            "bunastare": 2
+          },
+          "teme": {
+            "risc": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "clientul-mare-intarzie",
+      "titlu": "Clientul mare nu plătește",
+      "text": "Au trecut cele 90 de zile, apoi încă 60. Contabilitatea lor „a schimbat sistemul”. Tu ai salarii de dat vineri.",
+      "nivel": 1,
+      "greutate": 2,
+      "doar_legata": true,
+      "cerinte": {
+        "flaguri": [
+          "client-mare"
+        ]
+      },
+      "optiuni": [
+        {
+          "text": "Îi suni în fiecare zi, politicos, până plătesc.",
+          "ef": {
+            "parteneri": 1,
+            "bunastare": -2
+          },
+          "profit": -10,
+          "teme": {
+            "clienti": -1,
+            "control": 1
+          }
+        },
+        {
+          "text": "Somație de la avocat. Plătesc, dar nu mai lucrează cu tine.",
+          "ef": {
+            "parteneri": -6,
+            "legalitate": 2
+          },
+          "profit": 20,
+          "teme": {
+            "clienti": 1
+          }
+        },
+        {
+          "text": "Iei credit de nevoi ca să acoperi salariile și aștepți.",
+          "ef": {
+            "bunastare": 3
+          },
+          "profit": -25,
+          "carte": "plicul",
+          "teme": {
+            "risc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "biroul",
+      "titlu": "Sediul",
+      "text": "Lucrezi din bucătărie și clienții încep să întrebe „unde aveți sediul?”. Ai trei oferte pe masă și un calcul pe șervețel.",
+      "nivel": 1,
+      "greutate": 3,
+      "optiuni": [
+        {
+          "text": "Clădire de sticlă, în zonă bună. Trebuie să arate bine.",
+          "ef": {
+            "parteneri": 5,
+            "bunastare": 4
+          },
+          "profit": -50,
+          "teme": {
+            "imagine": 2,
+            "risc": 2
+          }
+        },
+        {
+          "text": "Lucrați de acasă, cu Zoom și Google Drive.",
+          "ef": {
+            "parteneri": -2,
+            "bunastare": -1
+          },
+          "profit": 25,
+          "teme": {
+            "imagine": -2,
+            "program": -2
+          }
+        },
+        {
+          "text": "Un apartament la parter de bloc, cu firmă pe geam.",
+          "profit": 10,
+          "teme": {
+            "imagine": -1,
+            "risc": -2
+          }
+        },
+        {
+          "text": "Coworking, plătești pe lună, pleci când vrei.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": 3
+          },
+          "profit": -15,
+          "teme": {
+            "imagine": 0,
+            "program": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "programul",
+      "titlu": "Programul",
+      "text": "Primii angajați întreabă care e programul. Tu ai dormit în birou de trei ori săptămâna asta.",
+      "nivel": 1,
+      "greutate": 3,
+      "optiuni": [
+        {
+          "text": "9-18 la birou, pontaj cu cartelă.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": -5
+          },
+          "teme": {
+            "program": 2,
+            "control": 2
+          }
+        },
+        {
+          "text": "Fiecare cum vrea, contează ce livrează.",
+          "ef": {
+            "parteneri": -2,
+            "bunastare": 6
+          },
+          "teme": {
+            "program": -2,
+            "control": -2
+          }
+        },
+        {
+          "text": "Hibrid: trei zile la birou, două de unde vor.",
+          "ef": {
+            "bunastare": 2
+          },
+          "teme": {
+            "program": 0,
+            "control": 0
+          }
+        },
+        {
+          "text": "De acasă, dar cu un program care le filmează ecranul.",
+          "ef": {
+            "bunastare": -7,
+            "legalitate": -3
+          },
+          "teme": {
+            "program": -1,
+            "control": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "masina-de-firma",
+      "titlu": "Prima mașină de firmă",
+      "text": "Dealerul te sună de două ori pe săptămână. „Pe firmă e deductibil, șefu’.”",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "BMW în leasing pe firmă, deductibil „parțial”.",
+          "ef": {
+            "parteneri": 4,
+            "legalitate": -3
+          },
+          "profit": -40,
+          "teme": {
+            "imagine": 2,
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Un Logan. Merge și ăsta.",
+          "profit": -15,
+          "teme": {
+            "imagine": -2,
+            "fisc": -1
+          }
+        },
+        {
+          "text": "Nicio mașină. Metrou și Uber.",
+          "ef": {
+            "parteneri": -1
+          },
+          "profit": 10,
+          "teme": {
+            "imagine": -1,
+            "fisc": -2
+          }
+        },
+        {
+          "text": "O dubă, că oricum cari marfă.",
+          "ef": {
+            "parteneri": 1,
+            "bunastare": 1
+          },
+          "profit": -25,
+          "teme": {
+            "imagine": 0,
+            "fisc": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "concurentul-copiaza",
+      "titlu": "Concurentul care copiază",
+      "text": "Un fost angajat și-a făcut firmă, ți-a copiat site-ul cuvânt cu cuvânt și vinde cu 20% mai ieftin.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Lași prețul sub al lui, chiar dacă pierzi bani câteva luni.",
+          "ef": {
+            "parteneri": 6
+          },
+          "profit": -50,
+          "teme": {
+            "clienti": 0,
+            "risc": 2
+          }
+        },
+        {
+          "text": "Te concentrezi pe calitate și pe clienții vechi.",
+          "ef": {
+            "parteneri": 3,
+            "bunastare": 2
+          },
+          "profit": -5,
+          "teme": {
+            "clienti": -2,
+            "risc": -1
+          }
+        },
+        {
+          "text": "Îl vorbești de rău la toți clienții.",
+          "ef": {
+            "parteneri": -4,
+            "legalitate": -1
+          },
+          "teme": {
+            "clienti": 2
+          }
+        },
+        {
+          "text": "Îi faci ofertă să-l cumperi.",
+          "ef": {
+            "parteneri": 4
+          },
+          "profit": -40,
+          "carte": "comanda-mare",
+          "teme": {
+            "risc": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "site-ul",
+      "titlu": "Site-ul firmei",
+      "text": "Clienții te caută pe Google și găsesc o pagină de Facebook din 2019 cu o poză cu o pisică.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Agenție, site ca lumea, 5.000 de euro.",
+          "ef": {
+            "parteneri": 5
+          },
+          "profit": -25,
+          "teme": {
+            "imagine": 1,
+            "risc": 1
+          }
+        },
+        {
+          "text": "Îl face nepotul pe Wix într-un weekend.",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": -2,
+          "teme": {
+            "imagine": -1,
+            "angajari": 1
+          }
+        },
+        {
+          "text": "N-ai nevoie, clienții vin din recomandări.",
+          "ef": {
+            "parteneri": -2
+          },
+          "teme": {
+            "imagine": -2,
+            "clienti": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "tva-ul",
+      "titlu": "Decontul de TVA",
+      "text": "Contabilul zice că ai de plată un TVA cât o mașină. Banii i-ai cheltuit deja pe marfă.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Plătești la zi, chiar dacă rămâi fără cash.",
+          "ef": {
+            "legalitate": 4
+          },
+          "profit": -30,
+          "teme": {
+            "fisc": -2
+          }
+        },
+        {
+          "text": "Ceri eșalonare la ANAF. Dosar, drumuri, dar legal.",
+          "ef": {
+            "legalitate": 1
+          },
+          "profit": -20,
+          "teme": {
+            "fisc": -1
+          }
+        },
+        {
+          "text": "Nu depui decontul luna asta. „Îl depunem rectificativ.”",
+          "ef": {
+            "legalitate": -8
+          },
+          "profit": 10,
+          "teme": {
+            "fisc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "prima-reclamatie",
+      "titlu": "Prima reclamație",
+      "text": "Un client scrie pe Facebook că „ați luat banii și n-ați livrat”. A livrat colegul, dar la adresa greșită.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Răspunzi public, îți ceri scuze, livrezi din nou gratuit.",
+          "ef": {
+            "parteneri": 5
+          },
+          "profit": -5,
+          "teme": {
+            "clienti": -2,
+            "imagine": 0
+          }
+        },
+        {
+          "text": "Îi răspunzi că nu e vina ta, ci a curierului.",
+          "ef": {
+            "parteneri": -4
+          },
+          "teme": {
+            "clienti": 1
+          }
+        },
+        {
+          "text": "Ștergi comentariul și blochezi omul.",
+          "ef": {
+            "parteneri": -6,
+            "legalitate": -1
+          },
+          "teme": {
+            "clienti": 2,
+            "imagine": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "fonduri-europene",
+      "titlu": "Fonduri europene",
+      "text": "S-a deschis o linie de finanțare pe fix domeniul tău. 70% nerambursabil, 30% de la tine, 400 de pagini de dosar.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Aplici, iei consultant, co-finanțezi din credit.",
+          "ef": {
+            "parteneri": 3
+          },
+          "profit": -60,
+          "flaguri": [
+            "fonduri"
+          ],
+          "urmatoare": [
+            "auditul-fondurilor"
+          ],
+          "teme": {
+            "stat": 2,
+            "risc": 2
+          }
+        },
+        {
+          "text": "Prea multă birocrație. Treci mai departe.",
+          "teme": {
+            "stat": -2,
+            "risc": -1
+          }
+        },
+        {
+          "text": "Aplici la o schemă mică, fără credit.",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": -15,
+          "teme": {
+            "stat": 1,
+            "risc": -1
+          }
+        },
+        {
+          "text": "Consultantul zice că „aranjează el” pentru 10% din sumă.",
+          "ef": {
+            "legalitate": -7
+          },
+          "profit": 30,
+          "flaguri": [
+            "fonduri"
+          ],
+          "urmatoare": [
+            "auditul-fondurilor"
+          ],
+          "teme": {
+            "stat": 2,
+            "fisc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "auditul-fondurilor",
+      "titlu": "Auditul fondurilor",
+      "text": "Au venit cei de la agenție să verifice cum ai cheltuit banii europeni. Vor facturi pentru fiecare leu și poze cu echipamentele.",
+      "nivel": 1,
+      "greutate": 2,
+      "doar_legata": true,
+      "cerinte": {
+        "flaguri": [
+          "fonduri"
+        ]
+      },
+      "optiuni": [
+        {
+          "text": "Totul e la dosar. Le dai cafea și așteaptă două ore.",
+          "ef": {
+            "parteneri": 2,
+            "legalitate": 3
+          },
+          "profit": 80,
+          "teme": {
+            "fisc": -2
+          }
+        },
+        {
+          "text": "Lipsesc câteva facturi. „Le aducem mâine.” Le faci peste noapte.",
+          "ef": {
+            "legalitate": -8
+          },
+          "profit": 60,
+          "teme": {
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Echipamentele „sunt la celălalt sediu”. N-ai alt sediu.",
+          "ef": {
+            "parteneri": -3,
+            "legalitate": -12
+          },
+          "profit": 40,
+          "carte": "procesul",
+          "teme": {
+            "fisc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "clientul-nu-plateste",
+      "titlu": "Clientul care nu plătește",
+      "text": "Factura de 60.000 de lei are 120 de zile. Clientul nu mai răspunde la telefon, dar postează din Mykonos.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Executor, instanță, tot.",
+          "ef": {
+            "parteneri": -2,
+            "legalitate": 2
+          },
+          "profit": 25,
+          "urmatoare": [
+            "executorul"
+          ],
+          "teme": {
+            "clienti": 1,
+            "control": 2
+          }
+        },
+        {
+          "text": "Îl suni personal și negociezi eșalonare.",
+          "ef": {
+            "parteneri": 2
+          },
+          "profit": 15,
+          "teme": {
+            "clienti": -1,
+            "control": 1
+          }
+        },
+        {
+          "text": "Îl lași, dar nu mai lucrezi cu el niciodată.",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": -30,
+          "teme": {
+            "clienti": -2
+          }
+        },
+        {
+          "text": "Trimiți doi băieți „să stea de vorbă” cu el.",
+          "ef": {
+            "parteneri": -5,
+            "bunastare": -3,
+            "legalitate": -12
+          },
+          "profit": 40,
+          "teme": {
+            "clienti": 2,
+            "fisc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "executorul",
+      "titlu": "Executorul",
+      "text": "Executorul l-a găsit. Are de recuperat banii, dar a găsit și un BMW pe firmă și trei angajați fără contract la client.",
+      "nivel": 1,
+      "greutate": 2,
+      "doar_legata": true,
+      "optiuni": [
+        {
+          "text": "Iei banii și pleci. Nu e treaba ta ce a găsit.",
+          "profit": 35,
+          "teme": {
+            "fisc": 0
+          }
+        },
+        {
+          "text": "Îi spui executorului de angajații fără contract. Să plătească tot.",
+          "ef": {
+            "parteneri": -3,
+            "legalitate": 3
+          },
+          "profit": 35,
+          "teme": {
+            "fisc": -2
+          }
+        },
+        {
+          "text": "Te înțelegi cu clientul: jumătate acum, cash, și uiți de restul.",
+          "ef": {
+            "parteneri": 2,
+            "legalitate": -4
+          },
+          "profit": 15,
+          "teme": {
+            "fisc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "instagramul-firmei",
+      "titlu": "Instagramul firmei",
+      "text": "Fiica ta zice că firma „nu există dacă nu e pe Instagram”. Concurența are 12.000 de urmăritori și filmări cu drona.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Agenție, dronă, tu în costum în fața sediului.",
+          "ef": {
+            "parteneri": 6
+          },
+          "profit": -35,
+          "teme": {
+            "imagine": 2,
+            "clienti": 1
+          }
+        },
+        {
+          "text": "Postezi tu, ce și când apuci.",
+          "ef": {
+            "parteneri": 1
+          },
+          "teme": {
+            "imagine": -1
+          }
+        },
+        {
+          "text": "O pagină cu echipa și proiectele lor, fără tine în cadru.",
+          "ef": {
+            "parteneri": 3,
+            "bunastare": 4
+          },
+          "profit": -10,
+          "teme": {
+            "imagine": 0,
+            "clienti": -1
+          }
+        },
+        {
+          "text": "Angajezi un influencer să vină la sediu. Pentru „vizibilitate”.",
+          "ef": {
+            "parteneri": 4,
+            "bunastare": -2
+          },
+          "profit": -20,
+          "carte": "hackerul",
+          "teme": {
+            "imagine": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "nunta-nepotului",
+      "titlu": "Nunta nepotului",
+      "text": "Se însoară nepotul. Mirele „caută ceva în domeniu”, iar toată familia se uită la tine cum pui plicul.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îl angajezi pe mire. Se descurcă el.",
+          "ef": {
+            "bunastare": -4
+          },
+          "profit": -15,
+          "flaguri": [
+            "mirele-angajat"
+          ],
+          "teme": {
+            "angajari": 2
+          }
+        },
+        {
+          "text": "Dai plic mare, să se vadă, și atât.",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": -20,
+          "carte": "plicul",
+          "teme": {
+            "imagine": 2,
+            "angajari": 0
+          }
+        },
+        {
+          "text": "Nu te duci. Ai livrare luni.",
+          "ef": {
+            "parteneri": -1,
+            "bunastare": 1
+          },
+          "profit": 10,
+          "teme": {
+            "angajari": -2,
+            "imagine": -2
+          }
+        },
+        {
+          "text": "Te duci, plic normal, și îi spui să trimită CV ca oricine.",
+          "ef": {
+            "bunastare": 2
+          },
+          "profit": -5,
+          "teme": {
+            "angajari": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "oferta-corporatie",
+      "titlu": "Oferta de la corporație",
+      "text": "O multinațională vrea 80% din capacitatea ta. Bani siguri, dar ar trebui să lași pe drum clienții mici cu care ai început.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Accepți. Devii dependent de ei, dar ce bani.",
+          "ef": {
+            "parteneri": -4,
+            "bunastare": -2
+          },
+          "profit": 90,
+          "flaguri": [
+            "corporatie"
+          ],
+          "urmatoare": [
+            "corporatia-pleaca"
+          ],
+          "teme": {
+            "risc": 2,
+            "clienti": 0
+          }
+        },
+        {
+          "text": "Refuzi. Nu vrei un singur client.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": 1
+          },
+          "teme": {
+            "risc": -2,
+            "clienti": -1
+          }
+        },
+        {
+          "text": "Accepți jumătate, restul rămâne pentru clienții vechi.",
+          "ef": {
+            "parteneri": 3,
+            "bunastare": 1
+          },
+          "profit": 45,
+          "teme": {
+            "risc": 0,
+            "clienti": -2
+          }
+        },
+        {
+          "text": "Accepți, le faci preț mic că e nume mare, și îi tai pe cei mici.",
+          "ef": {
+            "parteneri": -8,
+            "bunastare": -3
+          },
+          "profit": 60,
+          "flaguri": [
+            "corporatie"
+          ],
+          "urmatoare": [
+            "corporatia-pleaca"
+          ],
+          "teme": {
+            "risc": 1,
+            "clienti": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "corporatia-pleaca",
+      "titlu": "Corporația pleacă",
+      "text": "Mail de două rânduri: „ne reorganizăm furnizorii”. 80% din venituri dispar de la 1 ale lunii. Clienții mici pe care i-ai lăsat nu mai răspund.",
+      "nivel": 1,
+      "greutate": 2,
+      "doar_legata": true,
+      "cerinte": {
+        "flaguri": [
+          "corporatie"
+        ]
+      },
+      "optiuni": [
+        {
+          "text": "Dai afară jumătate din oameni și o iei de la capăt.",
+          "ef": {
+            "parteneri": -3,
+            "bunastare": -15
+          },
+          "profit": -40,
+          "carte": "demisia-cto",
+          "teme": {
+            "salarii": -2,
+            "risc": -1
+          }
+        },
+        {
+          "text": "Ții toți oamenii din rezerve și alergi după clienți noi.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": 5
+          },
+          "profit": -90,
+          "teme": {
+            "salarii": 2,
+            "risc": 2
+          }
+        },
+        {
+          "text": "Te duci cu capul plecat la clienții mici. Unii te primesc.",
+          "ef": {
+            "parteneri": 4,
+            "bunastare": -2
+          },
+          "profit": -50,
+          "teme": {
+            "clienti": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "intarziatul",
+      "titlu": "Întârziatul",
+      "text": "Un angajat bun vine la 9:40 în fiecare zi. Ceilalți au început să se uite la ceas când intră.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îl dai afară, de exemplu pentru ceilalți.",
+          "ef": {
+            "bunastare": -6
+          },
+          "profit": 5,
+          "teme": {
+            "control": 2,
+            "program": 2
+          }
+        },
+        {
+          "text": "Îl chemi la o vorbă. Are copil mic. Îi dai program flexibil.",
+          "ef": {
+            "bunastare": 6
+          },
+          "teme": {
+            "control": -2,
+            "program": -2
+          }
+        },
+        {
+          "text": "Îi tai din salariu la fiecare întârziere.",
+          "ef": {
+            "bunastare": -4,
+            "legalitate": -2
+          },
+          "profit": 5,
+          "teme": {
+            "control": 1,
+            "program": 1
+          }
+        },
+        {
+          "text": "Nu zici nimic, dar îl pui pe lista pentru „vremuri grele”.",
+          "ef": {
+            "bunastare": -1
+          },
+          "teme": {
+            "control": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "omul-cheie",
+      "titlu": "Omul-cheie",
+      "text": "Cel mai bun om al tău a primit ofertă de la concurență, cu 40% mai mult. A venit să-ți spună, cu ochii în pământ.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îi dai cu 30% peste ce i-au oferit ei.",
+          "ef": {
+            "bunastare": 3
+          },
+          "profit": -35,
+          "teme": {
+            "salarii": 2,
+            "control": -1
+          }
+        },
+        {
+          "text": "Îl lași să plece. Nimeni nu e de neînlocuit.",
+          "ef": {
+            "parteneri": -3,
+            "bunastare": -5
+          },
+          "profit": 10,
+          "carte": "demisia-cto",
+          "teme": {
+            "salarii": -1,
+            "control": 2
+          }
+        },
+        {
+          "text": "Îi oferi parte din firmă.",
+          "ef": {
+            "bunastare": 7
+          },
+          "profit": -10,
+          "carte": "team-building",
+          "teme": {
+            "salarii": 1,
+            "control": -2
+          }
+        },
+        {
+          "text": "Îi spui că e trădător și îl dai afară pe loc.",
+          "ef": {
+            "parteneri": -2,
+            "bunastare": -9
+          },
+          "teme": {
+            "salarii": -2,
+            "control": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "cadoul-furnizor",
+      "titlu": "Cadoul de la furnizor",
+      "text": "Furnizorul principal îți oferă o săptămână în Grecia, „cu familia, nu e nicio obligație”. Concurentul lui tocmai ți-a trimis o ofertă mai bună.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Accepți vacanța și rămâi cu el.",
+          "ef": {
+            "parteneri": 3,
+            "legalitate": -3
+          },
+          "profit": 15,
+          "teme": {
+            "fisc": 2,
+            "clienti": 1
+          }
+        },
+        {
+          "text": "Refuzi. Compari ofertele pe bune.",
+          "ef": {
+            "parteneri": 1,
+            "legalitate": 2
+          },
+          "profit": -5,
+          "teme": {
+            "fisc": -2,
+            "clienti": -1
+          }
+        },
+        {
+          "text": "Accepți vacanța și treci oricum la celălalt.",
+          "ef": {
+            "parteneri": -6,
+            "legalitate": -2
+          },
+          "profit": 25,
+          "teme": {
+            "fisc": 1,
+            "clienti": 2
+          }
+        },
+        {
+          "text": "Îi ceri în loc discount pe facturi.",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": 30,
+          "teme": {
+            "fisc": -1,
+            "clienti": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "sambata",
+      "titlu": "Sâmbăta",
+      "text": "Livrarea cea mare e luni și nu sunteți gata. Toată lumea știe ce urmează și nimeni nu se uită la tine.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Toată lumea vine sâmbătă, neplătit. „Suntem o familie.”",
+          "ef": {
+            "bunastare": -9,
+            "legalitate": -2
+          },
+          "profit": 25,
+          "teme": {
+            "program": 2,
+            "salarii": -2
+          }
+        },
+        {
+          "text": "Cine vrea, plătit dublu.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": 4
+          },
+          "profit": -10,
+          "carte": "petrecere-cu-pizza",
+          "teme": {
+            "program": 0,
+            "salarii": 2
+          }
+        },
+        {
+          "text": "Nu lucrăm sâmbăta, punct. Amâni livrarea.",
+          "ef": {
+            "parteneri": -4,
+            "bunastare": 3
+          },
+          "profit": -15,
+          "teme": {
+            "program": -2
+          }
+        },
+        {
+          "text": "Vii doar tu și termini singur.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": 3
+          },
+          "profit": 5,
+          "teme": {
+            "program": -1,
+            "control": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "te-au-facut-pe-forum",
+      "titlu": "Te-au făcut pe forum",
+      "text": "Un client nemulțumit a scris un roman despre tine pe un forum. A fost preluat de două pagini de Facebook. Telefonul sună.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Răspunzi public, calm, cu dovezi.",
+          "ef": {
+            "parteneri": 4
+          },
+          "teme": {
+            "imagine": 0,
+            "clienti": -1
+          }
+        },
+        {
+          "text": "Dai în judecată site-ul.",
+          "ef": {
+            "parteneri": -3
+          },
+          "profit": -25,
+          "carte": "procesul",
+          "teme": {
+            "imagine": 1,
+            "clienti": 2
+          }
+        },
+        {
+          "text": "Ignori. Trece.",
+          "ef": {
+            "parteneri": -2
+          },
+          "teme": {
+            "imagine": -2
+          }
+        },
+        {
+          "text": "Pui angajații să scrie recenzii de cinci stele.",
+          "ef": {
+            "parteneri": -4,
+            "bunastare": -3,
+            "legalitate": -2
+          },
+          "teme": {
+            "imagine": 2,
+            "clienti": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "evaluarea-anuala",
+      "titlu": "Evaluarea anuală",
+      "text": "HR-ul (adică tu) trebuie să decidă cine e promovat. Ai un om care livrează și unul care îți aduce cafeaua și îți ține partea mereu.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Evaluare cu criterii, pe toată lumea, inclusiv pe tine.",
+          "ef": {
+            "bunastare": 5
+          },
+          "profit": -10,
+          "teme": {
+            "control": -2,
+            "angajari": -2
+          }
+        },
+        {
+          "text": "Îi chemi pe fiecare și le spui ce crezi tu.",
+          "ef": {
+            "bunastare": -2
+          },
+          "teme": {
+            "control": 2
+          }
+        },
+        {
+          "text": "Nu faci evaluare. „Îi știu eu pe toți.”",
+          "ef": {
+            "bunastare": -1
+          },
+          "teme": {
+            "control": 1,
+            "angajari": 1
+          }
+        },
+        {
+          "text": "Promovezi pe cine ți-e loial, nu neapărat pe cine livrează.",
+          "ef": {
+            "parteneri": -1,
+            "bunastare": -5
+          },
+          "teme": {
+            "control": 1,
+            "angajari": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "sindicatul",
+      "titlu": "Sindicatul",
+      "text": "Angajații vor să facă sindicat. Au deja avocat și o listă de revendicări prinsă pe frigider.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îi lași. E dreptul lor. Te așezi la masă cu ei.",
+          "ef": {
+            "bunastare": 5,
+            "legalitate": 2
+          },
+          "profit": -10,
+          "teme": {
+            "control": -2,
+            "salarii": 1
+          }
+        },
+        {
+          "text": "Îi chemi pe lideri și „le explici” situația.",
+          "ef": {
+            "bunastare": -7,
+            "legalitate": -4
+          },
+          "teme": {
+            "control": 2
+          }
+        },
+        {
+          "text": "Le dai mărirea înainte să apuce să o ceară.",
+          "ef": {
+            "bunastare": 8
+          },
+          "profit": -30,
+          "teme": {
+            "salarii": 2,
+            "control": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "inspectia-muncii",
+      "titlu": "Inspecția Muncii",
+      "text": "Inspecția Muncii e la poartă. Ai trei „colaboratori” care lucrează de luni până vineri, de un an, fără contract.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Totul e în regulă, poftiți. Plătești amenda pentru cei trei.",
+          "ef": {
+            "bunastare": 2,
+            "legalitate": 4
+          },
+          "profit": -30,
+          "teme": {
+            "fisc": -2
+          }
+        },
+        {
+          "text": "Îi trimiți acasă pe ușa din spate.",
+          "ef": {
+            "bunastare": -3,
+            "legalitate": -6
+          },
+          "profit": 10,
+          "teme": {
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Le faci contracte „de ieri”, cu o semnătură de la contabil.",
+          "ef": {
+            "legalitate": -9
+          },
+          "profit": -5,
+          "teme": {
+            "fisc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "imprumutul-sorei",
+      "titlu": "Împrumutul",
+      "text": "Sora ta are nevoie de 20.000 de lei „pe două luni” din firmă. Mama a sunat și ea.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Dai din firmă. Îi dă ea înapoi.",
+          "ef": {
+            "legalitate": -2
+          },
+          "profit": -20,
+          "teme": {
+            "angajari": 2,
+            "risc": 2
+          }
+        },
+        {
+          "text": "Nu amesteci familia cu firma. Îi dai din banii tăi.",
+          "profit": -5,
+          "teme": {
+            "angajari": -1,
+            "risc": -1
+          }
+        },
+        {
+          "text": "Îi faci contract de împrumut cu dobândă, ca la bancă.",
+          "ef": {
+            "legalitate": 1
+          },
+          "profit": -20,
+          "teme": {
+            "fisc": -2,
+            "angajari": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "concediul-patronului",
+      "titlu": "Concediul tău",
+      "text": "N-ai avut concediu de doi ani. Nevasta a rezervat deja. Firma „nu merge fără tine”, cel puțin așa zici tu.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Pleci două săptămâni și lași telefonul închis.",
+          "ef": {
+            "parteneri": -2,
+            "bunastare": 5
+          },
+          "profit": -10,
+          "carte": "cafea-cu-echipa",
+          "teme": {
+            "control": -2
+          }
+        },
+        {
+          "text": "Pleci, dar suni de trei ori pe zi.",
+          "ef": {
+            "bunastare": -2
+          },
+          "teme": {
+            "control": 2
+          }
+        },
+        {
+          "text": "Nu pleci. Nevasta pleacă singură.",
+          "ef": {
+            "bunastare": -1
+          },
+          "profit": 10,
+          "teme": {
+            "control": 2,
+            "program": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "criza",
+      "titlu": "Criza",
+      "text": "Comenzile au scăzut cu 30% în două luni. Banca te-a sunat „să vadă cum mai ești”.",
+      "nivel": 3,
+      "greutate": 3,
+      "optiuni": [
+        {
+          "text": "Dai afară 20% din oameni.",
+          "ef": {
+            "parteneri": -2,
+            "bunastare": -12
+          },
+          "profit": 40,
+          "teme": {
+            "salarii": -2,
+            "risc": -2
+          }
+        },
+        {
+          "text": "Tai din salariul tău și ții toți oamenii.",
+          "ef": {
+            "bunastare": 8
+          },
+          "profit": -30,
+          "carte": "premiul",
+          "teme": {
+            "salarii": 2,
+            "risc": 0
+          }
+        },
+        {
+          "text": "Iei credit să treci peste. Nimeni nu pleacă.",
+          "ef": {
+            "bunastare": 4
+          },
+          "profit": -50,
+          "teme": {
+            "salarii": 1,
+            "risc": 2
+          }
+        },
+        {
+          "text": "Treci oamenii pe part-time, temporar.",
+          "ef": {
+            "bunastare": -4
+          },
+          "profit": 15,
+          "teme": {
+            "salarii": -1,
+            "risc": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "investitorul",
+      "titlu": "Investitorul",
+      "text": "Un fond de investiții a văzut cifrele și vrea să intre. Bani de extindere, în schimbul unei părți din firmă și al unui loc în consiliu.",
+      "nivel": 3,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Vinzi 40% pentru bani de extindere.",
+          "ef": {
+            "parteneri": 4,
+            "bunastare": -2
+          },
+          "profit": 150,
+          "flaguri": [
+            "investitor"
+          ],
+          "teme": {
+            "risc": 2,
+            "control": -2
+          }
+        },
+        {
+          "text": "Refuzi. Firma e a ta.",
+          "teme": {
+            "risc": -1,
+            "control": 2
+          }
+        },
+        {
+          "text": "Iei credit în loc. Păstrezi controlul.",
+          "profit": 80,
+          "teme": {
+            "risc": 1,
+            "control": 2
+          }
+        },
+        {
+          "text": "Le dai 10%, doar bani de dezvoltare, fără drept de vot.",
+          "ef": {
+            "parteneri": 2
+          },
+          "profit": 50,
+          "teme": {
+            "risc": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "consultanta-minister",
+      "titlu": "Consultanța de la minister",
+      "text": "Un director din minister îți propune un contract de „consultanță strategică” de 200.000 de lei. Livrabilul: un PDF de 12 pagini.",
+      "nivel": 4,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Semnezi. Un PDF se face într-o zi.",
+          "ef": {
+            "parteneri": 3,
+            "legalitate": -12
+          },
+          "profit": 140,
+          "carte": "mail-de-la-anaf",
+          "teme": {
+            "stat": 2,
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Refuzi politicos.",
+          "ef": {
+            "parteneri": -1,
+            "legalitate": 2
+          },
+          "teme": {
+            "stat": -2
+          }
+        },
+        {
+          "text": "Accepți, dar livrezi pe bune, cu echipă și 200 de pagini.",
+          "ef": {
+            "legalitate": -2
+          },
+          "profit": 60,
+          "teme": {
+            "stat": 1,
+            "fisc": -1
+          }
+        },
+        {
+          "text": "Dai pontul presei.",
+          "ef": {
+            "parteneri": -6,
+            "legalitate": 5
+          },
+          "profit": -20,
+          "teme": {
+            "stat": -2,
+            "fisc": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "angajata-insarcinata",
+      "titlu": "Angajata însărcinată",
+      "text": "Cea mai bună vânzătoare a ta vine zâmbind: e însărcinată. Pleacă doi ani și fix acum ai cel mai mare pipeline.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îi ții postul și iei pe cineva temporar.",
+          "ef": {
+            "bunastare": 5
+          },
+          "profit": -25,
+          "teme": {
+            "salarii": 1,
+            "angajari": -1
+          }
+        },
+        {
+          "text": "Găsești un motiv să o dai afară înainte.",
+          "ef": {
+            "bunastare": -8,
+            "legalitate": -6
+          },
+          "profit": 15,
+          "teme": {
+            "salarii": -2,
+            "angajari": 1
+          }
+        },
+        {
+          "text": "O rogi să lucreze de acasă din concediu, „doar e-mailuri”.",
+          "ef": {
+            "bunastare": -3,
+            "legalitate": -2
+          },
+          "profit": 5,
+          "teme": {
+            "salarii": -1
+          }
+        },
+        {
+          "text": "Îi dai și bonus, și „stai cât ai nevoie”.",
+          "ef": {
+            "bunastare": 8
+          },
+          "profit": -35,
+          "carte": "premiul",
+          "teme": {
+            "salarii": 2,
+            "angajari": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "pensionarea-lui-nea-vasile",
+      "titlu": "Pensionarea lui nea Vasile",
+      "text": "Nea Vasile, primul tău om, iese la pensie. Fiul lui „a crescut în firmă” și așteaptă să preia postul.",
+      "nivel": 3,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Petrecere, bonus de pensionare, îl ții consultant.",
+          "ef": {
+            "bunastare": 6
+          },
+          "profit": -25,
+          "carte": "petrecere-concert",
+          "teme": {
+            "salarii": 2
+          }
+        },
+        {
+          "text": "Îl înlocuiești cu fiul lui, că a crescut în firmă.",
+          "ef": {
+            "bunastare": 2
+          },
+          "teme": {
+            "angajari": 2
+          }
+        },
+        {
+          "text": "Pui anunț și iei cel mai bun candidat.",
+          "ef": {
+            "bunastare": 1
+          },
+          "profit": -10,
+          "teme": {
+            "angajari": -2
+          }
+        },
+        {
+          "text": "Îi dai un ceas și gata.",
+          "ef": {
+            "bunastare": -3
+          },
+          "profit": -5,
+          "teme": {
+            "salarii": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "totul-ieri",
+      "titlu": "Totul ieri",
+      "text": "Un client mare vrea proiectul de trei luni livrat în trei săptămâni. „Dacă nu puteți, știm pe cineva care poate.”",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Promiți, și tragi echipa trei nopți la rând.",
+          "ef": {
+            "parteneri": 3,
+            "bunastare": -7
+          },
+          "profit": 30,
+          "teme": {
+            "clienti": 1,
+            "program": 2
+          }
+        },
+        {
+          "text": "Explici termenul realist. Pierzi contractul.",
+          "ef": {
+            "parteneri": -3,
+            "bunastare": 3
+          },
+          "profit": -20,
+          "teme": {
+            "clienti": -2,
+            "program": -2
+          }
+        },
+        {
+          "text": "Promiți, livrezi jumătate și „restul vine”.",
+          "ef": {
+            "parteneri": -6
+          },
+          "profit": 20,
+          "teme": {
+            "clienti": 2
+          }
+        },
+        {
+          "text": "Accepți cu taxă de urgență 50% și plătești oamenii dublu.",
+          "ef": {
+            "parteneri": 1,
+            "bunastare": 2
+          },
+          "profit": 25,
+          "teme": {
+            "clienti": -1,
+            "program": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "oferta-de-cumparare",
+      "titlu": "Oferta de cumpărare",
+      "text": "Cel mai mare concurent vrea să te cumpere. Suma e cu multe zerouri. Oamenii tăi au aflat de pe LinkedIn.",
+      "nivel": 3,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Vinzi tot și pleci în Bali.",
+          "ef": {
+            "parteneri": -3,
+            "bunastare": -10
+          },
+          "profit": 200,
+          "teme": {
+            "risc": -2,
+            "clienti": 2
+          }
+        },
+        {
+          "text": "Refuzi și crești agresiv împotriva lor.",
+          "ef": {
+            "parteneri": 3,
+            "bunastare": 3
+          },
+          "profit": -40,
+          "teme": {
+            "risc": 2
+          }
+        },
+        {
+          "text": "Vinzi, cu clauză că oamenii rămân trei ani.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": 3
+          },
+          "profit": 120,
+          "teme": {
+            "risc": -1,
+            "clienti": -2
+          }
+        },
+        {
+          "text": "Parteneriat în loc de vânzare.",
+          "ef": {
+            "parteneri": 4
+          },
+          "profit": 40,
+          "teme": {
+            "risc": 0,
+            "clienti": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "ultimul-bilant",
+      "titlu": "Ultimul bilanț",
+      "text": "Contabilul pune bilanțul pe masă: profit. Cel mai mare de până acum. Te uiți la cifră și la ușa din spatele căreia e echipa.",
+      "nivel": 3,
+      "greutate": 4,
+      "optiuni": [
+        {
+          "text": "Dividende. Toate ție.",
+          "ef": {
+            "bunastare": -5
+          },
+          "profit": 40,
+          "teme": {
+            "salarii": -2,
+            "fisc": 1
+          }
+        },
+        {
+          "text": "Împarți profitul cu echipa.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": 12
+          },
+          "profit": -20,
+          "carte": "petrecere-concert",
+          "teme": {
+            "salarii": 2
+          }
+        },
+        {
+          "text": "Reinvestești tot.",
+          "ef": {
+            "parteneri": 4,
+            "bunastare": 2
+          },
+          "profit": -30,
+          "teme": {
+            "risc": 1
+          }
+        },
+        {
+          "text": "Muți profitul în firma din Cipru.",
+          "ef": {
+            "bunastare": -2,
+            "legalitate": -9
+          },
+          "profit": 50,
+          "teme": {
+            "fisc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "a-cazut-sistemul",
+      "titlu": "A căzut sistemul",
+      "text": "E ziua cu cele mai multe comenzi din an și a picat tot: site, facturare, telefoane. IT-ul e pe el de două ore.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Stai toată noaptea lângă ei și dai indicații.",
+          "ef": {
+            "parteneri": 1,
+            "bunastare": -3
+          },
+          "teme": {
+            "control": 2
+          }
+        },
+        {
+          "text": "Îi lași să lucreze. Le comanzi pizza.",
+          "ef": {
+            "bunastare": 4
+          },
+          "profit": -5,
+          "carte": "petrecere-cu-pizza",
+          "teme": {
+            "control": -2
+          }
+        },
+        {
+          "text": "Suni la o firmă din afară să preia tot, oricât costă.",
+          "ef": {
+            "parteneri": 3,
+            "bunastare": -2
+          },
+          "profit": -40,
+          "teme": {
+            "risc": 1,
+            "control": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "accidentul-curierului",
+      "titlu": "Accidentul",
+      "text": "Curierul firmei a lovit duba. Vina lui, 4.000 de lei pagubă. Are doi copii și al treilea salariu la tine.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îi reții din salariu, în rate.",
+          "ef": {
+            "bunastare": -4
+          },
+          "profit": 5,
+          "teme": {
+            "salarii": -2
+          }
+        },
+        {
+          "text": "Plătește firma. Asta e.",
+          "ef": {
+            "bunastare": 4
+          },
+          "profit": -20,
+          "teme": {
+            "salarii": 2
+          }
+        },
+        {
+          "text": "Îl dai afară și îi reții și paguba.",
+          "ef": {
+            "parteneri": -1,
+            "bunastare": -8,
+            "legalitate": -3
+          },
+          "profit": 10,
+          "teme": {
+            "salarii": -2,
+            "control": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "vizita-cumatrului",
+      "titlu": "Vizita cumătrului",
+      "text": "Cumătrul vine „în trecere” pe la birou cu fata lui, care „a terminat facultatea” și ar vrea ceva la tine. Oricare.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "O iei, „să vedem”.",
+          "ef": {
+            "bunastare": -3
+          },
+          "profit": -10,
+          "flaguri": [
+            "fata-cumatrului"
+          ],
+          "teme": {
+            "angajari": 2
+          }
+        },
+        {
+          "text": "Să trimită CV, ca toată lumea.",
+          "ef": {
+            "parteneri": -1,
+            "bunastare": 1
+          },
+          "teme": {
+            "angajari": -2
+          }
+        },
+        {
+          "text": "O recomanzi la un partener, să scapi elegant.",
+          "ef": {
+            "parteneri": -2
+          },
+          "carte": "zvonul",
+          "teme": {
+            "angajari": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "furnizorul-chinez",
+      "titlu": "Furnizorul nou",
+      "text": "Un furnizor din China îți oferă aceeași marfă la jumătate de preț. Mostrele arată bine. Certificatele „vin pe mail”.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Treci pe el. Marja se dublează.",
+          "ef": {
+            "parteneri": -3,
+            "legalitate": -3
+          },
+          "profit": 50,
+          "teme": {
+            "risc": 2,
+            "clienti": 1
+          }
+        },
+        {
+          "text": "Comanzi un lot mic de test și ceri certificatele înainte.",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": 10,
+          "teme": {
+            "risc": 0,
+            "clienti": -1
+          }
+        },
+        {
+          "text": "Rămâi cu furnizorul vechi. Știi ce primești.",
+          "ef": {
+            "parteneri": 3
+          },
+          "teme": {
+            "risc": -2,
+            "clienti": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "vecinul-reclama",
+      "titlu": "Vecinul de la etajul 2",
+      "text": "Vecinul de deasupra sediului a reclamat la Primărie că „se face zgomot și vin mașini”. Inspectorul vine marți.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Te duci la el cu o sticlă de vin și o vorbă bună.",
+          "ef": {
+            "parteneri": 2
+          },
+          "teme": {
+            "clienti": -1,
+            "stat": 0
+          }
+        },
+        {
+          "text": "Îl ignori. Să vină inspectorul.",
+          "ef": {
+            "parteneri": -1,
+            "legalitate": -3
+          },
+          "teme": {
+            "control": 1
+          }
+        },
+        {
+          "text": "Îi faci un „contract de consultanță” de 500 de lei pe lună. Tace.",
+          "ef": {
+            "legalitate": -5
+          },
+          "profit": -10,
+          "teme": {
+            "fisc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "salariul-la-negru",
+      "titlu": "Plicul de la sfârșitul lunii",
+      "text": "Jumătate din oameni au salariul minim pe hârtie și restul „în plic”. Un angajat vrea credit la bancă și are nevoie de adeverință pe tot venitul.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Treci pe toată lumea pe salariul real. Costă, dar dormi.",
+          "ef": {
+            "bunastare": 5,
+            "legalitate": 8
+          },
+          "profit": -45,
+          "teme": {
+            "fisc": -2,
+            "salarii": 1
+          }
+        },
+        {
+          "text": "Îi faci lui adeverință „specială”. Restul rămân cum erau.",
+          "ef": {
+            "bunastare": 1,
+            "legalitate": -6
+          },
+          "teme": {
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Îi spui că nu se poate. Să-și ia credit mai mic.",
+          "ef": {
+            "bunastare": -5
+          },
+          "teme": {
+            "fisc": 1,
+            "salarii": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "ziua-firmei",
+      "titlu": "Ziua firmei",
+      "text": "Se fac trei ani de când ai deschis. Echipa a început să șoptească despre o petrecere. Contabilul șoptește despre buget.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Petrecere mare, cu formație și familiile.",
+          "ef": {
+            "parteneri": 3,
+            "bunastare": 10
+          },
+          "profit": -30,
+          "carte": "petrecere-concert",
+          "teme": {
+            "imagine": 2,
+            "salarii": 1
+          }
+        },
+        {
+          "text": "O cină cu echipa, fără pretenții.",
+          "ef": {
+            "bunastare": 5
+          },
+          "profit": -8,
+          "carte": "petrecere-cu-pizza",
+          "teme": {
+            "imagine": 0
+          }
+        },
+        {
+          "text": "Un mail cu „mulțumesc” și o prăjitură în bucătărie.",
+          "ef": {
+            "bunastare": -3
+          },
+          "teme": {
+            "imagine": -2,
+            "salarii": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "al-doilea-sediu",
+      "titlu": "Al doilea oraș",
+      "text": "Un client mare din alt oraș te vrea aproape. Ar trebui un sediu acolo, cu doi oameni și un șef pe care nu-l vezi niciodată.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Deschizi. Trimiți omul de încredere să conducă.",
+          "ef": {
+            "parteneri": 5,
+            "bunastare": -2
+          },
+          "profit": -40,
+          "teme": {
+            "risc": 2,
+            "control": -2
+          }
+        },
+        {
+          "text": "Deschizi, dar conduci tu de la distanță, cu camere și rapoarte zilnice.",
+          "ef": {
+            "parteneri": 3,
+            "bunastare": -5
+          },
+          "profit": -45,
+          "teme": {
+            "risc": 1,
+            "control": 2
+          }
+        },
+        {
+          "text": "Nu. Faci naveta când e nevoie.",
+          "ef": {
+            "parteneri": -2
+          },
+          "profit": 5,
+          "teme": {
+            "risc": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "stagiarii",
+      "titlu": "Stagiarii",
+      "text": "Universitatea îți trimite cinci studenți „în practică”. Gratis, trei luni. Au nevoie de cineva care să-i învețe.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îi iei și le dai un mentor. Pierzi timp, câștigi oameni.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": 3
+          },
+          "profit": -10,
+          "teme": {
+            "angajari": -2,
+            "salarii": 1
+          }
+        },
+        {
+          "text": "Îi iei și îi pui la Excel-uri. Munca e muncă.",
+          "ef": {
+            "bunastare": -2
+          },
+          "profit": 15,
+          "teme": {
+            "angajari": 0,
+            "salarii": -2
+          }
+        },
+        {
+          "text": "Îi refuzi. N-ai timp de școală.",
+          "ef": {
+            "parteneri": -1
+          },
+          "teme": {
+            "angajari": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "facturile-furnizorului",
+      "titlu": "Furnizorul care așteaptă",
+      "text": "Ai 90.000 de lei neplătiți la furnizorul principal. El are și el salarii. Te sună pentru a treia oară.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Plătești tot, chiar dacă rămâi pe zero.",
+          "ef": {
+            "parteneri": 6
+          },
+          "profit": -40,
+          "teme": {
+            "clienti": -2,
+            "risc": -1
+          }
+        },
+        {
+          "text": "Plătești jumătate și promiți restul luna viitoare.",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": -20,
+          "teme": {
+            "clienti": -1
+          }
+        },
+        {
+          "text": "Îl ții în șah: „contestăm o factură”. Mai câștigi două luni.",
+          "ef": {
+            "parteneri": -7,
+            "legalitate": -2
+          },
+          "profit": 10,
+          "teme": {
+            "clienti": 2,
+            "fisc": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "telefonul-de-la-ziarist",
+      "titlu": "Ziaristul",
+      "text": "Un ziarist local te sună: scrie un articol despre firmele care „au crescut suspect de repede”. Vrea un comentariu.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îl inviți la sediu și îi arăți tot.",
+          "ef": {
+            "parteneri": 3,
+            "legalitate": 2
+          },
+          "teme": {
+            "imagine": 1,
+            "fisc": -1
+          }
+        },
+        {
+          "text": "„Fără comentarii.” Închizi.",
+          "ef": {
+            "parteneri": -3
+          },
+          "teme": {
+            "imagine": -1
+          }
+        },
+        {
+          "text": "Îi propui „un parteneriat media”. Articolul dispare.",
+          "ef": {
+            "parteneri": 1,
+            "legalitate": -5
+          },
+          "profit": -15,
+          "teme": {
+            "fisc": 2,
+            "imagine": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "bonusul-de-craciun",
+      "titlu": "Bonusul de Crăciun",
+      "text": "E decembrie. Anul a fost cum a fost. Oamenii se uită la tine cu ochi de ren.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Un salariu în plus, la toată lumea.",
+          "ef": {
+            "bunastare": 10
+          },
+          "profit": -45,
+          "teme": {
+            "salarii": 2
+          }
+        },
+        {
+          "text": "Bonuri de masă și o sticlă de vin.",
+          "ef": {
+            "bunastare": 2
+          },
+          "profit": -10,
+          "teme": {
+            "salarii": -1
+          }
+        },
+        {
+          "text": "Nimic anul ăsta. Le explici cifrele.",
+          "ef": {
+            "bunastare": -7
+          },
+          "profit": 5,
+          "teme": {
+            "salarii": -2,
+            "control": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "masina-sefului-de-vanzari",
+      "titlu": "Șeful de vânzări vrea mașină",
+      "text": "Cel mai bun om de vânzări zice că „nu poate merge la clienți cu Loganul”. Vrea Audi. Altfel se uită în altă parte.",
+      "nivel": 2,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îi iei Audi-ul. Pe firmă, deductibil parțial.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": 4
+          },
+          "profit": -30,
+          "teme": {
+            "imagine": 2,
+            "salarii": 1
+          }
+        },
+        {
+          "text": "Îi dai bonus de performanță, să-și ia ce vrea.",
+          "ef": {
+            "bunastare": 3
+          },
+          "profit": -20,
+          "teme": {
+            "salarii": 2,
+            "imagine": 0
+          }
+        },
+        {
+          "text": "Loganul e bun. Clienții cumpără marfa, nu mașina.",
+          "ef": {
+            "bunastare": -4
+          },
+          "teme": {
+            "imagine": -2,
+            "control": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "vine-controlul-dsp",
+      "titlu": "Controlul care nu era programat",
+      "text": "Un control „tematic” de la o instituție de care n-ai auzit. Au tabelul lor și pixul pregătit. Lipsește o autorizație de care nu știai.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Recunoști, plătești amenda, obții autorizația.",
+          "ef": {
+            "legalitate": 3
+          },
+          "profit": -20,
+          "teme": {
+            "fisc": -2
+          }
+        },
+        {
+          "text": "Îi ții de vorbă până vine avocatul.",
+          "profit": -10,
+          "teme": {
+            "control": 1
+          }
+        },
+        {
+          "text": "Întrebi „cum putem rezolva pe loc”.",
+          "ef": {
+            "legalitate": -7
+          },
+          "profit": -5,
+          "teme": {
+            "fisc": 2,
+            "stat": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "prietenul-cu-ideea",
+      "titlu": "Prietenul cu ideea",
+      "text": "Un prieten din liceu vine cu „o idee de un milion”: să intri cu el la jumătate într-o afacere nouă. Are prezentarea pe telefon.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Intri cu 50.000. Ce poate merge rău?",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": -50,
+          "carte": "comanda-mare",
+          "teme": {
+            "risc": 2
+          }
+        },
+        {
+          "text": "Îi dai o sumă mică, ca prieten, și te uiți de pe margine.",
+          "profit": -10,
+          "teme": {
+            "risc": 0
+          }
+        },
+        {
+          "text": "Nu. Îi plătești cafeaua.",
+          "profit": -1,
+          "teme": {
+            "risc": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "casa-de-marcat",
+      "titlu": "Casa de marcat",
+      "text": "Casa de marcat s-a stricat într-o zi de vineri. Clienții stau la coadă. Service-ul vine luni.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Închizi până luni. Pierzi weekendul.",
+          "ef": {
+            "parteneri": -2,
+            "legalitate": 2
+          },
+          "profit": -20,
+          "teme": {
+            "fisc": -2
+          }
+        },
+        {
+          "text": "Vinzi fără bon, cu chitanță de mână. „Temporar.”",
+          "ef": {
+            "legalitate": -7
+          },
+          "profit": 15,
+          "teme": {
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Împrumuți casa de marcat de la vecinul de local, pe codul lui.",
+          "ef": {
+            "parteneri": 2,
+            "legalitate": -5
+          },
+          "profit": 10,
+          "teme": {
+            "fisc": 2,
+            "clienti": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "telefonul-nevestei",
+      "titlu": "Telefonul de la 11 seara",
+      "text": "Nevasta (sau bărbatul) te sună: „Iar nu vii? Copilul te-a întrebat dacă mai locuiești aici.”",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Pleci acasă. Restul mâine.",
+          "ef": {
+            "bunastare": 2
+          },
+          "profit": -5,
+          "teme": {
+            "program": -2,
+            "control": -1
+          }
+        },
+        {
+          "text": "Mai stai o oră. Doar una.",
+          "teme": {
+            "program": 1
+          }
+        },
+        {
+          "text": "Rămâi. „Firma nu se face singură.”",
+          "ef": {
+            "bunastare": -1
+          },
+          "profit": 10,
+          "teme": {
+            "program": 2,
+            "control": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "recomandarea",
+      "titlu": "Recomandarea",
+      "text": "Un client vechi te roagă să-i angajezi fiul, „măcar pe perioadă de probă”. Clientul aduce 20% din venituri.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îl iei pe probă, trei luni, cu obiective clare.",
+          "ef": {
+            "parteneri": 4,
+            "bunastare": -1
+          },
+          "profit": -8,
+          "teme": {
+            "angajari": 1,
+            "clienti": -1
+          }
+        },
+        {
+          "text": "Îi explici politicos că n-ai post. Riști clientul.",
+          "ef": {
+            "parteneri": -5,
+            "bunastare": 2
+          },
+          "teme": {
+            "angajari": -2
+          }
+        },
+        {
+          "text": "Îl angajezi și îl pui „la proiecte speciale”, adică nicăieri.",
+          "ef": {
+            "parteneri": 3,
+            "bunastare": -4
+          },
+          "profit": -15,
+          "teme": {
+            "angajari": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "chiria-creste",
+      "titlu": "Chiria crește",
+      "text": "Proprietarul sediului vrea cu 40% mai mult de la 1. „Așa e piața.” Mutarea ar costa și ea.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Plătești. Mutarea ar costa mai mult.",
+          "profit": -30,
+          "teme": {
+            "risc": -1
+          }
+        },
+        {
+          "text": "Negociezi: 15% și contract pe trei ani.",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": -12,
+          "teme": {
+            "risc": 0,
+            "clienti": -1
+          }
+        },
+        {
+          "text": "Te muți într-un loc mai ieftin, la margine.",
+          "ef": {
+            "parteneri": -2,
+            "bunastare": -3
+          },
+          "profit": -20,
+          "teme": {
+            "imagine": -2,
+            "risc": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "amenda-de-parcare",
+      "titlu": "Dubele din fața sediului",
+      "text": "Poliția locală a amendat toate dubele parcate pe trotuar în fața sediului. 3.000 de lei, plus o vizită de la „domnul de la Primărie”.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Plătești amenzile și închiriezi locuri de parcare.",
+          "ef": {
+            "legalitate": 2
+          },
+          "profit": -15,
+          "teme": {
+            "fisc": -1,
+            "stat": 0
+          }
+        },
+        {
+          "text": "Contești tot. Avocatul zice că ai șanse.",
+          "profit": -8,
+          "teme": {
+            "control": 1
+          }
+        },
+        {
+          "text": "Îl asculți pe domnul de la Primărie. Are „o soluție”.",
+          "ef": {
+            "parteneri": 2,
+            "legalitate": -6
+          },
+          "profit": -5,
+          "teme": {
+            "stat": 2,
+            "fisc": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "angajatul-bolnav",
+      "titlu": "Concediul medical",
+      "text": "Omul de la depozit e în concediu medical de două luni. Al treilea. Contabilul zice că „se poate face ceva”.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îl lași în pace. E bolnav, asta e.",
+          "ef": {
+            "bunastare": 4,
+            "legalitate": 1
+          },
+          "profit": -10,
+          "teme": {
+            "salarii": 1
+          }
+        },
+        {
+          "text": "Îi ceri „să-și dea demisia frumos”, că altfel…",
+          "ef": {
+            "bunastare": -6,
+            "legalitate": -5
+          },
+          "teme": {
+            "salarii": -2,
+            "control": 2
+          }
+        },
+        {
+          "text": "Angajezi pe altcineva pe perioadă determinată și aștepți.",
+          "ef": {
+            "bunastare": 1
+          },
+          "profit": -15,
+          "teme": {
+            "angajari": -1
           }
         }
       ]

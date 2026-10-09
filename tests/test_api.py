@@ -109,7 +109,7 @@ class API(unittest.TestCase):
         h = {"X-Parola": "secret"}
         sit = self.client.get("/api/admin/continut", headers=h).json()["situatii.json"]
         noua = {
-            "id": "test-noua", "titlu": "Situație nouă", "text": "din test", "an_min": 1, "an_max": 4,
+            "id": "test-noua", "titlu": "Situație nouă", "text": "din test", "nivel": 1,
             "optiuni": [
                 {"text": "da", "ef": {"parteneri": 1}, "profit": 5, "urmatoare": [sit["situatii"][0]["id"]]},
                 {"text": "nu", "ef": {"parteneri": -1}, "profit": 0},
@@ -181,7 +181,7 @@ class API(unittest.TestCase):
         marker["niveluri.json"] = hashlib.sha256(text_zece.encode("utf-8")).hexdigest()
         # situațiile: editate de admin, cer nivelul 10
         sit = json.loads((d / "situatii.json").read_text(encoding="utf-8"))
-        sit["situatii"][0]["cerinte"] = {"nivel_min": 10}
+        sit["situatii"][0]["nivel"] = 10
         (d / "situatii.json").write_text(json.dumps(sit, ensure_ascii=False), encoding="utf-8")
         marker["situatii.json"] = "altceva"
         (d / main.MARKER).write_text(json.dumps(marker), encoding="utf-8")
@@ -212,6 +212,11 @@ class API(unittest.TestCase):
         self.assertEqual(o2, {"profit": 4 * mc.FACTOR_BUGET_IN_PROFIT})
         self.assertEqual(brut["carti.json"]["carti"][0]["efect"], {"bunastare": 6, "profit": -2 * mc.FACTOR_BUGET_IN_PROFIT, "scut": {"resurse": ["parteneri"]}})
         self.assertFalse(mc.migreaza(brut), "a doua oară nu mai e nimic de migrat")
+        vechi = {"situatii.json": {"situatii": [{"an_min": 2, "an_max": 4, "cerinte": {"nivel_min": 3, "flaguri": ["x"]}, "optiuni": []}, {"an_min": 1, "optiuni": []}]}}
+        self.assertTrue(mc.migreaza(vechi))
+        s1, s2 = vechi["situatii.json"]["situatii"]
+        self.assertEqual((s1["nivel"], s1["cerinte"]), (3, {"flaguri": ["x"]}))
+        self.assertEqual(s2, {"optiuni": [], "nivel": 1})
 
     def test_pagina_joc(self):
         r = self.client.get("/")
