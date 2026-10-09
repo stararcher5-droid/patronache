@@ -104,7 +104,6 @@ class Continut:
             "resurse": self.resurse,
             "domenii": self.domenii,
             "profit_de_baza_pe_an": int(self.config.get("profit_de_baza_pe_an", 0)),
-            "garantie_carte_dupa": int((self.config.get("garantie_carte") or {}).get("dupa", 0)),
             "niveluri": self.niveluri,
             # cărțile surpriză nu apar deloc în lista publică: nici numele n-ar trebui să se vadă
             "carti": [c for c in self.carti if not c.get("surpriza")],

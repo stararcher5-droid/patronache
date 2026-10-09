@@ -302,12 +302,12 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     stare["istoric"].append({
         "tip": PAS_DECIZIE, "id": s["id"], "an": stare["an"], "trimestru": stare["trimestru"],
         "optiune": optiune, "delta": delta, "profit": profit, "teme": dict(o.get("teme", {})),
-        "carte": o.get("carte"),
+        "carte": o.get("carte"), "carte_garantata": garantata,
     })
 
     efect = {
         "delta": delta, "profit": profit, "resurse": dict(stare["resurse"]),
-        "carte": carte_noua, "carte_garantata": garantata, "carte_luata": carte_luata, "teme": dict(o.get("teme", {})), "scut_oprit": oprit,
+        "carte": carte_noua, "carte_luata": carte_luata, "teme": dict(o.get("teme", {})), "scut_oprit": oprit,
         "profit_baza": baza_delta, "profit_baza_total": int(c.config.get("profit_de_baza_pe_an", 0)) + int(stare.get("profit_baza_delta", 0)),
     }
     if _verifica_terminat(c, stare):

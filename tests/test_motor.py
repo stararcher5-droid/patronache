@@ -352,7 +352,8 @@ class Carti(unittest.TestCase):
         self.assertIsNone(ef1["carte"]); self.assertIsNone(ef2["carte"])
         s["pas"] = motor.PAS_DECIZIE; s["pas_id"] = next(ids)
         ef3 = motor.alege(c, s, 1)                              # a 3-a: opțiunea „rea” scade legalitatea -> Citația
-        self.assertTrue(ef3["carte_garantata"]); self.assertEqual(s["carti"], ["proces"])
+        self.assertNotIn("carte_garantata", ef3, "jucătorul nu află că a fost garantată")
+        self.assertEqual(s["carti"], ["proces"]); self.assertTrue(s["istoric"][-1]["carte_garantata"])
         self.assertEqual(s["fara_carte"], 0, "contorul se resetează")
 
     def test_situatia_conditionata_de_resurse(self):
