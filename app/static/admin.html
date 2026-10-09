@@ -38,7 +38,7 @@
   select option { background:var(--input); }
   textarea { min-height:70px; resize:vertical; }
   .rand { display:grid; gap:10px; margin-bottom:10px; }
-  .r2 { grid-template-columns:1fr 1fr; } .r3 { grid-template-columns:1fr 1fr 1fr; } .r4 { grid-template-columns:repeat(4,1fr); } .r6 { grid-template-columns:repeat(6,1fr); }
+  .r2 { grid-template-columns:1fr 1fr; } .r3 { grid-template-columns:1fr 1fr 1fr; } .r4 { grid-template-columns:repeat(4,1fr); } .r6 { grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); }
   .bifa { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text); margin:4px 0; }
   .bifa input { width:auto; }
   button { font:inherit; padding:7px 12px; border-radius:6px; border:1px solid var(--line); background:var(--input); color:var(--text); cursor:pointer; }
@@ -377,6 +377,7 @@ function optiuneHtml(o, i, s) {
     <div class="rand r6">
       ${RESURSE.map(r => `<div><label>${NUME_RESURSE[r]} ±</label><input type="number" class="o-ef" data-r="${r}" value="${o.ef?.[r] || ''}" placeholder="0"></div>`).join('')}
       <div><label>Profit (mii lei; banii, în plus sau în minus)</label><input type="number" class="o-profit" value="${o.profit || ''}" placeholder="0"></div>
+      <div><label>Profit de bază pe an ± (permanent, până la final)</label><input type="number" class="o-profit-baza" value="${o.profit_baza || ''}" placeholder="0" title="Rar: schimbă venitul anual din activitatea firmei de la alegerea asta până la finalul jocului"></div>
       <div><label>Dă cartea</label><select class="o-carte"><option value="">—</option>${carti().map(c => `<option value="${esc(c.id)}" ${o.carte === c.id ? 'selected' : ''}>${esc(c.nume)}</option>`).join('')}</select></div>
       <div><label>Pune flaguri (virgulă)</label><input type="text" class="o-flaguri" value="${esc((o.flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
     </div>
@@ -459,6 +460,7 @@ function citesteEditor() {
     const o = { text: $('.o-text', div).value, ef: {}, profit: numar($('.o-profit', div).value) };
     for (const x of $$('.o-ef', div)) { const v = numar(x.value); if (v) o.ef[x.dataset.r] = v; }   // doar ce se schimbă; o opțiune poate mișca o singură resursă sau niciuna
     if (!o.profit) delete o.profit;
+    const pb = numar($('.o-profit-baza', div).value); if (pb) o.profit_baza = pb;
     const carte = $('.o-carte', div).value; if (carte) o.carte = carte;
     const f = lista($('.o-flaguri', div).value); if (f.length) o.flaguri = f;
     if (vechi.urmatoare && vechi.urmatoare.length) o.urmatoare = vechi.urmatoare;
@@ -645,6 +647,7 @@ function deschideCarte(id) {
       <div class="rand r4">
         ${RESURSE.map(r => `<div><label>${NUME_RESURSE[r]} ±</label><input type="number" class="k-ef" data-r="${r}" value="${ef[r] ?? 0}"></div>`).join('')}
         <div><label>Profit (mii lei, intră în bilanțul anului)</label><input type="number" class="k-ef" data-r="profit" value="${ef.profit ?? 0}"></div>
+        <div><label>Profit de bază pe an ± (permanent)</label><input type="number" class="k-ef" data-r="profit_baza" value="${ef.profit_baza ?? 0}"></div>
       </div>
       <h3>Scut (opțional)</h3>
       <p class="nota">De la <b>următoarea</b> decizie (nu cea pe care jucătorul o vede când folosește cartea), scăderile pe resursele bifate sunt anulate, pentru numărul de decizii de mai jos.</p>

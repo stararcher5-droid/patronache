@@ -288,8 +288,8 @@ def _valideaza_carti(carti: list[dict[str, Any]], ids_domenii: set[str] = frozen
                         or ("decizii" in v and (not isinstance(v["decizii"], int) or v["decizii"] < 1)):
                     raise ContinutInvalid(f"{unde}: 'scut' trebuie să fie {{'resurse': [...din {RESURSE}], 'decizii': >= 1}}")
                 continue
-            if k not in (*RESURSE, "profit") or not _numar(v):
-                raise ContinutInvalid(f"{unde}: 'efect' acceptă doar {RESURSE}, 'profit' și 'scut'")
+            if k not in (*RESURSE, "profit", "profit_baza") or not _numar(v):
+                raise ContinutInvalid(f"{unde}: 'efect' acceptă doar {RESURSE}, 'profit', 'profit_baza' și 'scut'")
     return ids
 
 
@@ -348,6 +348,8 @@ def _valideaza_situatii(situatii: list[dict[str, Any]], ids_carti: set[str], tem
             ef = o.get("ef", {})
             if not isinstance(ef, dict) or any(k not in RESURSE or not _numar(v) for k, v in ef.items()):
                 raise ContinutInvalid(f"{u}: 'ef' trebuie să aibă chei din {RESURSE} și valori numerice")
+            if "profit_baza" in o and not _numar(o["profit_baza"]):
+                raise ContinutInvalid(f"{u}: 'profit_baza' trebuie să fie număr")
             if "profit" in o and not _numar(o["profit"]):
                 raise ContinutInvalid(f"{u}: 'profit' trebuie să fie număr")
             if o.get("carte") and o["carte"] not in ids_carti:

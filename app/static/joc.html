@@ -356,7 +356,7 @@ function carteHtml(c, buton = '') {
 }
 function dezvaluie(carte, efect) {
   const d = document.createElement('div'); d.className = 'dezvaluire';
-  const chips = efecteHtml({ delta: efect.delta || {}, profit: efect.profit || 0, carte: null })
+  const chips = efecteHtml({ delta: efect.delta || {}, profit: efect.profit || 0, profit_baza: efect.profit_baza || 0, carte: null })
     + (efect.scut ? `<div class="efecte" style="justify-content:center"><span class="chip scut">🛡️ De la următoarea decizie: ${efect.scut.resurse.map(numeRes).join(', ')} nu poate scădea</span></div>` : '');
   d.innerHTML = `<div class="scena">${carteHtml({ ...carte, surpriza: false })}<div style="font-size:14px; margin-bottom:6px">${carte.surpriza ? 'Ai întors cartea.' : 'Ai folosit cartea.'}</div><div style="display:inline-block; text-align:left">${chips.replace('class="efecte"', 'class="efecte" style="margin:0; justify-content:center"')}</div><div><button class="btn">Mai departe</button></div></div>`;
   document.body.appendChild(d);
@@ -380,6 +380,7 @@ function scuturiHtml() {
 function efecteHtml(ef) {
   const chips = RES.filter(x => ef.delta[x.k]).map(x => `<span class="chip ${ef.delta[x.k] > 0 ? 'plus' : 'minus'}">${x.icon} ${x.nume} ${semn(ef.delta[x.k])}</span>`);
   if (ef.profit) chips.push(`<span class="chip ${ef.profit > 0 ? 'plus' : 'minus'}">Profit ${semn(ef.profit)} mii</span>`);
+  if (ef.profit_baza) chips.push(`<span class="chip ${ef.profit_baza > 0 ? 'plus' : 'minus'}">📈 Activitatea firmei: ${semn(ef.profit_baza)} mii pe an, de acum până la final (acum ${semn(ef.profit_baza_total ?? 0)} pe an)</span>`);
   if (ef.carte) chips.push(`<span class="chip primita">🃏 ${ef.carte.surpriza ? 'Ai primit o carte surpriză' : 'Ai primit: ' + esc(ef.carte.nume)}</span>`);
   for (const [k, v] of Object.entries(ef.scut_oprit || {})) chips.push(`<span class="chip scut">🛡️ Scutul a oprit: ${numeRes(k)} ${semn(v)}</span>`);
   if (!chips.length) chips.push('<span class="chip">Nimic nu s-a schimbat. Deocamdată.</span>');
@@ -393,7 +394,7 @@ function ecranBilant() {
       <h1>Bilanțul</h1>
       <p class="text">Contabilul pune hârtiile pe masă. Profitul pe anul ăsta:</p>
       <div class="mare" style="color:${pas.profit_an >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(pas.profit_an)} mii lei</div>
-      <p class="gol">din alegerile tale${CONT.profit_de_baza_pe_an ? '; activitatea curentă mai aduce ' + semn(CONT.profit_de_baza_pe_an) + ' mii la închiderea anului' : ''}.</p>
+      <p class="gol">din alegerile tale${pas.profit_baza ? '; activitatea curentă mai aduce ' + semn(pas.profit_baza) + ' mii la închiderea anului' : ''}.</p>
       <p class="gol">Profit total până acum: ${semn(pas.profit_total)} mii lei. Nivelul se recalculează din totalul firmei; un an pe minus îl poate coborî.</p>
       <div class="actiuni"><button class="btn" id="inchide-anul">Închide anul</button></div>
     </div>`;
@@ -409,7 +410,7 @@ function ecranBilantRezultat(b) {
       <h1>${dir}</h1>
       <div class="nivel-salt"><div class="n">${b.nivel_vechi}</div><span>→</span><div class="n nou">${b.nivel}</div><div><b>${esc(nivelNou.nume)}</b><br><span class="gol">${esc(nivelNou.desc || '')}</span></div></div>
       <table class="tabel">
-        ${b.profit_baza ? `<tr><td>Activitatea curentă a firmei</td><td>${semn(b.profit_baza)} mii</td></tr><tr><td>Efectul alegerilor tale</td><td style="color:${b.profit_alegeri >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(b.profit_alegeri)} mii</td></tr>` : ''}
+        ${b.profit_baza ? `<tr><td>Activitatea curentă a firmei${b.profit_baza !== CONT.profit_de_baza_pe_an ? ` <span class="gol">(de bază ${semn(CONT.profit_de_baza_pe_an)}, modificată de alegerile tale)</span>` : ''}</td><td>${semn(b.profit_baza)} mii</td></tr><tr><td>Efectul alegerilor tale</td><td style="color:${b.profit_alegeri >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(b.profit_alegeri)} mii</td></tr>` : ''}
         <tr><td>Profitul anului</td><td style="color:${b.profit_an >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(b.profit_an)} mii</td></tr>
         <tr><td>Profit total</td><td>${semn(b.profit_total)} mii</td></tr>
       </table>

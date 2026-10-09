@@ -9,7 +9,9 @@ API-ul, interfața jocului (la `/`) și meniul de admin pentru conținut (la `/a
   ajunge la 0, ai pierdut (partenerii au plecat / toți au plecat / dosar penal).
   Banii nu sunt resursă: sunt profitul, care dă nivelul.
 - **5 ani × 4 trimestre × 2 decizii** (configurabil în `continut/config.json`).
-- **Profit și nivel**: fiecare opțiune aduce profit (mii lei). La finalul
+- **Profit și nivel**: fiecare opțiune aduce profit (mii lei). Firma mai are un
+  profit de bază anual din activitatea curentă, pe care unele alegeri rare îl
+  schimbă permanent (`profit_baza`), de atunci până la final. La finalul
   anului profitul se adună la totalul firmei, iar totalul dă **nivelul 1..4**
   (praguri în `continut/niveluri.json`). Un an pe minus poate coborî nivelul.
 - **Domeniul firmei**: jucătorul alege unul din cele 6 domenii la început (IT,

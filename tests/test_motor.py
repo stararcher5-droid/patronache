@@ -86,6 +86,22 @@ class Reguli(unittest.TestCase):
         self.assertEqual((b["profit_alegeri"], b["profit_baza"], b["profit_an"]), (60, 70, 130))
         self.assertEqual(s["profit_total"], 130)
 
+    def test_profitul_de_baza_se_schimba_permanent(self):
+        c = continut_de_test()
+        c.config["profit_de_baza_pe_an"] = 70
+        c.situatie("a")["optiuni"][0]["profit_baza"] = 25
+        s = motor.stare_noua(c, {}, seed=1)
+        s["pas_id"] = "a"
+        ef = motor.alege(c, s, 0)
+        self.assertEqual((ef["profit_baza"], ef["profit_baza_total"]), (25, 95))
+        self.assertEqual(motor.pas_curent(c, s)["profit_baza"], 95)
+        motor.alege(c, s, 0)
+        b = motor.bilant(c, s)
+        self.assertEqual(b["profit_baza"], 95, "anul 1 e deja afectat")
+        motor.alege(c, s, 0); motor.alege(c, s, 0)
+        b = motor.bilant(c, s)
+        self.assertEqual(b["profit_baza"], 95, "și anii următori, până la final")
+
     def test_resursa_la_zero_termina_partida(self):
         c = continut_de_test()
         s = motor.stare_noua(c, {}, seed=1)

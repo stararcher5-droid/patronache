@@ -7,7 +7,8 @@ Regulile:
 - `ani` ani, `trimestre_pe_an` trimestre, `decizii_pe_trimestru` decizii pe trimestru.
 - Trei resurse 0..100 (parteneri, bunăstare angajați, legalitate). Una la 0 = partida s-a terminat.
   Banii nu sunt resursă: sunt profitul, care dă nivelul.
-- Fiecare opțiune aduce profit (mii lei). La finalul anului se face bilanțul:
+- Fiecare opțiune aduce profit (mii lei). Unele, rare, schimbă permanent profitul
+  de bază anual al firmei (`profit_baza`), de atunci până la final. La finalul anului se face bilanțul:
   profitul anului se adună la profitul total, care dă nivelul firmei (1..10).
   Un an pe minus scade profitul total, deci nivelul poate și să scadă.
 - Firma are un domeniu (IT, construcții...); situațiile și cărțile cu `domenii`
@@ -62,6 +63,7 @@ def stare_noua(c: Continut, firma: dict[str, Any], seed: int | None = None) -> d
         "trimestru": 1,          # în anul curent
         "decizia": 1,            # în trimestrul curent
         "profit_an": 0,
+        "profit_baza_delta": 0,  # modificări permanente ale profitului de bază anual, din alegeri rare
         "profit_total": 0,
         "nivel": 1,
         "carti": [],             # inventarul, în ordinea primirii
@@ -211,6 +213,9 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     ef, oprit = _aplica_scuturi(stare, s["id"], o.get("ef", {}))
     delta = _aplica_resurse(stare, ef)
     profit = o.get("profit", 0)
+    baza_delta = int(o.get("profit_baza", 0))
+    if baza_delta:
+        stare["profit_baza_delta"] = int(stare.get("profit_baza_delta", 0)) + baza_delta
     stare["profit_an"] += profit
 
     carte_noua = None
@@ -235,6 +240,7 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     efect = {
         "delta": delta, "profit": profit, "resurse": dict(stare["resurse"]),
         "carte": carte_noua, "teme": dict(o.get("teme", {})), "scut_oprit": oprit,
+        "profit_baza": baza_delta, "profit_baza_total": int(c.config.get("profit_de_baza_pe_an", 0)) + int(stare.get("profit_baza_delta", 0)),
     }
     if _verifica_terminat(c, stare):
         return efect
@@ -261,7 +267,7 @@ def bilant(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
     if stare["pas"] != PAS_BILANT:
         raise ActiuneInvalida(f"nu e momentul bilanțului, pasul curent e {stare['pas']!r}")
 
-    baza = int(c.config.get("profit_de_baza_pe_an", 0))
+    baza = int(c.config.get("profit_de_baza_pe_an", 0)) + int(stare.get("profit_baza_delta", 0))
     net = stare["profit_an"] + baza
 
     nivel_vechi = stare["nivel"]
@@ -327,6 +333,9 @@ def foloseste_carte(c: Continut, stare: dict[str, Any], id_carte: str) -> dict[s
     delta = _aplica_resurse(stare, ef)
     profit = ef.get("profit", 0)
     stare["profit_an"] += profit
+    baza_delta = int(ef.get("profit_baza", 0))
+    if baza_delta:
+        stare["profit_baza_delta"] = int(stare.get("profit_baza_delta", 0)) + baza_delta
     scut = None
     if ef.get("scut"):
         scut = {"carte": id_carte, "resurse": list(ef["scut"]["resurse"]), "ramase": int(ef["scut"].get("decizii", 1)), "sare": stare["pas_id"]}
@@ -334,7 +343,7 @@ def foloseste_carte(c: Continut, stare: dict[str, Any], id_carte: str) -> dict[s
     stare["carti"].remove(id_carte)
     stare["istoric"].append({"tip": PAS_CARTE, "id": id_carte, "an": stare["an"], "trimestru": stare["trimestru"], "delta": delta, "profit": profit, "scut": scut})
     _verifica_terminat(c, stare)
-    return {"carte": carte, "delta": delta, "profit": profit, "scut": scut, "resurse": dict(stare["resurse"])}
+    return {"carte": carte, "delta": delta, "profit": profit, "profit_baza": baza_delta, "scut": scut, "resurse": dict(stare["resurse"])}
 
 
 # ---------------------------------------------------------------- rezultat
@@ -438,6 +447,7 @@ def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
         "nr_decizie": len([i for i in stare["istoric"] if i["tip"] == PAS_DECIZIE]) + 1,
         "resurse": dict(stare["resurse"]),
         "profit_an": stare["profit_an"], "profit_total": stare["profit_total"],
+        "profit_baza": int(c.config.get("profit_de_baza_pe_an", 0)) + int(stare.get("profit_baza_delta", 0)),
         "nivel": {"nivel": stare["nivel"], "nume": nivel["nume"]},
         "carti": [vedere_carte(stare, c.carte(x), x) for x in stare["carti"]],
         "scuturi": [

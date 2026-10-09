@@ -1,5 +1,5 @@
 {
-  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație are un 'nivel' (1..4) și apare de la nivelul ăla al firmei în sus (la nivelul 3 jucătorul primește situații de nivel 1, 2 și 3), dacă îi sunt îndeplinite și 'cerinte' (cărți, flaguri, situații jucate înainte, nivel maxim). O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe parteneri / bunastare / legalitate (doar ce se schimbă). 'profit' = banii, în plus sau în minus (mii lei), intră în bilanțul anual. 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație. 'domenii': ['it', 'horeca'] = situația apare doar la firmele din domeniile listate; fără 'domenii' apare la toate.",
+  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație are un 'nivel' (1..4) și apare de la nivelul ăla al firmei în sus (la nivelul 3 jucătorul primește situații de nivel 1, 2 și 3), dacă îi sunt îndeplinite și 'cerinte' (cărți, flaguri, situații jucate înainte, nivel maxim). O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe parteneri / bunastare / legalitate (doar ce se schimbă). 'profit' = banii, în plus sau în minus (mii lei), intră în bilanțul anual. 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație. 'domenii': ['it', 'horeca'] = situația apare doar la firmele din domeniile listate; fără 'domenii' apare la toate. 'profit_baza' pe o opțiune (rar): schimbă permanent profitul de bază anual al firmei, de la alegerea asta până la finalul jocului.",
   "situatii": [
     {
       "id": "primul-angajat",
@@ -267,7 +267,8 @@
           "teme": {
             "stat": 2,
             "fisc": 1
-          }
+          },
+          "profit_baza": 50
         }
       ]
     },
@@ -397,7 +398,8 @@
             "risc": 2,
             "imagine": 1
           },
-          "carte": "demisia-cto"
+          "carte": "demisia-cto",
+          "profit_baza": 15
         },
         {
           "text": "Rămâi în chirie.",
@@ -602,7 +604,8 @@
           "teme": {
             "clienti": -1,
             "risc": -1
-          }
+          },
+          "profit_baza": -10
         }
       ]
     },
@@ -694,7 +697,8 @@
           "teme": {
             "risc": 2,
             "stat": -1
-          }
+          },
+          "profit_baza": 20
         }
       ]
     },
@@ -1220,7 +1224,8 @@
           "profit": 80,
           "teme": {
             "fisc": -2
-          }
+          },
+          "profit_baza": 20
         },
         {
           "text": "Lipsesc câteva facturi. „Le aducem mâine.” Le faci peste noapte.",
@@ -1230,7 +1235,8 @@
           "profit": 60,
           "teme": {
             "fisc": 2
-          }
+          },
+          "profit_baza": 15
         },
         {
           "text": "Echipamentele „sunt la celălalt sediu”. N-ai alt sediu.",
@@ -1475,7 +1481,8 @@
           "teme": {
             "risc": 2,
             "clienti": 0
-          }
+          },
+          "profit_baza": 40
         },
         {
           "text": "Refuzi. Nu vrei un singur client.",
@@ -1516,7 +1523,8 @@
           "teme": {
             "risc": 1,
             "clienti": 2
-          }
+          },
+          "profit_baza": 30
         }
       ]
     },
@@ -1544,7 +1552,8 @@
           "teme": {
             "salarii": -2,
             "risc": -1
-          }
+          },
+          "profit_baza": -45
         },
         {
           "text": "Ții toți oamenii din rezerve și alergi după clienți noi.",
@@ -1556,7 +1565,8 @@
           "teme": {
             "salarii": 2,
             "risc": 2
-          }
+          },
+          "profit_baza": -35
         },
         {
           "text": "Te duci cu capul plecat la clienții mici. Unii te primesc.",
@@ -1567,7 +1577,8 @@
           "profit": -50,
           "teme": {
             "clienti": -2
-          }
+          },
+          "profit_baza": -25
         }
       ]
     },
@@ -2073,7 +2084,8 @@
           "teme": {
             "salarii": -2,
             "risc": -2
-          }
+          },
+          "profit_baza": -15
         },
         {
           "text": "Tai din salariul tău și ții toți oamenii.",
@@ -2131,7 +2143,8 @@
           "teme": {
             "risc": 2,
             "control": -2
-          }
+          },
+          "profit_baza": 30
         },
         {
           "text": "Refuzi. Firma e a ta.",
@@ -2391,7 +2404,8 @@
           "teme": {
             "risc": -2,
             "clienti": 2
-          }
+          },
+          "profit_baza": -60
         },
         {
           "text": "Refuzi și crești agresiv împotriva lor.",
@@ -2425,7 +2439,8 @@
           "teme": {
             "risc": 0,
             "clienti": -1
-          }
+          },
+          "profit_baza": 20
         }
       ]
     },
@@ -2626,7 +2641,8 @@
           "teme": {
             "risc": 2,
             "clienti": 1
-          }
+          },
+          "profit_baza": 20
         },
         {
           "text": "Comanzi un lot mic de test și ceri certificatele înainte.",
@@ -2791,7 +2807,8 @@
           "teme": {
             "risc": 2,
             "control": -2
-          }
+          },
+          "profit_baza": 25
         },
         {
           "text": "Deschizi, dar conduci tu de la distanță, cu camere și rapoarte zilnice.",
@@ -2803,7 +2820,8 @@
           "teme": {
             "risc": 1,
             "control": 2
-          }
+          },
+          "profit_baza": 15
         },
         {
           "text": "Nu. Faci naveta când e nevoie.",
