@@ -430,14 +430,28 @@ function efecteHtml(ef) {
 }
 
 function ecranBilant() {
+  const baza = pas.profit_baza || 0, alegeri = pas.profit_an || 0, an = alegeri + baza, total = pas.profit_total + an;
+  const uz = CONT.uzura_pe_an || {};
+  const uzuraTxt = Object.entries(uz).filter(([, v]) => v).map(([k, v]) => numeRes(k) + ' ' + semn(v)).join(', ');
+  const niv = CONT.niveluri, curent = niv[pas.nivel.nivel - 1], urm = niv[pas.nivel.nivel];
+  let nivelTxt;
+  if (urm && total >= urm.prag) nivelTxt = `Cu totalul ăsta urci la nivelul ${urm.nivel}, ${esc(urm.nume)}.`;
+  else if (curent && total < curent.prag) nivelTxt = `Cu totalul ăsta cobori de la nivelul ${curent.nivel}.`;
+  else if (urm) nivelTxt = `Rămâi la nivelul ${curent.nivel}; pentru ${urm.nivel} îți trebuie ${urm.prag} mii în total.`;
+  else nivelTxt = 'Ești la nivelul maxim.';
   return `
     <div class="card intra">
       <div class="cand">Sfârșitul anului ${pas.an}</div>
       <h1>Bilanțul</h1>
-      <p class="text">Contabilul pune hârtiile pe masă. Profitul pe anul ăsta:</p>
-      <div class="mare" style="color:${pas.profit_an >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(pas.profit_an)} mii lei</div>
-      <p class="gol">din alegerile tale${pas.profit_baza ? '; activitatea curentă mai aduce ' + semn(pas.profit_baza) + ' mii la închiderea anului' : ''}.</p>
-      <p class="gol">Profit total până acum: ${semn(pas.profit_total)} mii lei. Nivelul se recalculează din totalul firmei; un an pe minus îl poate coborî.</p>
+      <p class="text">Contabilul pune hârtiile pe masă. Așa arată anul:</p>
+      <table class="tabel">
+        <tr><td>Efectul alegerilor tale</td><td style="color:${alegeri > 0 ? 'var(--ok)' : alegeri < 0 ? 'var(--rau)' : 'inherit'}">${alegeri ? semn(alegeri) : '0'} mii</td></tr>
+        ${baza ? `<tr><td>Activitatea curentă a firmei</td><td>${semn(baza)} mii</td></tr>` : ''}
+        <tr><td><b>Profitul anului</b></td><td style="color:${an >= 0 ? 'var(--ok)' : 'var(--rau)'}"><b>${an ? semn(an) : '0'} mii</b></td></tr>
+        <tr><td>Profit total după acest an</td><td>${semn(total)} mii</td></tr>
+        ${uzuraTxt ? `<tr><td>Uzura anului <span class="gol">(partenerii uită, oamenii se plictisesc, hârtiile se învechesc)</span></td><td>${uzuraTxt}</td></tr>` : ''}
+      </table>
+      <p class="gol">${nivelTxt}</p>
       <div class="actiuni"><button class="btn" id="inchide-anul">Închide anul</button></div>
     </div>`;
 }
