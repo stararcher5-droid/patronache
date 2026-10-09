@@ -1,5 +1,5 @@
 {
-  "_nota": "Cărțile speciale intră în inventar când jucătorul alege o opțiune care are 'carte': <id>. Le folosește oricând în timpul unei decizii; cartea se consumă și aplică 'efect' pe loc: delte pe parteneri / bunastare / legalitate și 'profit' (mii lei, în plus sau în minus, intră în bilanțul anului). O carte poate avea și 'scut': {'resurse': ['bunastare'], 'decizii': 1}: de la următoarea decizie (nu cea pe care o vezi), scăderile pe resursele alese sunt anulate, pentru atâtea decizii. 'surpriza': true = cartea stă cu spatele în sus în inventar: jucătorul îi vede doar numele, nu și ce face; află când o folosește.",
+  "_nota": "Cărțile speciale intră în inventar când jucătorul alege o opțiune care are 'carte': <id>. Le folosește oricând în timpul unei decizii; cartea se consumă și aplică 'efect' pe loc: delte pe parteneri / bunastare / legalitate și 'profit' (mii lei, în plus sau în minus, intră în bilanțul anului). O carte poate avea și 'scut': {'resurse': ['bunastare'], 'decizii': 1}: de la următoarea decizie (nu cea pe care o vezi), scăderile pe resursele alese sunt anulate, pentru atâtea decizii. 'surpriza': true = cartea stă cu spatele în sus în inventar: jucătorul îi vede doar numele, nu și ce face; află când o folosește. 'domenii': ['horeca'] = cartea se primește doar la firmele din domeniile listate.",
   "carti": [
     {
       "id": "petrecere-cu-pizza",
@@ -99,6 +99,19 @@
       "efect": {
         "parteneri": 5,
         "bunastare": -3
+      }
+    },
+    {
+      "id": "seara-cu-casa-inchisa",
+      "nume": "Seara cu casa închisă",
+      "icon": "🍷",
+      "domenii": [
+        "horeca"
+      ],
+      "desc": "Închizi localul o seară doar pentru echipă. Bucătarul gătește ce vrea el.",
+      "efect": {
+        "bunastare": 10,
+        "profit": -8
       }
     }
   ]

@@ -115,5 +115,43 @@
       "minus": "Patron nou",
       "plus": "Patron vechi"
     }
-  }
+  },
+  "domenii": [
+    {
+      "id": "it",
+      "nume": "IT & software",
+      "icon": "💻",
+      "desc": "Birou cu laptopuri, clienți din afară, oameni care pleacă la prima ofertă mai bună."
+    },
+    {
+      "id": "constructii",
+      "nume": "Construcții",
+      "icon": "🏗️",
+      "desc": "Șantiere, autorizații „în lucru”, zilieri și termene imposibile."
+    },
+    {
+      "id": "horeca",
+      "nume": "Restaurant & cafenea",
+      "icon": "🍽️",
+      "desc": "Program de la 7 la 2 noaptea, bacșiș, recenzii pe Google și controale de la DSV."
+    },
+    {
+      "id": "transport",
+      "nume": "Transport & logistică",
+      "icon": "🚚",
+      "desc": "Camioane pe leasing, șoferi care sună din Germania, motorină și tahografe."
+    },
+    {
+      "id": "comert",
+      "nume": "Comerț & magazin online",
+      "icon": "🛒",
+      "desc": "Marfă din China, curieri, retururi, Black Friday și recenzii de o stea."
+    },
+    {
+      "id": "agricultura",
+      "nume": "Agricultură",
+      "icon": "🚜",
+      "desc": "Subvenții APIA, tractoare, vremea și oameni din sat."
+    }
+  ]
 }

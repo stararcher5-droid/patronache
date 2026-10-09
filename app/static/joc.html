@@ -96,13 +96,28 @@
   .camp { margin-bottom:14px; }
   label { display:block; font-family:system-ui, sans-serif; font-size:12px; color:var(--mut); margin-bottom:4px; }
   input[type=text] { width:100%; font:inherit; font-size:17px; padding:10px 12px; border:1.5px solid var(--linie); border-radius:10px; background:#fff; }
+  .domenii { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .domenii button { font:inherit; font-size:14px; display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; border:2px solid transparent; background:var(--hartie2); cursor:pointer; text-align:left; }
+  .domenii button .ic { font-size:22px; }
+  .domenii button.activ { border-color:var(--cerneala); background:#fff; }
+  @media (max-width:520px) { .domenii { grid-template-columns:1fr 1fr; } }
   .alegeri { display:flex; flex-wrap:wrap; gap:8px; }
   .alegeri button { font-size:22px; width:46px; height:46px; border-radius:10px; border:2px solid transparent; background:var(--hartie2); cursor:pointer; }
   .alegeri button.activ { border-color:var(--cerneala); background:#fff; }
   .alegeri .culoare { width:34px; height:34px; border-radius:99px; }
-  .tine { position:relative; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; }
-  .tine i { position:absolute; left:0; top:0; bottom:0; width:0; background:rgba(0,0,0,.25); transition:width .1s linear; }
+  .tine { position:relative; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; transition:transform .15s, box-shadow .15s; }
+  .tine i { position:absolute; left:0; top:0; bottom:0; width:0; background:linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,.15)); box-shadow:4px 0 14px rgba(255,255,255,.45); }
   .tine span { position:relative; }
+  .tine.apasat { transform:scale(.97); box-shadow:0 0 0 6px rgba(0,0,0,.08), var(--umbra); }
+  .tine.gata { animation:tremur .35s ease; }
+  @keyframes tremur { 25% { transform:translateX(-3px) rotate(-1deg); } 75% { transform:translateX(3px) rotate(1deg); } }
+  .start { position:relative; overflow:hidden; }
+  .stampila { position:absolute; left:50%; top:42%; transform:translate(-50%,-50%) rotate(-14deg) scale(3); opacity:0; pointer-events:none;
+    font-family:system-ui, sans-serif; font-weight:900; font-size:52px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent);
+    border:6px solid var(--accent); border-radius:14px; padding:6px 22px; mix-blend-mode:multiply; -webkit-mask:radial-gradient(circle at 30% 40%, #000 55%, transparent 56%) 0 0/9px 9px, linear-gradient(#000, #000); -webkit-mask-composite:source-over; }
+  .stampila.cade { animation:stampila .55s cubic-bezier(.2,1.4,.4,1) forwards; }
+  @keyframes stampila { to { opacity:.9; transform:translate(-50%,-50%) rotate(-12deg) scale(1); } }
+  @media (max-width:520px) { .stampila { font-size:32px; border-width:4px; } }
   /* bilanț & final */
   .mare { font-size:40px; font-weight:bold; line-height:1; margin:6px 0; }
   .tabel { width:100%; border-collapse:collapse; font-family:system-ui, sans-serif; font-size:14px; margin:10px 0; }
@@ -188,24 +203,38 @@ function ecranStart() {
       <p class="text">Ține partenerii aproape, oamenii mulțumiți și ANAF-ul departe. Fiecare alegere mișcă relația cu partenerii, bunăstarea angajaților și legalitatea, și aduce sau pierde bani. Dacă una din cele trei ajunge la zero, s-a terminat.</p>
       <div class="camp"><label>Numele firmei</label><input type="text" id="f-nume" maxlength="40" placeholder="Patronache SRL"></div>
       <div class="camp"><label>Slogan (opțional)</label><input type="text" id="f-slogan" maxlength="80" placeholder="Ieftin, rapid, aproape legal"></div>
+      <div class="camp"><label>Domeniul firmei</label><div class="domenii" id="f-domenii">${(CONT.domenii || []).map((d, i) => `<button type="button" data-v="${esc(d.id)}" class="${i === 0 ? 'activ' : ''}" title="${esc(d.desc || '')}"><span class="ic">${esc(d.icon || '🏢')}</span><span>${esc(d.nume)}</span></button>`).join('')}</div><div class="gol" id="f-domeniu-desc" style="margin-top:6px">${esc((CONT.domenii[0] || {}).desc || '')}</div></div>
       <div class="camp"><label>Sigla</label><div class="alegeri" id="f-sigle">${SIGLE.map((s, i) => `<button type="button" data-v="${s}" class="${i === 0 ? 'activ' : ''}">${s}</button>`).join('')}</div></div>
       <div class="camp"><label>Culoarea</label><div class="alegeri" id="f-culori">${CULORI.map((c, i) => `<button type="button" data-v="${c}" class="${i === 0 ? 'activ' : ''}"><span class="culoare" style="background:${c}; display:block"></span></button>`).join('')}</div></div>
       <div class="actiuni"><button class="btn tine" id="f-start"><i></i><span>Ține apăsat: semnezi actele</span></button></div>
       ${CONT.situatii < CONT.ani * CONT.trimestre_pe_an * CONT.decizii_pe_trimestru ? '<p class="gol" style="margin-top:12px">Conținutul e încă în lucru: partida se poate termina înainte de ' + CONT.ani + ' ani dacă nu mai sunt situații.</p>' : ''}
     </div>`;
-  for (const g of ['#f-sigle', '#f-culori']) $(g, el).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $$(g + ' button').forEach(x => x.classList.remove('activ')); b.classList.add('activ'); });
+  for (const g of ['#f-sigle', '#f-culori', '#f-domenii']) $(g, el).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $$(g + ' button').forEach(x => x.classList.remove('activ')); b.classList.add('activ'); if (g === '#f-domenii') $('#f-domeniu-desc').textContent = (CONT.domenii.find(d => d.id === b.dataset.v) || {}).desc || ''; });
   tineApasat($('#f-start', el), 1200, incepePartida);
 }
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
 function tineApasat(btn, ms, cb) {
-  let t0 = null, raf = null;
-  const bara = $('i', btn);
-  const tick = () => { const p = Math.min(1, (performance.now() - t0) / ms); bara.style.width = p * 100 + '%'; if (p >= 1) { gata(); cb(); } else raf = requestAnimationFrame(tick); };
-  const gata = () => { cancelAnimationFrame(raf); t0 = null; bara.style.width = '0'; };
-  btn.addEventListener('pointerdown', e => { e.preventDefault(); btn.setPointerCapture(e.pointerId); t0 = performance.now(); raf = requestAnimationFrame(tick); });
-  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) btn.addEventListener(ev, () => { if (t0) gata(); });
-  btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cb(); } });
+  let t0 = null, raf = null, terminat = false;
+  const bara = $('i', btn), eticheta = $('span', btn), textInitial = eticheta.textContent;
+  const PASI = ['Citești contractul…', 'Scoți pixul…', 'Semnezi…', 'Ștampila!'];
+  const tick = () => {
+    const p = Math.min(1, (performance.now() - t0) / ms);
+    bara.style.width = p * 100 + '%';
+    eticheta.textContent = PASI[Math.min(PASI.length - 1, Math.floor(p * PASI.length))];
+    if (p >= 1) { gata(true); } else raf = requestAnimationFrame(tick);
+  };
+  const gata = (complet = false) => {
+    cancelAnimationFrame(raf); t0 = null; btn.classList.remove('apasat');
+    if (!complet) { bara.style.width = '0'; eticheta.textContent = textInitial; return; }
+    terminat = true; btn.classList.add('gata'); if (navigator.vibrate) navigator.vibrate(40);
+    const st = document.createElement('div'); st.className = 'stampila'; st.textContent = 'Înregistrat';
+    btn.closest('.card').appendChild(st); requestAnimationFrame(() => st.classList.add('cade'));
+    setTimeout(cb, 750);
+  };
+  btn.addEventListener('pointerdown', e => { if (terminat) return; e.preventDefault(); btn.setPointerCapture(e.pointerId); btn.classList.add('apasat'); t0 = performance.now(); raf = requestAnimationFrame(tick); });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) btn.addEventListener(ev, () => { if (t0) gata(false); });
+  btn.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !terminat) { e.preventDefault(); gata(true); } });
 }
 
 async function incepePartida() {
@@ -215,6 +244,7 @@ async function incepePartida() {
     slogan: $('#f-slogan').value.trim(),
     sigla: $('.activ', $('#f-sigle')).dataset.v,
     culoare: $('.activ', $('#f-culori')).dataset.v,
+    domeniu: ($('.activ', $('#f-domenii')) || {}).dataset?.v || '',
   };
   try {
     const d = await api('POST', '/api/partida', firma);
@@ -243,7 +273,7 @@ function antet() {
   return `
     <header class="top">
       <div class="sigla">${esc(f.sigla || '🏢')}</div>
-      <div class="firma"><b>${esc(f.nume)}</b><small>${esc(f.slogan || 'Anul ' + pas.an + ', trimestrul ' + pas.trimestru)}</small></div>
+      <div class="firma"><b>${esc(f.nume)}</b><small>${esc(numeDomeniu(f.domeniu))}${f.slogan ? ' · ' + esc(f.slogan) : ''}</small></div>
       <div class="nivel">nivelul ${pas.nivel.nivel}<b>${esc(pas.nivel.nume)}</b></div>
     </header>
     ${baraProfit()}
@@ -300,6 +330,7 @@ function dezvaluie(carte, efect) {
   $('.btn', d).addEventListener('click', inchide);
   d.addEventListener('click', e => { if (e.target === d) inchide(); });
 }
+function numeDomeniu(id) { const d = (CONT.domenii || []).find(x => x.id === id); return d ? (d.icon ? d.icon + ' ' : '') + d.nume : ''; }
 function numeRes(k) { return (RES.find(x => x.k === k) || { nume: k }).nume; }
 function efectCarte(ef) {
   if (!ef) return '';

@@ -203,6 +203,31 @@ class Legaturi(unittest.TestCase):
         self.assertIn(s["pas_id"], {"d", "e", "f"})
 
 
+class Domenii(unittest.TestCase):
+    def test_situatiile_si_cartile_respecta_domeniul(self):
+        c = continut_de_test()
+        c.config["domenii"] = [{"id": "it", "nume": "IT"}, {"id": "horeca", "nume": "Horeca"}]
+        for id_ in ("b", "c", "d", "e", "f"):
+            c.situatie(id_)["domenii"] = ["horeca"]
+        c.carti.append({"id": "vin", "nume": "Vin", "domenii": ["horeca"], "efect": {"bunastare": 5}}); c._carti["vin"] = c.carti[-1]
+        c.situatie("a")["optiuni"][0]["carte"] = "vin"
+        s = motor.stare_noua(c, {"domeniu": "it"}, seed=1)
+        self.assertEqual(s["pas_id"], "a", "doar situația fără domenii e pentru IT")
+        motor.alege(c, s, 0)
+        self.assertEqual(s["carti"], [], "cartea de horeca nu se dă la IT")
+        self.assertEqual(s["final"]["motiv"], "fara_situatii")
+        s2 = motor.stare_noua(c, {"domeniu": "horeca"}, seed=1)
+        s2["pas_id"] = "a"; motor.alege(c, s2, 0)
+        self.assertEqual(s2["carti"], ["vin"])
+        self.assertIn(s2["pas_id"], {"b", "c", "d", "e", "f"})
+
+    def test_domeniu_necunoscut_devine_primul(self):
+        c = continut_de_test()
+        c.config["domenii"] = [{"id": "it", "nume": "IT"}]
+        s = motor.stare_noua(c, {"domeniu": "ceva"}, seed=1)
+        self.assertEqual(s["firma"]["domeniu"], "it")
+
+
 class Carti(unittest.TestCase):
     def test_cartea_intra_in_inventar_si_se_foloseste(self):
         c = continut_de_test()

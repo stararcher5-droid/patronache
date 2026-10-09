@@ -1,5 +1,5 @@
 {
-  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație apare dacă îi sunt îndeplinite 'cerinte' (nivel, cărți, flaguri, situații jucate înainte) și dacă anul curent e între 'an_min' și 'an_max'. O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe parteneri / bunastare / legalitate (doar ce se schimbă). 'profit' = banii, în plus sau în minus (mii lei), intră în bilanțul anual. 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație.",
+  "_nota": "EXEMPLE, de înlocuit din meniul de admin (/admin). O situație apare dacă îi sunt îndeplinite 'cerinte' (nivel, cărți, flaguri, situații jucate înainte) și dacă anul curent e între 'an_min' și 'an_max'. O opțiune poate deschide alte situații ('urmatoare'), poate pune flaguri, poate da o carte și poate fi blocată de 'cerinte' proprii (ex. nivel 10). 'ef' = delte pe parteneri / bunastare / legalitate (doar ce se schimbă). 'profit' = banii, în plus sau în minus (mii lei), intră în bilanțul anual. 'doar_legata': true = nu apare la întâmplare, doar deschisă de altă situație. 'domenii': ['it', 'horeca'] = situația apare doar la firmele din domeniile listate; fără 'domenii' apare la toate.",
   "situatii": [
     {
       "id": "primul-angajat",
@@ -432,6 +432,289 @@
           "teme": {
             "risc": 0,
             "imagine": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "it-senior-pleaca",
+      "domenii": [
+        "it"
+      ],
+      "titlu": "Senior-ul vrea remote din Bali",
+      "text": "Cel mai bun programator al tău anunță că se mută în Bali și lucrează de acolo „la fel de bine, doar cu alt fus orar”.",
+      "an_min": 1,
+      "an_max": 5,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îl lași. Contează ce livrează.",
+          "ef": {
+            "bunastare": 6
+          },
+          "profit": -5,
+          "teme": {
+            "program": -2,
+            "control": -2
+          }
+        },
+        {
+          "text": "Doar dacă vine la birou o săptămână pe lună, pe banii lui.",
+          "ef": {
+            "bunastare": -2
+          },
+          "teme": {
+            "program": 0,
+            "control": 1
+          }
+        },
+        {
+          "text": "Nu. Ori aici, ori la revedere.",
+          "ef": {
+            "bunastare": -7,
+            "parteneri": -2
+          },
+          "profit": -20,
+          "teme": {
+            "program": 2,
+            "control": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "constructii-inspectia",
+      "domenii": [
+        "constructii"
+      ],
+      "titlu": "Inspectoratul pe șantier",
+      "text": "ISC-ul a venit pe șantier și trei oameni n-au cască. Unul n-are nici contract.",
+      "an_min": 1,
+      "an_max": 5,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Plătești amenda și faci contractele a doua zi.",
+          "ef": {
+            "legalitate": 3
+          },
+          "profit": -25,
+          "teme": {
+            "fisc": -1
+          }
+        },
+        {
+          "text": "Îi trimiți pe cei trei „la depozit” cât e inspectorul acolo.",
+          "ef": {
+            "legalitate": -6,
+            "bunastare": -2
+          },
+          "profit": 0,
+          "teme": {
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Îl inviți pe inspector la o cafea în baracă.",
+          "ef": {
+            "legalitate": -8,
+            "parteneri": 3
+          },
+          "profit": -5,
+          "teme": {
+            "fisc": 2,
+            "stat": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "horeca-recenzia",
+      "domenii": [
+        "horeca"
+      ],
+      "titlu": "Recenzia de o stea",
+      "text": "„Ciorba rece, ospătar obraznic, 2 ore de așteptat.” E prima recenzie care apare când cauți localul pe Google.",
+      "an_min": 1,
+      "an_max": 5,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Răspunzi public, calm, și inviți clientul la o masă din partea casei.",
+          "ef": {
+            "parteneri": 4
+          },
+          "profit": -3,
+          "teme": {
+            "clienti": -2,
+            "imagine": 0
+          }
+        },
+        {
+          "text": "Îi răspunzi că „nici noi nu vrem clienți ca dumneavoastră”.",
+          "ef": {
+            "parteneri": -5,
+            "bunastare": 2
+          },
+          "teme": {
+            "clienti": 2,
+            "imagine": 1
+          }
+        },
+        {
+          "text": "Pui angajații și rudele să scrie zece recenzii de cinci stele.",
+          "ef": {
+            "parteneri": 2,
+            "legalitate": -3,
+            "bunastare": -2
+          },
+          "teme": {
+            "imagine": 2,
+            "clienti": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "transport-soferul-din-germania",
+      "domenii": [
+        "transport"
+      ],
+      "titlu": "Telefon de la 3 noaptea",
+      "text": "Șoferul sună din parcarea de la Nürnberg: camionul s-a oprit, marfa trebuie livrată la 8, iar el n-a mai dormit de 20 de ore.",
+      "an_min": 1,
+      "an_max": 5,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Chemi service mobil, oricât costă, și anunți clientul că întârzii.",
+          "ef": {
+            "parteneri": -1,
+            "bunastare": 3
+          },
+          "profit": -20,
+          "teme": {
+            "clienti": -1,
+            "program": -1
+          }
+        },
+        {
+          "text": "Îi spui să repare cum poate și să meargă mai departe. Tahograful „se rezolvă”.",
+          "ef": {
+            "legalitate": -7,
+            "bunastare": -5,
+            "parteneri": 2
+          },
+          "profit": 5,
+          "teme": {
+            "fisc": 2,
+            "program": 2
+          }
+        },
+        {
+          "text": "Trimiți alt camion din țară și pierzi comanda.",
+          "ef": {
+            "parteneri": -4,
+            "bunastare": 2
+          },
+          "profit": -35,
+          "teme": {
+            "clienti": -1,
+            "risc": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "comert-returul",
+      "domenii": [
+        "comert"
+      ],
+      "titlu": "Returul de Black Friday",
+      "text": "După Black Friday, 40% din comenzi vin înapoi. Jumătate din cutii sunt deschise, câteva goale.",
+      "an_min": 1,
+      "an_max": 5,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Rambursezi tot, fără întrebări. Clientul are mereu dreptate.",
+          "ef": {
+            "parteneri": 5,
+            "legalitate": 2
+          },
+          "profit": -40,
+          "teme": {
+            "clienti": -2
+          }
+        },
+        {
+          "text": "Rambursezi doar cutiile sigilate, restul „nu respectă condițiile”.",
+          "ef": {
+            "parteneri": -3,
+            "legalitate": -2
+          },
+          "profit": -10,
+          "teme": {
+            "clienti": 1
+          }
+        },
+        {
+          "text": "Întârzii rambursările două luni, poate uită.",
+          "ef": {
+            "parteneri": -6,
+            "legalitate": -5
+          },
+          "profit": 10,
+          "teme": {
+            "clienti": 2,
+            "fisc": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "agricultura-seceta",
+      "domenii": [
+        "agricultura"
+      ],
+      "titlu": "Seceta",
+      "text": "N-a plouat de două luni. Grâul e la jumătate, iar vecinul zice că „se dă ceva de la stat, dacă ai pe cineva la APIA”.",
+      "an_min": 1,
+      "an_max": 5,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Depui dosarul de despăgubire, corect, și aștepți.",
+          "ef": {
+            "legalitate": 2
+          },
+          "profit": -30,
+          "teme": {
+            "stat": 1,
+            "fisc": -1
+          }
+        },
+        {
+          "text": "Suni la „cineva de la APIA”. Dosarul merge mai repede, cu un procent.",
+          "ef": {
+            "legalitate": -7,
+            "parteneri": 3
+          },
+          "profit": -5,
+          "teme": {
+            "stat": 2,
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Iei credit pentru irigații. Anul viitor nu te mai prinde.",
+          "ef": {
+            "bunastare": 2
+          },
+          "profit": -60,
+          "teme": {
+            "risc": 2,
+            "stat": -1
           }
         }
       ]

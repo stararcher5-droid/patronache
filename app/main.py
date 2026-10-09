@@ -159,6 +159,7 @@ class FirmaNoua(BaseModel):
     slogan: str = Field(default="", max_length=80)
     culoare: str = Field(default="", max_length=20)
     sigla: str = Field(default="", max_length=8)
+    domeniu: str = Field(default="", max_length=40)
 
 
 class Alegere(BaseModel):

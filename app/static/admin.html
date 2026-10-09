@@ -157,6 +157,9 @@
       </div>
       <h3>Resurse (valoarea de start, 0..100)</h3>
       <div class="rand r3" id="cfg-resurse"></div>
+      <h3>Domenii (jucătorul alege unul la început)</h3>
+      <table id="tabel-domenii"><thead><tr><th>Id</th><th>Iconiță</th><th>Nume</th><th>Descriere</th><th></th></tr></thead><tbody></tbody></table>
+      <div style="margin-top:8px"><button id="domeniu-adauga">+ Domeniu</button></div>
       <h3>Finaluri</h3>
       <div id="cfg-finaluri"></div>
       <div style="margin-top:10px; display:flex; gap:8px"><button class="primar" id="salveaza-reguli">Salvează regulile</button><button data-reset="config.json">Revino la regulile implicite</button></div>
@@ -205,6 +208,8 @@ const niveluri = () => C['niveluri.json'].niveluri;
 const cfg = () => C['config.json'];
 const teme = () => Object.fromEntries(Object.entries(cfg().teme || {}).filter(([k]) => !k.startsWith('_')));
 const ani = () => cfg().ani || 4;
+const domenii = () => cfg().domenii || [];
+function domeniiBife(clasa, alese) { return domenii().length ? `<div class="etichete">${domenii().map(d => `<label class="bifa" style="margin:0"><input type="checkbox" class="${clasa}" value="${esc(d.id)}" ${alese.includes(d.id) ? 'checked' : ''}> ${esc(d.icon || '')} ${esc(d.nume)}</label>`).join('')}</div><div class="nota">nimic bifat = apare la toate domeniile</div>` : '<span class="nota">niciun domeniu definit (tab Reguli)</span>'; }
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 function marcheaza(fisier) { nesalvat.add(fisier); arataStare(); }
@@ -263,7 +268,7 @@ function randeazaLista() {
     if (q && !(s.id + ' ' + s.titlu + ' ' + s.text).toLowerCase().includes(q)) continue;
     const li = document.createElement('li');
     li.className = s.id === curent ? 'activ' : '';
-    li.innerHTML = `<div><b>${esc(s.titlu)}</b><small>${esc(s.id)} · an ${s.an_min || 1}–${s.an_max || ani()}${s.doar_legata ? ' · doar legată' : ''} · ${s.optiuni.length} opțiuni</small></div><button class="mic pericol sterge" title="Șterge situația">×</button>`;
+    li.innerHTML = `<div><b>${esc(s.titlu)}</b><small>${esc(s.id)} · an ${s.an_min || 1}–${s.an_max || ani()}${s.doar_legata ? ' · doar legată' : ''}${s.domenii ? ' · ' + s.domenii.map(id => (domenii().find(d => d.id === id) || {icon: id}).icon).join('') : ''} · ${s.optiuni.length} opțiuni</small></div><button class="mic pericol sterge" title="Șterge situația">×</button>`;
     li.addEventListener('click', () => deschide(s.id));
     $('.sterge', li).addEventListener('click', e => { e.stopPropagation(); stergeSituatie(s.id); });
     ul.appendChild(li);
@@ -305,6 +310,8 @@ function deschide(id) {
           <div class="bifa"><input type="checkbox" id="s-repetabila" ${s.repetabila ? 'checked' : ''}> Poate apărea de mai multe ori</div>
         </div>
       </div>
+
+      <div class="rand"><div><label>Domenii în care apare</label>${domeniiBife('s-domenii', s.domenii || [])}</div></div>
 
       <h3>Cerințe ca situația să apară</h3>
       <div class="rand r2">
@@ -436,6 +443,7 @@ function citesteEditor() {
   s.greutate = numar($('#s-greutate', el).value, 1);
   s.doar_legata = $('#s-doar-legata', el).checked || undefined;
   s.repetabila = $('#s-repetabila', el).checked || undefined;
+  const dom = $$('.s-domenii:checked', el).map(x => x.value); if (dom.length) s.domenii = dom; else delete s.domenii;
   const cer = {};
   if ($('#c-nivel-min', el).value) cer.nivel_min = numar($('#c-nivel-min', el).value);
   if ($('#c-nivel-max', el).value) cer.nivel_max = numar($('#c-nivel-max', el).value);
@@ -628,6 +636,7 @@ function deschideCarte(id) {
         <div><label>Iconiță (emoji, opțional)</label><input type="text" id="k-icon" value="${esc(c.icon || '')}" placeholder="🍕"></div>
       </div>
       <div class="rand"><div><label>Descriere (ce vede jucătorul)</label><textarea id="k-desc">${esc(c.desc || '')}</textarea></div></div>
+      <div class="rand"><div><label>Domenii în care se primește</label>${domeniiBife('k-domenii', c.domenii || [])}</div></div>
       <div class="bifa"><input type="checkbox" id="k-surpriza" ${c.surpriza ? 'checked' : ''}> <b>Carte surpriză</b>: stă cu spatele în sus în inventar, jucătorul vede doar numele; ce face află când o folosește.</div>
 
       <h3>Efect când e folosită</h3>
@@ -699,6 +708,7 @@ function citesteEditorCarte() {
   const icon = $('#k-icon', el).value.trim(); if (icon) c.icon = icon; else delete c.icon;
   c.desc = $('#k-desc', el).value;
   if ($('#k-surpriza', el).checked) c.surpriza = true; else delete c.surpriza;
+  const kd = $$('.k-domenii:checked', el).map(x => x.value); if (kd.length) c.domenii = kd; else delete c.domenii;
   c.efect = {};
   for (const x of $$('.k-ef', el)) { const v = numar(x.value); if (v) c.efect[x.dataset.r] = v; }
   const scut = $$('.k-scut:checked', el).map(x => x.value);
@@ -780,6 +790,7 @@ function randeazaReguli() {
   const c = cfg();
   $('#cfg-ani').value = c.ani; $('#cfg-trimestre').value = c.trimestre_pe_an; $('#cfg-decizii').value = c.decizii_pe_trimestru;
   $('#cfg-resurse').innerHTML = RESURSE.map(r => `<div><label>${esc(c.resurse[r].nume)}</label><input type="number" min="1" max="100" data-r="${r}" value="${c.resurse[r].start}"></div>`).join('');
+  randeazaDomenii();
   $('#cfg-finaluri').innerHTML = Object.entries(c.finaluri).map(([k, f]) => `<div class="rand r2"><div><label>${k} · titlu</label><input type="text" data-f="${k}" data-k="titlu" value="${esc(f.titlu)}"></div><div><label>text</label><input type="text" data-f="${k}" data-k="text" value="${esc(f.text || '')}"></div></div>`).join('');
   $$('#tab-reguli input').forEach(x => x.addEventListener('input', () => {
     if (x.id === 'cfg-ani') c.ani = numar(x.value, 4); else if (x.id === 'cfg-trimestre') c.trimestre_pe_an = numar(x.value, 4); else if (x.id === 'cfg-decizii') c.decizii_pe_trimestru = numar(x.value, 2);
@@ -788,7 +799,32 @@ function randeazaReguli() {
     marcheaza('config.json');
   }));
 }
-$('#salveaza-reguli').addEventListener('click', () => salveaza('config.json'));
+function randeazaDomenii() {
+  const tb = $('#tabel-domenii tbody'); tb.innerHTML = '';
+  domenii().forEach((d, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><input type="text" data-k="id" value="${esc(d.id)}"></td><td><input type="text" data-k="icon" value="${esc(d.icon || '')}" style="width:60px"></td><td><input type="text" data-k="nume" value="${esc(d.nume)}"></td><td><input type="text" data-k="desc" value="${esc(d.desc || '')}"></td><td><button class="mic pericol">șterge</button></td>`;
+    $$('input', tr).forEach(x => x.addEventListener('input', () => {
+      if (x.dataset.k === 'id') { const nou = x.value.trim(); for (const s of sit()) if (s.domenii) s.domenii = s.domenii.map(v => v === d.id ? nou : v); for (const c of carti()) if (c.domenii) c.domenii = c.domenii.map(v => v === d.id ? nou : v); d.id = nou; marcheaza('situatii.json'); marcheaza('carti.json'); }
+      else d[x.dataset.k] = x.value;
+      marcheaza('config.json');
+    }));
+    $('button', tr).addEventListener('click', () => {
+      if (!confirm(`Ștergi domeniul „${d.nume}”? Situațiile și cărțile marcate doar cu el vor apărea la toate domeniile.`)) return;
+      for (const s of sit()) if (s.domenii) { s.domenii = s.domenii.filter(v => v !== d.id); if (!s.domenii.length) delete s.domenii; }
+      for (const c of carti()) if (c.domenii) { c.domenii = c.domenii.filter(v => v !== d.id); if (!c.domenii.length) delete c.domenii; }
+      cfg().domenii.splice(i, 1); marcheaza('config.json'); marcheaza('situatii.json'); marcheaza('carti.json'); randeazaDomenii();
+    });
+    tb.appendChild(tr);
+  });
+}
+$('#domeniu-adauga').addEventListener('click', () => { cfg().domenii = cfg().domenii || []; let n = cfg().domenii.length + 1, id = 'domeniu-' + n; while (domenii().some(d => d.id === id)) id = 'domeniu-' + (++n); cfg().domenii.push({ id, nume: 'Domeniu nou', icon: '🏢', desc: '' }); marcheaza('config.json'); randeazaDomenii(); });
+$('#salveaza-reguli').addEventListener('click', async () => {
+  // situațiile și cărțile pleacă primele dacă au fost atinse de redenumiri de domenii
+  if (nesalvat.has('situatii.json')) { citesteEditor(); await salveaza('situatii.json'); }
+  if (nesalvat.has('carti.json')) { citesteEditorCarte(); await salveaza('carti.json'); }
+  await salveaza('config.json');
+});
 
 // ------------------------------------------------------------------ arhetipuri
 function randeazaArhetipuri() { $('#json-arhetipuri').value = JSON.stringify(C['arhetipuri.json'], null, 2); }

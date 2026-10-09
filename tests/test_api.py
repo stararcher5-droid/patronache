@@ -37,11 +37,12 @@ class API(unittest.TestCase):
         d = r.json()
         self.assertEqual(set(d["resurse"]), {"parteneri", "bunastare", "legalitate"})
         self.assertEqual(len(d["niveluri"]), 4)
+        self.assertEqual(len(d["domenii"]), 6)
         self.assertTrue(all("efect" in c and not c.get("surpriza") for c in d["carti"]), "cărțile surpriză nu apar în lista publică")
         self.assertGreater(d["carti_surpriza"], 0, "exemplele au și surprize")
 
     def test_partida_prin_http(self):
-        r = self.client.post("/api/partida", json={"nume": "Test SRL", "slogan": "merge"})
+        r = self.client.post("/api/partida", json={"nume": "Test SRL", "slogan": "merge", "domeniu": "horeca"})
         self.assertEqual(r.status_code, 201)
         id_ = r.json()["id"]
         pas = r.json()["pas"]
@@ -92,6 +93,7 @@ class API(unittest.TestCase):
         self.assertIn("nivel", d)
         self.assertIn("potrivire", d)
         self.assertEqual(d["firma"]["nume"], "Test SRL")
+        self.assertEqual(d["firma"]["domeniu"], "horeca")
 
         r = self.client.delete(f"/api/partida/{id_}")
         self.assertEqual(r.status_code, 204)

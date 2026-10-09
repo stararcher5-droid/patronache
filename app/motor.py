@@ -10,6 +10,8 @@ Regulile:
 - Fiecare opțiune aduce profit (mii lei). La finalul anului se face bilanțul:
   profitul anului se adună la profitul total, care dă nivelul firmei (1..10).
   Un an pe minus scade profitul total, deci nivelul poate și să scadă.
+- Firma are un domeniu (IT, construcții...); situațiile și cărțile cu `domenii`
+  apar doar pentru domeniile lor, cele fără `domenii` pentru toate.
 - Situațiile se leagă: o opțiune poate deschide situații următoare (intră
   într-o coadă) și poate pune flaguri; o situație sau o opțiune poate cere nivel,
   cărți, flaguri sau situații jucate înainte.
@@ -47,6 +49,8 @@ def stare_noua(c: Continut, firma: dict[str, Any], seed: int | None = None) -> d
     """Pornește o partidă. `firma` e ce a ales jucătorul (nume, slogan...), netratat."""
     if not c.situatii:
         raise ActiuneInvalida("nu există nicio situație în conținut")
+    if c.domenii and firma.get("domeniu") not in c.ids_domenii:
+        firma = {**firma, "domeniu": c.domenii[0]["id"]}
     if seed is None:
         seed = random.SystemRandom().randrange(2**31)
     stare: dict[str, Any] = {
@@ -109,8 +113,16 @@ def _in_an(c: Continut, s: dict[str, Any], an: int) -> bool:
     return s.get("an_min", 1) <= an <= s.get("an_max", c.ani)
 
 
+def in_domeniu(stare: dict[str, Any], obiect: dict[str, Any]) -> bool:
+    """O situație sau o carte fără 'domenii' e pentru toate firmele; altfel doar pentru domeniile listate."""
+    dom = obiect.get("domenii")
+    return not dom or stare["firma"].get("domeniu") in dom
+
+
 def _eligibila(c: Continut, stare: dict[str, Any], s: dict[str, Any], din_coada: bool) -> bool:
     if s["id"] in stare["jucate"] and not s.get("repetabila"):
+        return False
+    if not in_domeniu(stare, s):
         return False
     if cerinte_indeplinite(stare, s.get("cerinte")) is not None:
         return False
@@ -200,7 +212,7 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     stare["profit_an"] += profit
 
     carte_noua = None
-    if o.get("carte"):
+    if o.get("carte") and in_domeniu(stare, c.carte(o["carte"]) or {}):
         # Aceeași carte poate fi primită la mai multe alegeri; inventarul ține fiecare exemplar.
         stare["carti"].append(o["carte"])
         carte_noua = vedere_carte(stare, c.carte(o["carte"]), o["carte"])

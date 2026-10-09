@@ -12,6 +12,10 @@ API-ul, interfața jocului (la `/`) și meniul de admin pentru conținut (la `/a
 - **Profit și nivel**: fiecare opțiune aduce profit (mii lei). La finalul
   anului profitul se adună la totalul firmei, iar totalul dă **nivelul 1..4**
   (praguri în `continut/niveluri.json`). Un an pe minus poate coborî nivelul.
+- **Domeniul firmei**: jucătorul alege unul din cele 6 domenii la început (IT,
+  construcții, restaurant, transport, comerț, agricultură; editabile în Reguli).
+  Situațiile și cărțile marcate cu `domenii` apar doar la acele domenii; cele
+  nemarcate, la toate.
 - **Nivelul deblochează alegeri**: o situație sau o singură opțiune poate cere
   `nivel_min` (ex. contractele cu ministerul doar la nivel 10). Opțiunile
   blocate se văd, dar cu motivul, și nu pot fi alese.

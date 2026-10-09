@@ -65,6 +65,14 @@ class Continut:
         return self.config["finaluri"]
 
     @property
+    def domenii(self) -> list[dict[str, Any]]:
+        return self.config.get("domenii", [])
+
+    @property
+    def ids_domenii(self) -> set[str]:
+        return {d["id"] for d in self.domenii}
+
+    @property
     def teme(self) -> dict[str, dict[str, str]]:
         return {k: v for k, v in self.config.get("teme", {}).items() if not k.startswith("_")}
 
@@ -92,6 +100,7 @@ class Continut:
             "trimestre_pe_an": self.trimestre_pe_an,
             "decizii_pe_trimestru": self.decizii_pe_trimestru,
             "resurse": self.resurse,
+            "domenii": self.domenii,
             "niveluri": self.niveluri,
             # cărțile surpriză nu apar deloc în lista publică: nici numele n-ar trebui să se vadă
             "carti": [c for c in self.carti if not c.get("surpriza")],
@@ -182,11 +191,12 @@ def construieste(brut: dict[str, dict[str, Any]]) -> Continut:
     niveluri = brut["niveluri.json"].get("niveluri", [])
     _valideaza_niveluri(niveluri)
 
+    ids_domenii = {d["id"] for d in config.get("domenii", [])}
     carti = brut["carti.json"].get("carti", [])
-    ids_carti = _valideaza_carti(carti)
+    ids_carti = _valideaza_carti(carti, ids_domenii)
 
     situatii = brut["situatii.json"].get("situatii", [])
-    _valideaza_situatii(situatii, ids_carti, teme, len(niveluri))
+    _valideaza_situatii(situatii, ids_carti, teme, len(niveluri), ids_domenii)
 
     arhetipuri = brut["arhetipuri.json"].get("arhetipuri", [])
     _valideaza_arhetipuri(arhetipuri, teme)
@@ -217,6 +227,13 @@ def _valideaza_config(c: dict[str, Any]) -> None:
     for k in (*RESURSE, "mandat", "fara_situatii"):
         if k not in fin or "titlu" not in fin[k]:
             raise ContinutInvalid(f"config: lipsește finalul {k!r}")
+    ids: set[str] = set()
+    for dom in c.get("domenii", []):
+        if not isinstance(dom, dict) or not dom.get("id") or not dom.get("nume"):
+            raise ContinutInvalid("config: fiecare domeniu are nevoie de 'id' și 'nume'")
+        if dom["id"] in ids:
+            raise ContinutInvalid(f"config: domeniul {dom['id']!r} apare de două ori")
+        ids.add(dom["id"])
     teme = {k: v for k, v in c.get("teme", {}).items() if not k.startswith("_")}
     for ax in c.get("axe", {}).values():
         for t in ax.get("teme", []):
@@ -240,7 +257,7 @@ def _valideaza_niveluri(niveluri: list[dict[str, Any]]) -> None:
         raise ContinutInvalid("niveluri: nivelul 1 trebuie să aibă prag 0")
 
 
-def _valideaza_carti(carti: list[dict[str, Any]]) -> set[str]:
+def _valideaza_carti(carti: list[dict[str, Any]], ids_domenii: set[str] = frozenset()) -> set[str]:
     ids: set[str] = set()
     for c in carti:
         unde = f"cartea {c.get('id', '?')!r}"
@@ -249,6 +266,7 @@ def _valideaza_carti(carti: list[dict[str, Any]]) -> set[str]:
         if c["id"] in ids:
             raise ContinutInvalid(f"{unde}: id duplicat")
         ids.add(c["id"])
+        _valideaza_domenii(c.get("domenii"), unde, ids_domenii)
         ef = c.get("efect", {})
         if not isinstance(ef, dict):
             raise ContinutInvalid(f"{unde}: 'efect' trebuie să fie dict")
@@ -262,6 +280,16 @@ def _valideaza_carti(carti: list[dict[str, Any]]) -> set[str]:
             if k not in (*RESURSE, "profit") or not _numar(v):
                 raise ContinutInvalid(f"{unde}: 'efect' acceptă doar {RESURSE}, 'profit' și 'scut'")
     return ids
+
+
+def _valideaza_domenii(dom: Any, unde: str, ids_domenii: set[str]) -> None:
+    if dom is None:
+        return
+    if not isinstance(dom, list) or any(not isinstance(x, str) for x in dom):
+        raise ContinutInvalid(f"{unde}: 'domenii' trebuie să fie listă de id-uri de domenii")
+    for x in dom:
+        if x not in ids_domenii:
+            raise ContinutInvalid(f"{unde}: domeniul necunoscut {x!r}")
 
 
 def _valideaza_cerinte(cer: Any, unde: str, ids_carti: set[str], nr_niveluri: int) -> None:
@@ -284,7 +312,7 @@ def _valideaza_cerinte(cer: Any, unde: str, ids_carti: set[str], nr_niveluri: in
             raise ContinutInvalid(f"{unde}: '{k}' trebuie să fie listă de text")
 
 
-def _valideaza_situatii(situatii: list[dict[str, Any]], ids_carti: set[str], teme: dict[str, Any], nr_niveluri: int) -> None:
+def _valideaza_situatii(situatii: list[dict[str, Any]], ids_carti: set[str], teme: dict[str, Any], nr_niveluri: int, ids_domenii: set[str] = frozenset()) -> None:
     ids: set[str] = set()
     for s in situatii:
         unde = f"situația {s.get('id', '?')!r}"
@@ -300,6 +328,7 @@ def _valideaza_situatii(situatii: list[dict[str, Any]], ids_carti: set[str], tem
         if "greutate" in s and (not _numar(s["greutate"]) or s["greutate"] <= 0):
             raise ContinutInvalid(f"{unde}: 'greutate' trebuie să fie > 0")
         _valideaza_cerinte(s.get("cerinte"), unde, ids_carti, nr_niveluri)
+        _valideaza_domenii(s.get("domenii"), unde, ids_domenii)
         if not (isinstance(s["optiuni"], list) and 2 <= len(s["optiuni"]) <= 4):
             raise ContinutInvalid(f"{unde}: între 2 și 4 opțiuni")
         for i, o in enumerate(s["optiuni"]):
@@ -352,17 +381,20 @@ def verifica(c: Continut) -> list[dict[str, str]]:
     avertismente: list[dict[str, str]] = []
     necesare = c.decizii_pe_an
 
-    # Câte situații pot apărea la întâmplare în fiecare an (fără cele doar legate).
-    for an in range(1, c.ani + 1):
-        n = sum(
-            1 for s in c.situatii
-            if not s.get("doar_legata") and s.get("an_min", 1) <= an <= s.get("an_max", c.ani)
-        )
-        if n < necesare:
-            avertismente.append({
-                "tip": "putine", "id": f"an-{an}",
-                "mesaj": f"Anul {an}: doar {n} situații pot apărea la întâmplare, sunt nevoie de {necesare}. Partida se poate termina devreme.",
-            })
+    # Câte situații pot apărea la întâmplare în fiecare an (fără cele doar legate), pentru fiecare domeniu.
+    domenii = c.domenii or [{"id": None, "nume": "toate"}]
+    for dom in domenii:
+        for an in range(1, c.ani + 1):
+            n = sum(
+                1 for s in c.situatii
+                if not s.get("doar_legata") and s.get("an_min", 1) <= an <= s.get("an_max", c.ani)
+                and (not s.get("domenii") or dom["id"] in s["domenii"])
+            )
+            if n < necesare:
+                avertismente.append({
+                    "tip": "putine", "id": f"an-{an}",
+                    "mesaj": f"{dom['nume']}, anul {an}: doar {n} situații pot apărea la întâmplare, sunt nevoie de {necesare}. Partida se poate termina devreme.",
+                })
 
     # Situații marcate 'doar_legata' pe care nu le deschide nimeni.
     deschise = {u for s in c.situatii for o in s["optiuni"] for u in o.get("urmatoare", [])}
