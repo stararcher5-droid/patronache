@@ -3,18 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#1a1c22">
 <title>Patronache</title>
 <meta name="description" content="Ești patronul unei firme românești. Ai patru ani. Ține firma pe linia de plutire, oamenii mulțumiți și ANAF-ul departe.">
 <style>
   :root {
-    --hartie:#fbf7ef; --hartie2:#f3ecdd; --cerneala:#2b2419; --mut:#7a6f5f; --linie:#e2d8c3;
-    --accent:#c9472b; --parteneri:#d9a62b; --bunastare:#e2694f; --legalitate:#3f8f7a; --ok:#3f8f7a; --rau:#c9472b;
-    --umbra:0 10px 30px rgba(60,40,10,.12);
+    --hartie:#1a1c22; --hartie2:#272a33; --card:#22252d; --cerneala:#ece6d8; --mut:#9b957f; --linie:#363a46;
+    --accent:#e0664a; --parteneri:#e2b23a; --bunastare:#ef7a5e; --legalitate:#4fb79b; --ok:#5fc9a8; --rau:#f08a76;
+    --umbra:0 10px 30px rgba(0,0,0,.35);
   }
   * { box-sizing:border-box; }
   html, body { margin:0; min-height:100%; }
   body { font:16px/1.5 Georgia, "Times New Roman", serif; color:var(--cerneala); background:var(--hartie);
-    background-image:radial-gradient(circle at 20% 0%, #fff8e8 0, transparent 50%), radial-gradient(circle at 100% 100%, #efe3cc 0, transparent 45%); }
+    background-image:radial-gradient(circle at 20% 0%, #2a2520 0, transparent 50%), radial-gradient(circle at 100% 100%, #1f2430 0, transparent 45%); }
   .pagina { max-width:760px; margin:0 auto; padding:16px 16px 60px; transition:max-width .2s; }
   .pagina.larg { max-width:940px; }
   header.top { display:flex; align-items:center; gap:12px; padding:6px 0 14px; }
@@ -24,12 +26,12 @@
   header.top .firma small { color:var(--mut); }
   .nivel { text-align:right; font-family:system-ui, sans-serif; font-size:12px; color:var(--mut); }
   .nivel b { display:block; font-size:15px; color:var(--cerneala); }
-  .profit { background:#fff; border:1px solid var(--linie); border-radius:12px; padding:8px 12px; margin-bottom:10px; font-family:system-ui, sans-serif; }
+  .profit { background:var(--card); border:1px solid var(--linie); border-radius:12px; padding:8px 12px; margin-bottom:10px; font-family:system-ui, sans-serif; }
   .profit .et { display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--mut); flex-wrap:wrap; }
   .profit .et b { color:var(--cerneala); font-size:14px; }
   .profit .bara i { background:linear-gradient(90deg, #7fb3a3, var(--legalitate)); }
   .resurse { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; font-family:system-ui, sans-serif; }
-  .res { background:#fff; border:1px solid var(--linie); border-radius:12px; padding:8px 10px; }
+  .res { background:var(--card); border:1px solid var(--linie); border-radius:12px; padding:8px 10px; }
   .res .et { display:flex; justify-content:space-between; font-size:12px; color:var(--mut); }
   .res .et b { color:var(--cerneala); font-size:14px; }
   .bara { height:8px; border-radius:99px; background:var(--hartie2); margin-top:6px; overflow:hidden; }
@@ -37,7 +39,7 @@
   .res.parteneri i { background:var(--parteneri); } .res.bunastare i { background:var(--bunastare); } .res.legalitate i { background:var(--legalitate); }
   .res.alarma { border-color:var(--rau); animation:puls 1.2s infinite; }
   @keyframes puls { 50% { box-shadow:0 0 0 4px rgba(201,71,43,.15); } }
-  .card { background:#fff; border:1px solid var(--linie); border-radius:16px; padding:22px; box-shadow:var(--umbra); margin-bottom:14px; }
+  .card { background:var(--card); border:1px solid var(--linie); border-radius:16px; padding:22px; box-shadow:var(--umbra); margin-bottom:14px; }
   .card.intra { animation:intra .35s ease; }
   @keyframes intra { from { opacity:0; transform:translateY(10px); } }
   .cand { font-family:system-ui, sans-serif; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--mut); margin-bottom:6px; }
@@ -46,20 +48,20 @@
   p { margin:0 0 12px; }
   .text { font-size:17px; }
   .optiuni { display:grid; gap:10px; margin-top:16px; }
-  .opt { text-align:left; font:inherit; font-size:16px; padding:14px 16px; border-radius:12px; border:1.5px solid var(--linie); background:var(--hartie); cursor:pointer; transition:transform .12s, border-color .12s; position:relative; }
+  .opt { text-align:left; font:inherit; font-size:16px; padding:14px 16px; border-radius:12px; border:1.5px solid var(--linie); background:var(--hartie2); color:var(--cerneala); cursor:pointer; transition:transform .12s, border-color .12s; position:relative; }
   .opt:hover:not(:disabled) { border-color:var(--accent); transform:translateX(3px); }
-  .opt:disabled { cursor:not-allowed; color:var(--mut); background:#f6f3ec; }
+  .opt:disabled { cursor:not-allowed; color:var(--mut); background:#1f2229; }
   .opt .blocat { display:block; font-family:system-ui, sans-serif; font-size:12px; color:var(--rau); margin-top:4px; }
   .opt .procent { position:absolute; right:12px; top:12px; font-family:system-ui, sans-serif; font-size:13px; color:var(--mut); }
-  .opt.aleasa { border-color:var(--accent); background:#fff3ef; }
+  .opt.aleasa { border-color:var(--accent); background:#3a2a26; color:var(--cerneala); }
   .efecte { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px; font-family:system-ui, sans-serif; font-size:14px; }
-  .chip { padding:5px 10px; border-radius:99px; background:var(--hartie2); }
-  .chip.scut { background:#e6ecfa; color:#2b3f7a; }
+  .chip { padding:5px 10px; border-radius:99px; background:var(--hartie2); color:var(--cerneala); }
+  .chip.scut { background:#26324f; color:#bcc9f2; }
   .scuturi { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; font-family:system-ui, sans-serif; font-size:13px; }
-  .chip.plus { background:#e3f2ec; color:#245e4f; } .chip.minus { background:#fbe4df; color:#8a2e1c; } .chip.primita { background:#fff0c7; color:#6a4b00; }
+  .chip.plus { background:#1f3a31; color:#a8e3c8; } .chip.minus { background:#4a2622; color:#f5b2a4; } .chip.primita { background:#4a3c14; color:#f3d98a; }
   .actiuni { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; align-items:center; }
   .btn { font:inherit; font-size:16px; padding:12px 20px; border-radius:12px; border:0; background:var(--accent); color:#fff; cursor:pointer; box-shadow:var(--umbra); }
-  .btn.secundar { background:#fff; color:var(--cerneala); border:1.5px solid var(--linie); box-shadow:none; }
+  .btn.secundar { background:var(--hartie2); color:var(--cerneala); border:1.5px solid var(--linie); box-shadow:none; }
   .btn:disabled { opacity:.5; cursor:default; }
   .inventar { margin-top:4px; }
   .inventar h3 { font-family:system-ui, sans-serif; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--mut); margin:0 0 8px; }
@@ -75,7 +77,8 @@
   .carte b { display:block; font-size:14px; text-align:center; line-height:1.2; color:#3b2a00; margin-bottom:4px; }
   .carte .d { color:#6a4b00; text-align:center; margin:0 0 8px; font-size:11px; line-height:1.35; flex:1; }
   .carte .efecte { margin:0 0 8px; justify-content:center; gap:4px; }
-  .carte .efecte .chip { padding:2px 7px; font-size:11px; }
+  .carte .efecte .chip { padding:2px 7px; font-size:11px; background:#f3e7c2; color:#3b2a00; }
+  .carte .efecte .chip.plus { background:#dff1e6; color:#1f5a46; } .carte .efecte .chip.minus { background:#f8dcd6; color:#8a2e1c; } .carte .efecte .chip.scut { background:#e3e9fa; color:#2b3f7a; }
   .carte button { font:inherit; font-size:12px; padding:6px 10px; border-radius:8px; border:0; background:#6a4b00; color:#fff; cursor:pointer; width:100%; }
   .carte button:disabled { opacity:.5; cursor:default; }
   .carte.spate { background:#2f3650; border-color:#1c2130; color:#e8e1cf; box-shadow:0 6px 16px rgba(0,0,0,.3), inset 0 0 0 4px #2f3650, inset 0 0 0 5px #8a93b8;
@@ -84,7 +87,7 @@
   .carte.spate .mare { color:#fff; }
   .carte.spate button { background:#f6c445; color:#2b2419; }
   /* dezvăluirea unei cărți folosite */
-  .dezvaluire { position:fixed; inset:0; background:rgba(30,25,15,.6); display:grid; place-items:center; z-index:20; padding:16px; }
+  .dezvaluire { position:fixed; inset:0; background:rgba(0,0,0,.7); display:grid; place-items:center; z-index:20; padding:16px; }
   .dezvaluire .scena { perspective:1200px; text-align:center; font-family:system-ui, sans-serif; color:#fff; }
   .dezvaluire .carte { width:210px; min-height:300px; margin:0 auto 14px; font-size:13px; animation:intoarce .7s ease; transform-style:preserve-3d; }
   .dezvaluire .carte .mare { font-size:60px; }
@@ -98,37 +101,38 @@
   .start-stanga, .start-dreapta, .start-jos { min-width:0; }
   .start-stanga { grid-column:1; grid-row:1; } .start-dreapta { grid-column:2; grid-row:1 / span 2; } .start-jos { grid-column:1; grid-row:2; }
   .start h1 { font-size:40px; line-height:1.05; margin:4px 0 12px; }
-  .start .text { font-size:16px; color:#4a3f30; }
+  .start .text { font-size:16px; color:#c9c2b2; }
   .start-dreapta { background:var(--hartie); border:1px solid var(--linie); border-radius:14px; padding:18px; }
   .camp { margin-bottom:16px; } .start-dreapta .camp:last-child { margin-bottom:0; }
   label { display:block; font-family:system-ui, sans-serif; font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--mut); margin-bottom:6px; }
-  input[type=text] { width:100%; font:inherit; font-size:17px; padding:11px 13px; border:1.5px solid var(--linie); border-radius:10px; background:#fff; }
+  input[type=text] { width:100%; font:inherit; font-size:17px; padding:11px 13px; border:1.5px solid var(--linie); border-radius:10px; background:var(--hartie2); color:var(--cerneala); }
+  input[type=text]::placeholder { color:#6f6a5c; }
   input[type=text]:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
   .domenii { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
-  .domenii button { font:inherit; font-family:system-ui, sans-serif; font-size:12.5px; line-height:1.2; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-height:74px; padding:8px 6px; border-radius:10px; border:2px solid transparent; background:#fff; cursor:pointer; text-align:center; color:var(--cerneala); min-width:0; overflow-wrap:anywhere; }
+  .domenii button { font:inherit; font-family:system-ui, sans-serif; font-size:12.5px; line-height:1.2; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-height:74px; padding:8px 6px; border-radius:10px; border:2px solid transparent; background:var(--hartie2); cursor:pointer; text-align:center; color:var(--cerneala); min-width:0; overflow-wrap:anywhere; }
   .domenii button .ic { font-size:24px; line-height:1; }
   .domenii button:hover { border-color:var(--linie); }
-  .domenii button.activ { border-color:var(--accent); background:#fff; box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .domenii button.activ { border-color:var(--accent); background:var(--card); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
   .domeniu-desc { margin-top:8px; min-height:2.6em; }
   .alegeri { display:grid; gap:8px; }
   .alegeri.sigle { grid-template-columns:repeat(8,minmax(0,1fr)); }
   .alegeri.culori { grid-template-columns:repeat(8,minmax(0,1fr)); }
-  .alegeri button { aspect-ratio:1; width:100%; font-size:22px; display:grid; place-items:center; border-radius:10px; border:2px solid transparent; background:#fff; cursor:pointer; padding:0; }
+  .alegeri button { aspect-ratio:1; width:100%; font-size:22px; display:grid; place-items:center; border-radius:10px; border:2px solid transparent; background:var(--hartie2); cursor:pointer; padding:0; }
   .alegeri button:hover { border-color:var(--linie); }
   .alegeri button.activ { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
   .alegeri .culoare { width:60%; height:60%; border-radius:99px; background:var(--c); }
   .mare-cta { width:100%; padding:16px 20px; font-size:18px; margin-top:6px; text-align:center; }
   @media (max-width:760px) { .start { padding:18px; } .start-grid { grid-template-columns:minmax(0,1fr); gap:18px; } .start-stanga, .start-dreapta, .start-jos { grid-column:1; grid-row:auto; } .start h1 { font-size:30px; } .domenii { grid-template-columns:repeat(3,minmax(0,1fr)); } .domenii button { font-size:11.5px; min-height:68px; } .alegeri.sigle, .alegeri.culori { grid-template-columns:repeat(8,minmax(0,1fr)); } .alegeri button { font-size:18px; border-radius:8px; } }
   .tine { position:relative; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; transition:transform .15s, box-shadow .15s; }
-  .tine i { position:absolute; left:0; top:0; bottom:0; width:0; background:linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,.15)); box-shadow:4px 0 14px rgba(255,255,255,.45); }
+  .tine i { position:absolute; left:0; top:0; bottom:0; width:0; background:linear-gradient(90deg, rgba(255,255,255,.3), rgba(255,255,255,.12)); box-shadow:4px 0 14px rgba(255,255,255,.4); }
   .tine span { position:relative; }
-  .tine.apasat { transform:scale(.97); box-shadow:0 0 0 6px rgba(0,0,0,.08), var(--umbra); }
+  .tine.apasat { transform:scale(.97); box-shadow:0 0 0 6px rgba(255,255,255,.08), var(--umbra); }
   .tine.gata { animation:tremur .35s ease; }
   @keyframes tremur { 25% { transform:translateX(-3px) rotate(-1deg); } 75% { transform:translateX(3px) rotate(1deg); } }
   .start { position:relative; overflow:hidden; }
   .stampila { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate(-14deg) scale(3); opacity:0; pointer-events:none;
     font-family:system-ui, sans-serif; font-weight:900; font-size:52px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent);
-    border:6px solid var(--accent); border-radius:14px; padding:6px 22px; mix-blend-mode:multiply; -webkit-mask:radial-gradient(circle at 30% 40%, #000 55%, transparent 56%) 0 0/9px 9px, linear-gradient(#000, #000); -webkit-mask-composite:source-over; }
+    border:6px solid var(--accent); border-radius:14px; padding:6px 22px; mix-blend-mode:screen; -webkit-mask:radial-gradient(circle at 30% 40%, #000 55%, transparent 56%) 0 0/9px 9px, linear-gradient(#000, #000); -webkit-mask-composite:source-over; }
   .stampila.cade { animation:stampila .55s cubic-bezier(.2,1.4,.4,1) forwards; }
   @keyframes stampila { to { opacity:.9; transform:translate(-50%,-50%) rotate(-12deg) scale(1); } }
   @media (max-width:520px) { .stampila { font-size:32px; border-width:4px; } }
@@ -146,8 +150,8 @@
   .busola { font-family:system-ui, sans-serif; font-size:14px; color:var(--mut); }
   footer { margin-top:30px; font-family:system-ui, sans-serif; font-size:12px; color:var(--mut); display:flex; gap:14px; flex-wrap:wrap; }
   footer a { color:var(--mut); cursor:pointer; }
-  .eroare { background:#fbe4df; color:#8a2e1c; padding:10px 14px; border-radius:10px; font-family:system-ui, sans-serif; font-size:14px; margin-bottom:12px; }
-  .modal { position:fixed; inset:0; background:rgba(40,30,10,.5); display:grid; place-items:center; padding:16px; z-index:10; }
+  .eroare { background:#4a2622; color:#f5b2a4; padding:10px 14px; border-radius:10px; font-family:system-ui, sans-serif; font-size:14px; margin-bottom:12px; }
+  .modal { position:fixed; inset:0; background:rgba(0,0,0,.6); display:grid; place-items:center; padding:16px; z-index:10; }
   .modal .card { max-width:560px; max-height:90vh; overflow:auto; }
   .ascuns { display:none !important; }
   @media (max-width:520px) { .resurse { gap:6px; } .res { padding:6px 8px; } h1 { font-size:24px; } .card { padding:16px; } .carti { gap:10px; } .carte { width:calc(50% - 5px); min-height:0; } }
@@ -174,7 +178,7 @@ const RES = [
   { k: 'legalitate', nume: 'Legalitate', icon: '⚖️' },
 ];
 const SIGLE = ['🥨', '🔧', '🚚', '💡', '🏗️', '🍕', '💻', '✂️', '🐓', '🚜', '☕', '🧱', '🛒', '📦', '🎩', '🍺'];
-const CULORI = ['#c9472b', '#d9a62b', '#3f8f7a', '#2f6fed', '#8a4fbf', '#2b2419'];
+const CULORI = ['#e0664a', '#e2b23a', '#4fb79b', '#5b8def', '#a06ad6', '#e8e1cf'];
 let CONT = null;          // /api/continut
 let joc = null;           // { id, firma }
 let pas = null;           // pasul curent de la server
