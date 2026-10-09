@@ -161,6 +161,11 @@
       <div class="rand r3"><div><label>Profit de bază pe an (mii lei, din activitatea curentă, peste alegeri)</label><input type="number" id="cfg-profit-baza"></div></div>
       <h3>Resurse (valoarea de start, 0..100)</h3>
       <div class="rand r3" id="cfg-resurse"></div>
+      <h3>Garanția de carte</h3>
+      <p class="nota">Dacă atâtea decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză. Cartea se alege după felul alegerii: prima regulă de mai jos care se potrivește cu efectul opțiunii alese; „oricând” e rezerva. Doar cărțile surpriză intră aici.</p>
+      <div class="rand r3"><div><label>După câte decizii fără carte (0 = oprit)</label><input type="number" id="cfg-garantie-dupa" min="0"></div></div>
+      <table id="tabel-garantie"><thead><tr><th style="width:220px">Când alegerea…</th><th>Cărți surpriză posibile</th><th></th></tr></thead><tbody></tbody></table>
+      <div style="margin-top:8px"><button id="garantie-adauga">+ Regulă</button></div>
       <h3>Domenii (jucătorul alege unul la început)</h3>
       <table id="tabel-domenii"><thead><tr><th>Id</th><th>Iconiță</th><th>Nume</th><th>Descriere</th><th></th></tr></thead><tbody></tbody></table>
       <div style="margin-top:8px"><button id="domeniu-adauga">+ Domeniu</button></div>
@@ -272,7 +277,7 @@ function randeazaLista() {
     if (q && !(s.id + ' ' + s.titlu + ' ' + s.text).toLowerCase().includes(q)) continue;
     const li = document.createElement('li');
     li.className = s.id === curent ? 'activ' : '';
-    li.innerHTML = `<div><b>${esc(s.titlu)}</b><small>${esc(s.id)} · nivel ${s.nivel || 1}+${s.doar_legata ? ' · doar legată' : ''}${s.domenii ? ' · ' + s.domenii.map(id => (domenii().find(d => d.id === id) || {icon: id}).icon).join('') : ''} · ${s.optiuni.length} opțiuni</small></div><button class="mic pericol sterge" title="Șterge situația">×</button>`;
+    li.innerHTML = `<div><b>${esc(s.titlu)}</b><small>${esc(s.id)} · nivel ${s.nivel || 1}+${s.doar_legata ? ' · doar legată' : ''}${s.domenii ? ' · ' + s.domenii.map(id => (domenii().find(d => d.id === id) || {icon: id}).icon).join('') : ''}${s.cerinte && s.cerinte.resurse ? ' · ' + Object.entries(s.cerinte.resurse).map(([r, p]) => NUME_RESURSE[r] + (p.min != null ? ' ≥' + p.min : '') + (p.max != null ? ' ≤' + p.max : '')).join(', ') : ''} · ${s.optiuni.length} opțiuni</small></div><button class="mic pericol sterge" title="Șterge situația">×</button>`;
     li.addEventListener('click', () => deschide(s.id));
     $('.sterge', li).addEventListener('click', e => { e.stopPropagation(); stergeSituatie(s.id); });
     ul.appendChild(li);
@@ -317,6 +322,10 @@ function deschide(id) {
       <div class="rand"><div><label>Domenii în care apare</label>${domeniiBife('s-domenii', s.domenii || [])}</div></div>
 
       <h3>Cerințe ca situația să apară</h3>
+      <div class="rand r3">
+        ${RESURSE.map(r => { const pr = (cer.resurse || {})[r] || {}; return `<div><label>${NUME_RESURSE[r]}: între … și …</label><div style="display:flex; gap:6px"><input type="number" class="c-res-min" data-r="${r}" min="0" max="100" value="${pr.min ?? ''}" placeholder="min"><input type="number" class="c-res-max" data-r="${r}" min="0" max="100" value="${pr.max ?? ''}" placeholder="max"></div></div>`; }).join('')}
+      </div>
+      <p class="nota" style="margin-top:-4px">Ex. Legalitate max 25 = situația apare doar când legalitatea e sub 25. Gol = fără condiție. Pune o greutate mare ca să apară repede când condiția e îndeplinită.</p>
       <div class="rand r2">
         <div><label>Nivel maxim (opțional: nu mai apare peste el)</label><input type="number" id="c-nivel-max" min="1" max="${niveluri().length}" value="${cer.nivel_max ?? ''}" placeholder="oricare"></div>
       </div>
@@ -454,6 +463,10 @@ function citesteEditor() {
   const ffl = lista($('#c-fara-flaguri', el).value); if (ffl.length) cer.fara_flaguri = ffl;
   const cc = $$('.c-carti:checked', el).map(x => x.value); if (cc.length) cer.carti = cc;
   const fcc = $$('.c-fara-carti:checked', el).map(x => x.value); if (fcc.length) cer.fara_carti = fcc;
+  const res = {};
+  for (const x of $$('.c-res-min', el)) if (x.value !== '') (res[x.dataset.r] = res[x.dataset.r] || {}).min = numar(x.value);
+  for (const x of $$('.c-res-max', el)) if (x.value !== '') (res[x.dataset.r] = res[x.dataset.r] || {}).max = numar(x.value);
+  if (Object.keys(res).length) cer.resurse = res;
   if (s.cerinte && s.cerinte.dupa && s.cerinte.dupa.length) cer.dupa = s.cerinte.dupa;
   s.cerinte = cer;
   s.optiuni = $$('.optiune', el).map((div, i) => {
@@ -797,17 +810,39 @@ function randeazaReguli() {
   const c = cfg();
   $('#cfg-ani').value = c.ani; $('#cfg-trimestre').value = c.trimestre_pe_an; $('#cfg-decizii').value = c.decizii_pe_trimestru;
   $('#cfg-profit-baza').value = c.profit_de_baza_pe_an ?? 0;
+  $('#cfg-garantie-dupa').value = (c.garantie_carte || {}).dupa ?? 0;
+  randeazaGarantie();
   $('#cfg-resurse').innerHTML = RESURSE.map(r => `<div><label>${esc(c.resurse[r].nume)}</label><input type="number" min="1" max="100" data-r="${r}" value="${c.resurse[r].start}"></div>`).join('');
   randeazaDomenii();
   $('#cfg-finaluri').innerHTML = Object.entries(c.finaluri).map(([k, f]) => `<div class="rand r2"><div><label>${k} · titlu</label><input type="text" data-f="${k}" data-k="titlu" value="${esc(f.titlu)}"></div><div><label>text</label><input type="text" data-f="${k}" data-k="text" value="${esc(f.text || '')}"></div></div>`).join('');
   $$('#tab-reguli input').forEach(x => x.addEventListener('input', () => {
-    if (x.id === 'cfg-profit-baza') c.profit_de_baza_pe_an = numar(x.value, 0);
+    if (x.id === 'cfg-garantie-dupa') { c.garantie_carte = c.garantie_carte || { reguli: [] }; c.garantie_carte.dupa = numar(x.value, 0); }
+    else if (x.closest('#tabel-garantie')) return;
+    else if (x.id === 'cfg-profit-baza') c.profit_de_baza_pe_an = numar(x.value, 0);
     else if (x.id === 'cfg-ani') c.ani = numar(x.value, 4); else if (x.id === 'cfg-trimestre') c.trimestre_pe_an = numar(x.value, 4); else if (x.id === 'cfg-decizii') c.decizii_pe_trimestru = numar(x.value, 2);
     else if (x.dataset.r) c.resurse[x.dataset.r].start = numar(x.value, 50);
     else if (x.dataset.f) c.finaluri[x.dataset.f][x.dataset.k] = x.value;
     marcheaza('config.json');
   }));
 }
+const CONDITII_GARANTIE = { legalitate_scade: 'scade legalitatea', bunastare_scade: 'scade bunăstarea', parteneri_scade: 'scade partenerii', profit_creste: 'aduce profit', bunastare_creste: 'crește bunăstarea', parteneri_creste: 'crește partenerii', oricand: 'oricând (rezervă)' };
+function randeazaGarantie() {
+  const g = cfg().garantie_carte || { dupa: 0, reguli: [] }; cfg().garantie_carte = g; g.reguli = g.reguli || [];
+  const tb = $('#tabel-garantie tbody'); tb.innerHTML = '';
+  const surprize = carti().filter(c => c.surpriza);
+  g.reguli.forEach((reg, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><select>${Object.entries(CONDITII_GARANTIE).map(([k, v]) => `<option value="${k}" ${reg.cand === k ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
+      <td><div class="etichete">${surprize.map(c => `<label class="bifa" style="margin:0"><input type="checkbox" value="${esc(c.id)}" ${(reg.carti || []).includes(c.id) ? 'checked' : ''}> ${esc(c.icon || '')} ${esc(c.nume)}</label>`).join('') || '<span class="nota">nicio carte surpriză definită</span>'}</div></td>
+      <td><button class="mic pericol">șterge</button><button class="mic" style="margin-left:4px" title="mută mai sus">↑</button></td>`;
+    $('select', tr).addEventListener('change', e => { reg.cand = e.target.value; marcheaza('config.json'); });
+    $$('input[type=checkbox]', tr).forEach(x => x.addEventListener('change', () => { reg.carti = $$('input[type=checkbox]:checked', tr).map(y => y.value); marcheaza('config.json'); }));
+    $('.pericol', tr).addEventListener('click', () => { g.reguli.splice(i, 1); marcheaza('config.json'); randeazaGarantie(); });
+    $$('button', tr)[1].addEventListener('click', () => { if (i === 0) return; [g.reguli[i - 1], g.reguli[i]] = [g.reguli[i], g.reguli[i - 1]]; marcheaza('config.json'); randeazaGarantie(); });
+    tb.appendChild(tr);
+  });
+}
+$('#garantie-adauga').addEventListener('click', () => { const g = cfg().garantie_carte || (cfg().garantie_carte = { dupa: 5, reguli: [] }); g.reguli.push({ cand: 'oricand', carti: [] }); marcheaza('config.json'); randeazaGarantie(); });
 function randeazaDomenii() {
   const tb = $('#tabel-domenii tbody'); tb.innerHTML = '';
   domenii().forEach((d, i) => {

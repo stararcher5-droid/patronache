@@ -1,5 +1,5 @@
 {
-  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json). 'profit_de_baza_pe_an' = ce aduce activitatea curentă a firmei în fiecare an (mii lei), peste efectele alegerilor; se adaugă la bilanț.",
+  "_nota": "Regulile generale. Resursele sunt pe scara 0..100; dacă una ajunge la 0, partida s-a terminat. Banii nu sunt resursă: profitul se adună la finalul fiecărui an și dă nivelul firmei (vezi niveluri.json). 'profit_de_baza_pe_an' = ce aduce activitatea curentă a firmei în fiecare an (mii lei), peste efectele alegerilor; se adaugă la bilanț. 'garantie_carte': dacă 'dupa' decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză, aleasă după felul alegerii (prima regulă care se potrivește).",
   "ani": 5,
   "trimestre_pe_an": 4,
   "decizii_pe_trimestru": 2,
@@ -154,5 +154,55 @@
       "desc": "Subvenții APIA, tractoare, vremea și oameni din sat."
     }
   ],
-  "profit_de_baza_pe_an": 25
+  "profit_de_baza_pe_an": 25,
+  "garantie_carte": {
+    "dupa": 5,
+    "reguli": [
+      {
+        "cand": "legalitate_scade",
+        "carti": [
+          "mail-de-la-anaf",
+          "procesul"
+        ]
+      },
+      {
+        "cand": "bunastare_scade",
+        "carti": [
+          "demisia-cto"
+        ]
+      },
+      {
+        "cand": "parteneri_scade",
+        "carti": [
+          "hackerul"
+        ]
+      },
+      {
+        "cand": "bunastare_creste",
+        "carti": [
+          "premiul"
+        ]
+      },
+      {
+        "cand": "profit_creste",
+        "carti": [
+          "comanda-mare",
+          "plicul"
+        ]
+      },
+      {
+        "cand": "parteneri_creste",
+        "carti": [
+          "comanda-mare"
+        ]
+      },
+      {
+        "cand": "oricand",
+        "carti": [
+          "zvonul",
+          "plicul"
+        ]
+      }
+    ]
+  }
 }

@@ -20,6 +20,9 @@ Regulile:
 - Următoarea situație: prima din coadă care îndeplinește cerințele; altfel una
   la întâmplare (ponderat cu `greutate`) dintre cele nejucate, de nivelul firmei
   sau mai mic, și nemarcate `doar_legata`.
+- Garanția de carte: dacă `garantie_carte.dupa` decizii la rând n-au dat nicio carte,
+  următoarea dă sigur o carte surpriză, aleasă după felul alegerii (regulile din config).
+- O situație poate cere praguri pe resurse (`cerinte.resurse`, ex. legalitate sub 25).
 - Unele opțiuni iau o carte din inventar (`ia_carte`: un id sau "oricare"); doar
   cărțile vizibile, niciodată surprizele.
 - Cărțile speciale intră în inventar când alegi opțiunea care le dă; le poți
@@ -72,6 +75,7 @@ def stare_noua(c: Continut, firma: dict[str, Any], seed: int | None = None) -> d
         "scuturi": [],           # cărți de tip scut active: {resurse, ramase, sare}
         "flaguri": [],
         "jucate": [],            # id-urile situațiilor jucate
+        "fara_carte": 0,         # câte decizii la rând n-au dat nicio carte (pentru garanție)
         "coada": [],             # situații deschise de opțiuni, încă nejucate
         "pas": PAS_DECIZIE,
         "pas_id": None,          # situația curentă
@@ -111,6 +115,12 @@ def cerinte_indeplinite(stare: dict[str, Any], cer: dict[str, Any] | None) -> st
     jucate = set(stare["jucate"])
     if any(x not in jucate for x in cer.get("dupa", [])):
         return "Venea după altă situație"
+    for r, prag in (cer.get("resurse") or {}).items():
+        val = stare["resurse"].get(r, 0)
+        if "min" in prag and val < prag["min"]:
+            return f"Cere {r} cel puțin {prag['min']}"
+        if "max" in prag and val > prag["max"]:
+            return f"Apare doar cu {r} sub {prag['max']}"
     return None
 
 
@@ -128,6 +138,29 @@ def motiv_deblocare(cer: dict[str, Any] | None) -> str | None:
     if cer.get("carti"):
         return "Deblocată de o carte din inventar"
     return None   # nivelul nu primește notă: se vede deja în antet
+
+
+def _carte_garantata(c: Continut, stare: dict[str, Any], o: dict[str, Any]) -> str | None:
+    """Garanția de carte: dacă `dupa` decizii la rând n-au dat nimic, următoarea dă o carte surpriză,
+    aleasă după felul alegerii (prima regulă din config care se potrivește cu efectul opțiunii)."""
+    g = c.config.get("garantie_carte") or {}
+    dupa = int(g.get("dupa", 0))
+    if not dupa or int(stare.get("fara_carte", 0)) <= dupa:
+        return None
+    ef = o.get("ef", {}) or {}
+    profit = o.get("profit", 0) or 0
+    potriviri = {
+        "legalitate_scade": ef.get("legalitate", 0) < 0, "bunastare_scade": ef.get("bunastare", 0) < 0,
+        "parteneri_scade": ef.get("parteneri", 0) < 0, "profit_creste": profit > 0,
+        "bunastare_creste": ef.get("bunastare", 0) > 0, "parteneri_creste": ef.get("parteneri", 0) > 0, "oricand": True,
+    }
+    for reg in g.get("reguli", []):
+        if not potriviri.get(reg.get("cand"), False):
+            continue
+        candidate = [x for x in reg.get("carti", []) if (carte := c.carte(x)) and carte.get("surpriza") and in_domeniu(stare, carte)]
+        if candidate:
+            return _rng(stare).choice(candidate)
+    return None
 
 
 def in_domeniu(stare: dict[str, Any], obiect: dict[str, Any]) -> bool:
@@ -248,6 +281,16 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
         # Aceeași carte poate fi primită la mai multe alegeri; inventarul ține fiecare exemplar.
         stare["carti"].append(o["carte"])
         carte_noua = vedere_carte(stare, c.carte(o["carte"]), o["carte"])
+    garantata = False
+    if carte_noua is None:
+        stare["fara_carte"] = int(stare.get("fara_carte", 0)) + 1
+        id_g = _carte_garantata(c, stare, o)
+        if id_g:
+            stare["carti"].append(id_g)
+            carte_noua = vedere_carte(stare, c.carte(id_g), id_g)
+            garantata = True
+    if carte_noua is not None:
+        stare["fara_carte"] = 0
     for f in o.get("flaguri", []):
         if f not in stare["flaguri"]:
             stare["flaguri"].append(f)
@@ -264,7 +307,7 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
 
     efect = {
         "delta": delta, "profit": profit, "resurse": dict(stare["resurse"]),
-        "carte": carte_noua, "carte_luata": carte_luata, "teme": dict(o.get("teme", {})), "scut_oprit": oprit,
+        "carte": carte_noua, "carte_garantata": garantata, "carte_luata": carte_luata, "teme": dict(o.get("teme", {})), "scut_oprit": oprit,
         "profit_baza": baza_delta, "profit_baza_total": int(c.config.get("profit_de_baza_pe_an", 0)) + int(stare.get("profit_baza_delta", 0)),
     }
     if _verifica_terminat(c, stare):

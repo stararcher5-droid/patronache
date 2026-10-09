@@ -17,7 +17,9 @@ DIR_CONTINUT_IMPLICIT = RADACINA / "continut"
 FISIERE = ("config.json", "niveluri.json", "carti.json", "situatii.json", "arhetipuri.json")
 RESURSE = ("parteneri", "bunastare", "legalitate")
 FACTOR_BUGET_IN_PROFIT = 5   # la migrare: un punct de „buget” din vechiul model = 5 mii lei profit
-CHEI_CERINTE = {"nivel_min", "nivel_max", "carti", "fara_carti", "flaguri", "fara_flaguri", "dupa"}
+CHEI_CERINTE = {"nivel_min", "nivel_max", "carti", "fara_carti", "flaguri", "fara_flaguri", "dupa", "resurse"}
+# Condițiile din garanția de carte: după felul alegerii care a declanșat-o.
+CONDITII_GARANTIE = ("legalitate_scade", "bunastare_scade", "parteneri_scade", "profit_creste", "bunastare_creste", "parteneri_creste", "oricand")
 
 
 class ContinutInvalid(ValueError):
@@ -102,6 +104,7 @@ class Continut:
             "resurse": self.resurse,
             "domenii": self.domenii,
             "profit_de_baza_pe_an": int(self.config.get("profit_de_baza_pe_an", 0)),
+            "garantie_carte_dupa": int((self.config.get("garantie_carte") or {}).get("dupa", 0)),
             "niveluri": self.niveluri,
             # cărțile surpriză nu apar deloc în lista publică: nici numele n-ar trebui să se vadă
             "carti": [c for c in self.carti if not c.get("surpriza")],
@@ -206,6 +209,11 @@ def construieste(brut: dict[str, dict[str, Any]]) -> Continut:
     carti = brut["carti.json"].get("carti", [])
     ids_carti = _valideaza_carti(carti, ids_domenii)
 
+    for reg in (config.get("garantie_carte") or {}).get("reguli", []):
+        for id_ in reg["carti"]:
+            if id_ not in ids_carti:
+                raise ContinutInvalid(f"config: regula de garanție folosește cartea inexistentă {id_!r}")
+
     situatii = brut["situatii.json"].get("situatii", [])
     _valideaza_situatii(situatii, ids_carti, teme, len(niveluri), ids_domenii)
 
@@ -245,6 +253,13 @@ def _valideaza_config(c: dict[str, Any]) -> None:
         if dom["id"] in ids:
             raise ContinutInvalid(f"config: domeniul {dom['id']!r} apare de două ori")
         ids.add(dom["id"])
+    g = c.get("garantie_carte")
+    if g is not None:
+        if not isinstance(g, dict) or not isinstance(g.get("dupa"), int) or g["dupa"] < 0:
+            raise ContinutInvalid("config: 'garantie_carte' are nevoie de 'dupa' (întreg >= 0; 0 = oprit)")
+        for reg in g.get("reguli", []):
+            if reg.get("cand") not in CONDITII_GARANTIE or not isinstance(reg.get("carti"), list):
+                raise ContinutInvalid(f"config: regula de garanție trebuie să aibă 'cand' din {CONDITII_GARANTIE} și 'carti' listă")
     teme = {k: v for k, v in c.get("teme", {}).items() if not k.startswith("_")}
     for ax in c.get("axe", {}).values():
         for t in ax.get("teme", []):
@@ -321,6 +336,13 @@ def _valideaza_cerinte(cer: Any, unde: str, ids_carti: set[str], nr_niveluri: in
     for k in ("flaguri", "fara_flaguri", "dupa"):
         if k in cer and not (isinstance(cer[k], list) and all(isinstance(x, str) for x in cer[k])):
             raise ContinutInvalid(f"{unde}: '{k}' trebuie să fie listă de text")
+    res = cer.get("resurse")
+    if res is not None:
+        if not isinstance(res, dict):
+            raise ContinutInvalid(f"{unde}: 'resurse' trebuie să fie dict, ex. {{'legalitate': {{'max': 25}}}}")
+        for r, prag in res.items():
+            if r not in RESURSE or not isinstance(prag, dict) or not prag or any(k not in ("min", "max") or not _numar(x) for k, x in prag.items()):
+                raise ContinutInvalid(f"{unde}: cerința pe resursa {r!r} trebuie să fie {{'min': n}} și/sau {{'max': n}}")
 
 
 def _valideaza_situatii(situatii: list[dict[str, Any]], ids_carti: set[str], teme: dict[str, Any], nr_niveluri: int, ids_domenii: set[str] = frozenset()) -> None:

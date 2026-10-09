@@ -402,7 +402,7 @@ function efecteHtml(ef) {
   const chips = RES.filter(x => ef.delta[x.k]).map(x => `<span class="chip ${ef.delta[x.k] > 0 ? 'plus' : 'minus'}">${x.icon} ${x.nume} ${semn(ef.delta[x.k])}</span>`);
   if (ef.profit) chips.push(`<span class="chip ${ef.profit > 0 ? 'plus' : 'minus'}">Profit ${semn(ef.profit)} mii</span>`);
   if (ef.profit_baza) chips.push(`<span class="chip ${ef.profit_baza > 0 ? 'plus' : 'minus'}">📈 Activitatea firmei: ${semn(ef.profit_baza)} mii pe an, de acum până la final (acum ${semn(ef.profit_baza_total ?? 0)} pe an)</span>`);
-  if (ef.carte) chips.push(`<span class="chip primita">🃏 ${ef.carte.surpriza ? 'Ai primit o carte surpriză' : 'Ai primit: ' + esc(ef.carte.nume)}</span>`);
+  if (ef.carte) chips.push(`<span class="chip primita">🃏 ${ef.carte.surpriza ? 'Ai primit o carte surpriză' : 'Ai primit: ' + esc(ef.carte.nume)}${ef.carte_garantata ? ' · după ' + (CONT.garantie_carte_dupa || 5) + ' alegeri fără nimic, ceva tot se întâmplă' : ''}</span>`);
   if (ef.carte_luata) chips.push(`<span class="chip minus">🃏 Ai pierdut: ${esc(ef.carte_luata.nume)}</span>`);
   for (const [k, v] of Object.entries(ef.scut_oprit || {})) chips.push(`<span class="chip scut">🛡️ Scutul a oprit: ${numeRes(k)} ${semn(v)}</span>`);
   if (!chips.length) chips.push('<span class="chip">Nimic nu s-a schimbat. Deocamdată.</span>');

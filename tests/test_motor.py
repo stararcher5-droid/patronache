@@ -19,7 +19,7 @@ def continut_de_test(**schimbari) -> modul_continut.Continut:
     """Conținut mic și controlat: 2 ani x 1 trimestru x 2 decizii = 4 decizii."""
     brut = {n: modul_continut.citeste_fisier(RADACINA / "continut", n) for n in modul_continut.FISIERE}
     brut = copy.deepcopy(brut)
-    brut["config.json"].update({"ani": 2, "trimestre_pe_an": 1, "decizii_pe_trimestru": 2, "profit_de_baza_pe_an": 0})
+    brut["config.json"].update({"ani": 2, "trimestre_pe_an": 1, "decizii_pe_trimestru": 2, "profit_de_baza_pe_an": 0, "garantie_carte": {"dupa": 0, "reguli": []}})
     brut["niveluri.json"]["niveluri"] = [
         {"nivel": 1, "nume": "Apartament", "prag": 0},
         {"nivel": 2, "nume": "Sediu", "prag": 50},
@@ -337,6 +337,31 @@ class Carti(unittest.TestCase):
         s["carti"] = ["plic", "pizza"]
         s["pas_id"] = "b"; ef = motor.alege(c, s, 0)
         self.assertEqual(ef["carte_luata"]["id"], "pizza"); self.assertEqual(s["carti"], ["plic"])
+
+    def test_garantia_de_carte_dupa_decizii_fara_nimic(self):
+        c = continut_de_test()
+        c.carti += [{"id": "proces", "nume": "Citația", "surpriza": True, "efect": {"legalitate": -6}},
+                    {"id": "premiu", "nume": "Premiul", "surpriza": True, "efect": {"bunastare": 4}}]
+        for x in c.carti[-2:]: c._carti[x["id"]] = x
+        c.config["garantie_carte"] = {"dupa": 2, "reguli": [{"cand": "legalitate_scade", "carti": ["proces"]}, {"cand": "oricand", "carti": ["premiu"]}]}
+        s = motor.stare_noua(c, {}, seed=1)
+        s["resurse"] = {"parteneri": 100, "bunastare": 100, "legalitate": 100}
+        ids = iter(["a", "b", "c", "d"])
+        s["pas_id"] = next(ids); ef1 = motor.alege(c, s, 0)   # 1 fără carte
+        s["pas_id"] = next(ids); ef2 = motor.alege(c, s, 0)   # 2 fără carte
+        self.assertIsNone(ef1["carte"]); self.assertIsNone(ef2["carte"])
+        s["pas"] = motor.PAS_DECIZIE; s["pas_id"] = next(ids)
+        ef3 = motor.alege(c, s, 1)                              # a 3-a: opțiunea „rea” scade legalitatea -> Citația
+        self.assertTrue(ef3["carte_garantata"]); self.assertEqual(s["carti"], ["proces"])
+        self.assertEqual(s["fara_carte"], 0, "contorul se resetează")
+
+    def test_situatia_conditionata_de_resurse(self):
+        c = continut_de_test()
+        c.situatie("f")["cerinte"] = {"resurse": {"legalitate": {"max": 25}}}
+        s = motor.stare_noua(c, {}, seed=1)
+        self.assertEqual(motor.cerinte_indeplinite(s, c.situatie("f")["cerinte"]), "Apare doar cu legalitate sub 25")
+        s["resurse"]["legalitate"] = 20
+        self.assertIsNone(motor.cerinte_indeplinite(s, c.situatie("f")["cerinte"]))
 
     def test_cartea_nu_se_poate_folosi_la_bilant(self):
         c = continut_de_test()
