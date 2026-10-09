@@ -93,7 +93,9 @@ class Continut:
             "decizii_pe_trimestru": self.decizii_pe_trimestru,
             "resurse": self.resurse,
             "niveluri": self.niveluri,
-            "carti": [({"id": c["id"], "nume": c["nume"], "icon": c.get("icon"), "surpriza": True} if c.get("surpriza") else c) for c in self.carti],
+            # cărțile surpriză nu apar deloc în lista publică: nici numele n-ar trebui să se vadă
+            "carti": [c for c in self.carti if not c.get("surpriza")],
+            "carti_surpriza": sum(1 for c in self.carti if c.get("surpriza")),
             "teme": self.teme,
             "axe": {k: {kk: vv for kk, vv in v.items() if kk != "inverseaza"} for k, v in self.axe.items()},
             "arhetipuri": [{"id": a["id"], "nume": a["nume"], "desc": a.get("desc", "")} for a in self.arhetipuri],

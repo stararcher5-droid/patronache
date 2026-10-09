@@ -263,10 +263,12 @@ class Carti(unittest.TestCase):
         s = motor.stare_noua(c, {}, seed=1)
         s["pas_id"] = "a"
         ef = motor.alege(c, s, 0)
-        self.assertEqual(ef["carte"], {"id": "plic", "nume": "Plicul", "icon": None, "surpriza": True})
+        self.assertEqual(ef["carte"]["nume"], "Carte surpriză")
+        self.assertTrue(ef["carte"]["id"].startswith("surpriza-"), "id-ul real nu se vede")
         vazuta = motor.pas_curent(c, s)["carti"][0]
-        self.assertNotIn("efect", vazuta); self.assertNotIn("desc", vazuta)
-        r = motor.foloseste_carte(c, s, "plic")
+        self.assertNotIn("efect", vazuta); self.assertNotIn("desc", vazuta); self.assertNotIn("Plic", vazuta["nume"])
+        self.assertEqual(vazuta["id"], ef["carte"]["id"], "același cod opac de fiecare dată")
+        r = motor.foloseste_carte(c, s, vazuta["id"])   # folosită prin codul opac
         self.assertEqual(r["carte"]["efect"], {"profit": 40, "legalitate": -6}, "la folosire se dezvăluie")
         self.assertEqual(r["delta"], {"legalitate": -6})
 

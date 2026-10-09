@@ -286,7 +286,7 @@ function ecranDecizie() {
 function carteHtml(c, buton = '') {
   const icon = c.icon || '🃏';
   if (c.surpriza) {
-    return `<div class="carte spate"><span class="colt ss">?</span><span class="colt dj">?</span><div class="mare">❔</div><b>${esc(c.nume)}</b><div class="d">Carte surpriză. Nu știi ce face până n-o întorci.</div>${buton}</div>`;
+    return `<div class="carte spate"><span class="colt ss">?</span><span class="colt dj">?</span><div class="mare">❔</div><b>Carte surpriză</b><div class="d">Poate fi bună, poate fi rea. Nu știi până n-o întorci.</div>${buton}</div>`;
   }
   return `<div class="carte"><span class="colt ss">${esc(icon)}</span><span class="colt dj">${esc(icon)}</span><div class="mare">${esc(icon)}</div><b>${esc(c.nume)}</b><div class="d">${esc(c.desc || '')}</div><div class="efecte">${efectCarte(c.efect)}</div>${buton}</div>`;
 }
@@ -315,7 +315,7 @@ function scuturiHtml() {
 function efecteHtml(ef) {
   const chips = RES.filter(x => ef.delta[x.k]).map(x => `<span class="chip ${ef.delta[x.k] > 0 ? 'plus' : 'minus'}">${x.icon} ${x.nume} ${semn(ef.delta[x.k])}</span>`);
   if (ef.profit) chips.push(`<span class="chip ${ef.profit > 0 ? 'plus' : 'minus'}">Profit ${semn(ef.profit)} mii</span>`);
-  if (ef.carte) chips.push(`<span class="chip carte">🃏 Ai primit: ${esc(ef.carte.nume)}${ef.carte.surpriza ? ' (surpriză)' : ''}</span>`);
+  if (ef.carte) chips.push(`<span class="chip carte">🃏 ${ef.carte.surpriza ? 'Ai primit o carte surpriză' : 'Ai primit: ' + esc(ef.carte.nume)}</span>`);
   for (const [k, v] of Object.entries(ef.scut_oprit || {})) chips.push(`<span class="chip scut">🛡️ Scutul a oprit: ${numeRes(k)} ${semn(v)}</span>`);
   if (!chips.length) chips.push('<span class="chip">Nimic nu s-a schimbat. Deocamdată.</span>');
   return `<div class="efecte">${chips.join('')}</div>`;

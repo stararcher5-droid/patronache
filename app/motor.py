@@ -24,6 +24,7 @@ Regulile:
 """
 from __future__ import annotations
 
+import hashlib
 import random
 from typing import Any
 
@@ -202,7 +203,7 @@ def alege(c: Continut, stare: dict[str, Any], optiune: int) -> dict[str, Any]:
     if o.get("carte"):
         # Aceeași carte poate fi primită la mai multe alegeri; inventarul ține fiecare exemplar.
         stare["carti"].append(o["carte"])
-        carte_noua = vedere_carte(c.carte(o["carte"]), o["carte"])
+        carte_noua = vedere_carte(stare, c.carte(o["carte"]), o["carte"])
     for f in o.get("flaguri", []):
         if f not in stare["flaguri"]:
             stare["flaguri"].append(f)
@@ -301,6 +302,7 @@ def foloseste_carte(c: Continut, stare: dict[str, Any], id_carte: str) -> dict[s
     """Jucătorul folosește o carte din inventar. Se consumă și efectul se aplică pe loc."""
     if stare["pas"] != PAS_DECIZIE:
         raise ActiuneInvalida(f"cărțile se folosesc în timpul unei decizii, pasul curent e {stare['pas']!r}")
+    id_carte = _id_real(stare, id_carte)
     if id_carte not in stare["carti"]:
         raise ActiuneInvalida(f"nu ai cartea {id_carte!r} în inventar")
     carte = c.carte(id_carte)
@@ -378,7 +380,7 @@ def rezultat(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
         "resurse": dict(stare["resurse"]),
         "profit_total": stare["profit_total"],
         "nivel": {"nivel": stare["nivel"], "nume": nivel["nume"], "desc": nivel.get("desc", "")},
-        "carti": [vedere_carte(c.carte(x), x) for x in stare["carti"]],
+        "carti": [vedere_carte(stare, c.carte(x), x) for x in stare["carti"]],
         "carti_folosite": [i["id"] for i in stare["istoric"] if i["tip"] == PAS_CARTE],
         "ani_jucati": stare["an"] if stare["final"]["mandat_complet"] else stare["an"],
         "decizii": len([i for i in stare["istoric"] if i["tip"] == PAS_DECIZIE]),
@@ -388,13 +390,27 @@ def rezultat(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
 
 # ---------------------------------------------------------------- vedere pentru client
 
-def vedere_carte(carte: dict[str, Any] | None, id_: str) -> dict[str, Any]:
-    """Cartea așa cum o vede jucătorul în inventar: o carte surpriză își ascunde descrierea și efectul."""
+def cod_surpriza(stare: dict[str, Any], id_carte: str) -> str:
+    """Cod opac pentru o carte surpriză: nu lasă să se ghicească ce carte e, nici din rețea."""
+    return "surpriza-" + hashlib.sha256(f"{stare['seed']}:{id_carte}".encode()).hexdigest()[:12]
+
+
+def vedere_carte(stare: dict[str, Any], carte: dict[str, Any] | None, id_: str) -> dict[str, Any]:
+    """Cartea așa cum o vede jucătorul în inventar: o carte surpriză nu-și arată nici numele, nici efectul."""
     if carte is None:
         return {"id": id_, "nume": id_}
     if carte.get("surpriza"):
-        return {"id": carte["id"], "nume": carte["nume"], "icon": carte.get("icon"), "surpriza": True}
+        return {"id": cod_surpriza(stare, carte["id"]), "nume": "Carte surpriză", "surpriza": True}
     return carte
+
+
+def _id_real(stare: dict[str, Any], id_sau_cod: str) -> str:
+    """Traduce un cod opac înapoi în id-ul cărții din inventar; un id obișnuit trece neschimbat."""
+    if id_sau_cod.startswith("surpriza-"):
+        for x in stare["carti"]:
+            if cod_surpriza(stare, x) == id_sau_cod:
+                return x
+    return id_sau_cod
 
 
 def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
@@ -408,7 +424,7 @@ def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
         "resurse": dict(stare["resurse"]),
         "profit_an": stare["profit_an"], "profit_total": stare["profit_total"],
         "nivel": {"nivel": stare["nivel"], "nume": nivel["nume"]},
-        "carti": [vedere_carte(c.carte(x), x) for x in stare["carti"]],
+        "carti": [vedere_carte(stare, c.carte(x), x) for x in stare["carti"]],
         "scuturi": [
             {"carte": (c.carte(sc.get("carte", "")) or {}).get("nume", sc.get("carte")), "resurse": sc["resurse"], "ramase": sc["ramase"],
              "activ_acum": sc.get("sare") != stare["pas_id"]}
