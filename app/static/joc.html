@@ -240,7 +240,7 @@ function ecranStart() {
       </div>
     </div>`;
   for (const g of ['#f-sigle', '#f-culori', '#f-domenii']) $(g, el).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $$(g + ' button').forEach(x => x.classList.remove('activ')); b.classList.add('activ'); if (g === '#f-domenii') $('#f-domeniu-desc').textContent = (CONT.domenii.find(d => d.id === b.dataset.v) || {}).desc || ''; });
-  tineApasat($('#f-start', el), 1200, incepePartida);
+  tineApasat($('#f-start', el), 700, incepePartida);
 }
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
@@ -260,7 +260,7 @@ function tineApasat(btn, ms, cb) {
     terminat = true; btn.classList.add('gata'); if (navigator.vibrate) navigator.vibrate(40);
     const st = document.createElement('div'); st.className = 'stampila'; st.textContent = 'Înregistrat';
     btn.closest('.card').appendChild(st); requestAnimationFrame(() => st.classList.add('cade'));
-    setTimeout(cb, 750);
+    setTimeout(cb, 450);
   };
   btn.style.minWidth = btn.offsetWidth + 'px';   // textul se schimbă cât ții, butonul nu trebuie să-și schimbe lățimea
   btn.addEventListener('pointerdown', e => { if (terminat || t0) return; e.preventDefault(); try { btn.setPointerCapture(e.pointerId); } catch (_) {} btn.classList.add('apasat'); t0 = performance.now(); raf = requestAnimationFrame(tick); });
