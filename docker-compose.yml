@@ -1,0 +1,18 @@
+services:
+  patronache:
+    # Construiește local din Dockerfile. Ca să folosești imaginea publicată de
+    # GitHub Actions, comentează "build" și decomentează "image".
+    build: .
+    # image: ghcr.io/stararcher5-droid/patronache:latest
+    container_name: patronache
+    restart: unless-stopped
+    ports:
+      - "9090:8000"
+    environment:
+      TZ: Europe/Bucharest
+      # Fără parolă, meniul /admin e deschis oricui ajunge la port. Pune una
+      # dacă NAS-ul e accesibil din afara casei.
+      # PATRONACHE_ADMIN_PAROLA: ""
+    volumes:
+      # Pe TrueNAS: /mnt/PollaSSD/apps/patronache/data:/srv/data
+      - ./data:/srv/data

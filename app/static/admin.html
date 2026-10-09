@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patronache · Admin</title>
+<style>
+  :root { --bg:#f4f5f8; --card:#fff; --text:#1c2130; --muted:#6b7280; --line:#e2e5ec; --accent:#2f6fed; --bad:#d64545; --ok:#1f9d55; --warn:#c77d00; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--bg); color:var(--text); }
+  header { display:flex; align-items:center; gap:16px; padding:10px 18px; background:#1c2130; color:#fff; position:sticky; top:0; z-index:5; }
+  header h1 { font-size:16px; margin:0 18px 0 0; }
+  header nav button { background:none; border:0; color:#cbd2e0; padding:6px 10px; cursor:pointer; border-radius:6px; font-size:14px; }
+  header nav button.activ { background:#2f3650; color:#fff; }
+  header .spatiu { flex:1; }
+  #stare { font-size:13px; color:#cbd2e0; }
+  #stare.nesalvat { color:#ffd166; }
+  main { padding:16px 18px; max-width:1400px; margin:0 auto; }
+  .ascuns { display:none !important; }
+  .coloane { display:grid; grid-template-columns:300px 1fr; gap:16px; align-items:start; }
+  .lista { background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .lista input[type=search] { width:100%; border:0; border-bottom:1px solid var(--line); padding:10px 12px; font-size:14px; }
+  .lista ul { list-style:none; margin:0; padding:0; max-height:70vh; overflow:auto; }
+  .lista li { padding:8px 12px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .lista li:hover { background:#f0f3ff; }
+  .lista li.activ { background:#e4ebff; }
+  .lista li small { display:block; color:var(--muted); }
+  .lista .jos { padding:10px 12px; display:flex; gap:8px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; }
+  .card h2 { margin:0 0 12px; font-size:16px; }
+  .card h3 { margin:16px 0 8px; font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:3px; }
+  input[type=text], input[type=number], textarea, select { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; background:#fff; }
+  textarea { min-height:70px; resize:vertical; }
+  .rand { display:grid; gap:10px; margin-bottom:10px; }
+  .r2 { grid-template-columns:1fr 1fr; } .r3 { grid-template-columns:1fr 1fr 1fr; } .r4 { grid-template-columns:repeat(4,1fr); } .r6 { grid-template-columns:repeat(6,1fr); }
+  .bifa { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text); margin:4px 0; }
+  .bifa input { width:auto; }
+  button { font:inherit; padding:7px 12px; border-radius:6px; border:1px solid var(--line); background:#fff; cursor:pointer; }
+  button.primar { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button.pericol { color:var(--bad); border-color:#f3c3c3; }
+  button.mic { padding:3px 8px; font-size:12px; }
+  .optiune { border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:10px; background:#fafbfd; }
+  .optiune .cap { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .optiune .cap b { flex:1; }
+  .etichete { display:flex; flex-wrap:wrap; gap:6px; }
+  .eticheta { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; background:#e4ebff; font-size:12px; }
+  .eticheta button { border:0; background:none; padding:0; color:var(--muted); cursor:pointer; font-size:14px; line-height:1; }
+  .eticheta.carte { background:#fff3d6; } .eticheta.flag { background:#e3f6ea; }
+  .detalii summary { cursor:pointer; color:var(--muted); font-size:12px; margin:6px 0; }
+  .avert { padding:8px 10px; border-radius:6px; margin-bottom:6px; background:#fff6e5; border:1px solid #f3dcae; }
+  .avert.ok { background:#e8f7ee; border-color:#bfe6cf; }
+  .eroare { background:#fdecec; border:1px solid #f3c3c3; color:var(--bad); padding:8px 10px; border-radius:6px; margin-bottom:10px; white-space:pre-wrap; }
+  table { width:100%; border-collapse:collapse; } th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; } th { color:var(--muted); font-weight:500; font-size:12px; }
+  td input { padding:5px 7px; }
+  .inapoi { color:var(--muted); font-size:13px; }
+  .inapoi a { color:var(--accent); cursor:pointer; }
+  #harta svg { width:100%; background:#fff; border:1px solid var(--line); border-radius:10px; }
+  #harta .nod { cursor:pointer; }
+  #harta .nod rect { fill:#e4ebff; stroke:#b9c7f5; rx:6; }
+  #harta .nod.legata rect { fill:#fff3d6; stroke:#f0d79a; }
+  #harta .nod text { font-size:11px; }
+  #harta line { stroke:#8a97b8; stroke-width:1.4; marker-end:url(#sageata); }
+  .nota { color:var(--muted); font-size:13px; }
+  @media (max-width:900px) { .coloane { grid-template-columns:1fr; } .r4, .r6 { grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Patronache · Admin</h1>
+  <nav>
+    <button data-tab="situatii" class="activ">Situații</button>
+    <button data-tab="harta">Harta legăturilor</button>
+    <button data-tab="carti">Cărți</button>
+    <button data-tab="niveluri">Niveluri</button>
+    <button data-tab="reguli">Reguli</button>
+    <button data-tab="arhetipuri">Arhetipuri</button>
+    <button data-tab="verificare">Verificare</button>
+  </nav>
+  <div class="spatiu"></div>
+  <span id="stare">se încarcă…</span>
+</header>
+
+<main>
+  <div id="eroare" class="eroare ascuns"></div>
+
+  <!-- ===================== SITUAȚII ===================== -->
+  <section id="tab-situatii" class="coloane">
+    <div class="lista">
+      <input type="search" id="cauta" placeholder="Caută situație…">
+      <ul id="lista-situatii"></ul>
+      <div class="jos">
+        <button class="primar" id="situatie-noua">+ Situație nouă</button>
+        <button id="salveaza-situatii">Salvează</button>
+      </div>
+    </div>
+    <div id="editor-situatie"><div class="card nota">Alege o situație din stânga sau creează una nouă.</div></div>
+  </section>
+
+  <!-- ===================== HARTA ===================== -->
+  <section id="tab-harta" class="ascuns">
+    <div class="card">
+      <h2>Harta legăturilor</h2>
+      <p class="nota">Coloanele sunt anii în care situația poate apărea prima dată (an_min). Săgețile sunt legăturile „urmatoare” din opțiuni. Galben = apare doar legată. Clic pe o situație o deschide în editor.</p>
+      <div id="harta"></div>
+    </div>
+  </section>
+
+  <!-- ===================== CĂRȚI ===================== -->
+  <section id="tab-carti" class="ascuns">
+    <div class="card">
+      <h2>Cărți speciale</h2>
+      <p class="nota">Jucătorul primește o carte când alege o opțiune care o dă. O folosește când vrea în timpul unei decizii; se consumă și efectul se aplică pe loc.</p>
+      <table id="tabel-carti"><thead><tr><th>Id</th><th>Nume</th><th>Descriere</th><th>Buget</th><th>Bunăstare</th><th>Legalitate</th><th>Profit</th><th></th></tr></thead><tbody></tbody></table>
+      <div style="margin-top:10px; display:flex; gap:8px"><button id="carte-noua">+ Carte nouă</button><button class="primar" id="salveaza-carti">Salvează cărțile</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== NIVELURI ===================== -->
+  <section id="tab-niveluri" class="ascuns">
+    <div class="card">
+      <h2>Nivelurile firmei</h2>
+      <p class="nota">Nivelul e cel mai mare al cărui prag (profit total acumulat, mii lei) e atins. Dacă un an iese pe minus, profitul total scade și nivelul poate coborî.</p>
+      <table id="tabel-niveluri"><thead><tr><th>Nivel</th><th>Nume</th><th>Descriere</th><th>Prag profit total</th></tr></thead><tbody></tbody></table>
+      <div style="margin-top:10px"><button class="primar" id="salveaza-niveluri">Salvează nivelurile</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== REGULI ===================== -->
+  <section id="tab-reguli" class="ascuns">
+    <div class="card">
+      <h2>Reguli generale</h2>
+      <div class="rand r3">
+        <div><label>Ani</label><input type="number" id="cfg-ani" min="1"></div>
+        <div><label>Trimestre pe an</label><input type="number" id="cfg-trimestre" min="1"></div>
+        <div><label>Decizii pe trimestru</label><input type="number" id="cfg-decizii" min="1"></div>
+      </div>
+      <h3>Resurse (valoarea de start, 0..100)</h3>
+      <div class="rand r3" id="cfg-resurse"></div>
+      <h3>Finaluri</h3>
+      <div id="cfg-finaluri"></div>
+      <div style="margin-top:10px"><button class="primar" id="salveaza-reguli">Salvează regulile</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== ARHETIPURI ===================== -->
+  <section id="tab-arhetipuri" class="ascuns">
+    <div class="card">
+      <h2>Arhetipuri (cu ce patron semeni)</h2>
+      <p class="nota">Opțional: se folosește doar dacă opțiunile au „teme”. Editare directă în JSON.</p>
+      <textarea id="json-arhetipuri" style="min-height:50vh; font-family:ui-monospace, monospace; font-size:12px"></textarea>
+      <div style="margin-top:10px"><button class="primar" id="salveaza-arhetipuri">Salvează arhetipurile</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== VERIFICARE ===================== -->
+  <section id="tab-verificare" class="ascuns">
+    <div class="card">
+      <h2>Verificare conținut</h2>
+      <p class="nota">Avertismente despre conținutul salvat pe server: situații puține pe un an, legături la care nu ajunge nimeni, flaguri sau cărți cerute pe care nu le dă nimeni.</p>
+      <button id="verifica">Verifică acum</button>
+      <div id="avertismente" style="margin-top:12px"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+// ------------------------------------------------------------------ stare
+const RESURSE = ['buget', 'bunastare', 'legalitate'];
+const NUME_RESURSE = { buget: 'Buget', bunastare: 'Bunăstare', legalitate: 'Legalitate' };
+let C = null;             // conținutul brut: { 'situatii.json': {...}, ... }
+let curent = null;        // id-ul situației din editor
+let nesalvat = new Set(); // fișiere modificate și nesalvate
+
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const sit = () => C['situatii.json'].situatii;
+const carti = () => C['carti.json'].carti;
+const niveluri = () => C['niveluri.json'].niveluri;
+const cfg = () => C['config.json'];
+const teme = () => Object.fromEntries(Object.entries(cfg().teme || {}).filter(([k]) => !k.startsWith('_')));
+const ani = () => cfg().ani || 4;
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function marcheaza(fisier) { nesalvat.add(fisier); arataStare(); }
+function arataStare(text) {
+  const el = $('#stare');
+  if (text) { el.textContent = text; el.className = ''; return; }
+  if (nesalvat.size) { el.textContent = 'modificări nesalvate: ' + [...nesalvat].join(', '); el.className = 'nesalvat'; }
+  else { el.textContent = 'totul e salvat'; el.className = ''; }
+}
+function eroare(msg) { const e = $('#eroare'); if (!msg) { e.classList.add('ascuns'); return; } e.textContent = msg; e.classList.remove('ascuns'); window.scrollTo(0, 0); }
+window.addEventListener('beforeunload', e => { if (nesalvat.size) { e.preventDefault(); e.returnValue = ''; } });
+
+// ------------------------------------------------------------------ API
+function parola() { return localStorage.getItem('patronache-parola') || ''; }
+async function api(metoda, cale, corp) {
+  const r = await fetch(cale, { method: metoda, headers: { 'Content-Type': 'application/json', 'X-Parola': parola() }, body: corp ? JSON.stringify(corp) : undefined });
+  if (r.status === 401) {
+    const p = prompt('Parola de admin:');
+    if (p === null) throw new Error('fără parolă');
+    localStorage.setItem('patronache-parola', p);
+    return api(metoda, cale, corp);
+  }
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : JSON.stringify(d.detail || d));
+  return d;
+}
+async function incarca() {
+  C = await api('GET', '/api/admin/continut');
+  nesalvat.clear(); arataStare();
+  randeazaLista(); randeazaCarti(); randeazaNiveluri(); randeazaReguli(); randeazaArhetipuri(); randeazaHarta();
+}
+async function salveaza(fisier) {
+  eroare(null);
+  try {
+    const r = await api('PUT', '/api/admin/continut/' + fisier, C[fisier]);
+    nesalvat.delete(fisier); arataStare();
+    if (r.avertismente && r.avertismente.length) arataStare('salvat, cu ' + r.avertismente.length + ' avertismente (vezi Verificare)');
+    randeazaHarta();
+  } catch (e) { eroare('Nu s-a salvat ' + fisier + ': ' + e.message); }
+}
+
+// ------------------------------------------------------------------ taburi
+$$('header nav button').forEach(b => b.addEventListener('click', () => arataTab(b.dataset.tab)));
+function arataTab(nume) {
+  $$('header nav button').forEach(b => b.classList.toggle('activ', b.dataset.tab === nume));
+  $$('main > section').forEach(s => s.classList.toggle('ascuns', s.id !== 'tab-' + nume));
+  if (nume === 'harta') randeazaHarta();
+}
+
+// ------------------------------------------------------------------ situații: lista
+$('#cauta').addEventListener('input', randeazaLista);
+function randeazaLista() {
+  const q = $('#cauta').value.toLowerCase();
+  const ul = $('#lista-situatii'); ul.innerHTML = '';
+  for (const s of sit()) {
+    if (q && !(s.id + ' ' + s.titlu + ' ' + s.text).toLowerCase().includes(q)) continue;
+    const li = document.createElement('li');
+    li.className = s.id === curent ? 'activ' : '';
+    li.innerHTML = `<b>${esc(s.titlu)}</b><small>${esc(s.id)} · an ${s.an_min || 1}–${s.an_max || ani()}${s.doar_legata ? ' · doar legată' : ''} · ${s.optiuni.length} opțiuni</small>`;
+    li.addEventListener('click', () => deschide(s.id));
+    ul.appendChild(li);
+  }
+}
+$('#situatie-noua').addEventListener('click', () => {
+  let n = sit().length + 1, id = 'situatie-' + n;
+  while (sit().some(s => s.id === id)) id = 'situatie-' + (++n);
+  sit().push({ id, titlu: 'Situație nouă', text: '', an_min: 1, an_max: ani(), greutate: 1, cerinte: {}, optiuni: [optiuneGoala(), optiuneGoala()] });
+  marcheaza('situatii.json'); randeazaLista(); deschide(id);
+});
+$('#salveaza-situatii').addEventListener('click', () => { citesteEditor(); salveaza('situatii.json'); });
+function optiuneGoala() { return { text: '', ef: { buget: 0, bunastare: 0, legalitate: 0 }, profit: 0 }; }
+
+// ------------------------------------------------------------------ situații: editor
+function deschide(id) {
+  if (curent && curent !== id) citesteEditor();
+  curent = id; randeazaLista(); arataTab('situatii');
+  const s = sit().find(x => x.id === id); if (!s) return;
+  const cer = s.cerinte || {};
+  const optiuniSelect = (alese = []) => sit().filter(x => x.id !== s.id).map(x => `<option value="${esc(x.id)}">${esc(x.titlu)} (${esc(x.id)})</option>`).join('');
+  const inapoi = legaturiInapoi(id);
+  const el = $('#editor-situatie');
+  el.innerHTML = `
+    <div class="card">
+      <h2>${esc(s.titlu)} <span class="nota">· ${esc(s.id)}</span></h2>
+      ${inapoi.length ? `<p class="inapoi">Vine după: ${inapoi.map(l => `<a data-sare="${esc(l.id)}">${esc(l.titlu)}</a> (opțiunea ${l.optiune + 1})`).join(', ')}</p>` : '<p class="inapoi">Nicio opțiune nu duce aici' + (s.doar_legata ? ' — <b>atenție</b>, e marcată „doar legată” și nu va apărea niciodată' : '') + '.</p>'}
+      <div class="rand r2">
+        <div><label>Id (fără spații; e folosit în legături)</label><input type="text" id="s-id" value="${esc(s.id)}"></div>
+        <div><label>Titlu</label><input type="text" id="s-titlu" value="${esc(s.titlu)}"></div>
+      </div>
+      <div class="rand"><div><label>Text</label><textarea id="s-text">${esc(s.text)}</textarea></div></div>
+      <div class="rand r4">
+        <div><label>An minim</label><input type="number" id="s-an-min" min="1" max="${ani()}" value="${s.an_min ?? 1}"></div>
+        <div><label>An maxim</label><input type="number" id="s-an-max" min="1" max="${ani()}" value="${s.an_max ?? ani()}"></div>
+        <div><label>Greutate (șansa de a apărea)</label><input type="number" id="s-greutate" min="0.1" step="0.1" value="${s.greutate ?? 1}"></div>
+        <div><label>&nbsp;</label>
+          <div class="bifa"><input type="checkbox" id="s-doar-legata" ${s.doar_legata ? 'checked' : ''}> Apare doar legată (nu la întâmplare)</div>
+          <div class="bifa"><input type="checkbox" id="s-repetabila" ${s.repetabila ? 'checked' : ''}> Poate apărea de mai multe ori</div>
+        </div>
+      </div>
+
+      <h3>Cerințe ca situația să apară</h3>
+      <div class="rand r2">
+        <div><label>Nivel minim al firmei</label><input type="number" id="c-nivel-min" min="1" max="${niveluri().length}" value="${cer.nivel_min ?? ''}" placeholder="oricare"></div>
+        <div><label>Nivel maxim</label><input type="number" id="c-nivel-max" min="1" max="${niveluri().length}" value="${cer.nivel_max ?? ''}" placeholder="oricare"></div>
+      </div>
+      <div class="rand r2">
+        <div><label>Flaguri necesare (separate prin virgulă)</label><input type="text" id="c-flaguri" value="${esc((cer.flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
+        <div><label>Flaguri care o exclud</label><input type="text" id="c-fara-flaguri" value="${esc((cer.fara_flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
+      </div>
+      <div class="rand r2">
+        <div><label>Cărți necesare în inventar</label>${cartiBife('c-carti', cer.carti || [])}</div>
+        <div><label>Cărți care o exclud</label>${cartiBife('c-fara-carti', cer.fara_carti || [])}</div>
+      </div>
+      <div class="rand"><div><label>Trebuie jucate înainte (situații)</label><div class="etichete" id="c-dupa">${(cer.dupa || []).map(d => eticheta(d, 'dupa')).join('')}</div>
+        <select id="c-dupa-adauga" style="margin-top:6px"><option value="">+ adaugă situație…</option>${optiuniSelect()}</select></div></div>
+
+      <h3>Opțiuni (2–4)</h3>
+      <div id="optiuni">${s.optiuni.map((o, i) => optiuneHtml(o, i, s)).join('')}</div>
+      <div style="display:flex; gap:8px; margin-top:8px">
+        <button id="o-adauga" ${s.optiuni.length >= 4 ? 'disabled' : ''}>+ Opțiune</button>
+        <div class="spatiu" style="flex:1"></div>
+        <button id="s-dubleaza">Dublează situația</button>
+        <button class="pericol" id="s-sterge">Șterge situația</button>
+        <button class="primar" id="s-salveaza">Salvează</button>
+      </div>
+    </div>
+    <datalist id="flaguri-cunoscute">${[...flaguriCunoscute()].map(f => `<option value="${esc(f)}">`).join('')}</datalist>`;
+
+  $$('[data-sare]', el).forEach(a => a.addEventListener('click', () => deschide(a.dataset.sare)));
+  $('#c-dupa-adauga', el).addEventListener('change', e => { if (e.target.value) { s.cerinte = s.cerinte || {}; s.cerinte.dupa = [...(s.cerinte.dupa || []), e.target.value]; marcheaza('situatii.json'); deschide(id); } });
+  $$('#c-dupa .eticheta button', el).forEach(b => b.addEventListener('click', () => { s.cerinte.dupa = s.cerinte.dupa.filter(x => x !== b.dataset.val); marcheaza('situatii.json'); deschide(id); }));
+  $('#o-adauga', el).addEventListener('click', () => { citesteEditor(); s.optiuni.push(optiuneGoala()); marcheaza('situatii.json'); deschide(id); });
+  $('#s-salveaza', el).addEventListener('click', () => { citesteEditor(); salveaza('situatii.json'); });
+  $('#s-dubleaza', el).addEventListener('click', () => {
+    citesteEditor();
+    const copie = JSON.parse(JSON.stringify(s)); copie.id = s.id + '-copie'; copie.titlu += ' (copie)';
+    while (sit().some(x => x.id === copie.id)) copie.id += '-2';
+    sit().push(copie); marcheaza('situatii.json'); deschide(copie.id);
+  });
+  $('#s-sterge', el).addEventListener('click', () => {
+    const inapoi = legaturiInapoi(s.id);
+    if (!confirm(`Ștergi situația „${s.titlu}”?` + (inapoi.length ? `\n\nAtenție: ${inapoi.length} opțiuni duc aici; legăturile vor fi scoase.` : ''))) return;
+    for (const l of inapoi) { const o = sit().find(x => x.id === l.id).optiuni[l.optiune]; o.urmatoare = o.urmatoare.filter(x => x !== s.id); }
+    for (const x of sit()) if (x.cerinte && x.cerinte.dupa) x.cerinte.dupa = x.cerinte.dupa.filter(d => d !== s.id);
+    C['situatii.json'].situatii = sit().filter(x => x.id !== s.id);
+    curent = null; marcheaza('situatii.json'); randeazaLista();
+    $('#editor-situatie').innerHTML = '<div class="card nota">Situația a fost ștearsă (nesalvat încă).</div>';
+  });
+  // opțiuni: butoane
+  $$('.optiune', el).forEach(div => {
+    const i = +div.dataset.i;
+    $('.o-sterge', div).addEventListener('click', () => { if (s.optiuni.length <= 2) return alert('Minim 2 opțiuni.'); citesteEditor(); s.optiuni.splice(i, 1); marcheaza('situatii.json'); deschide(id); });
+    $('.o-sus', div).addEventListener('click', () => { if (i === 0) return; citesteEditor(); [s.optiuni[i - 1], s.optiuni[i]] = [s.optiuni[i], s.optiuni[i - 1]]; marcheaza('situatii.json'); deschide(id); });
+    $('.o-urm-adauga', div).addEventListener('change', e => { if (!e.target.value) return; citesteEditor(); const o = s.optiuni[i]; o.urmatoare = [...(o.urmatoare || []), e.target.value]; marcheaza('situatii.json'); deschide(id); });
+    $$('.o-urm .eticheta button', div).forEach(b => b.addEventListener('click', () => { citesteEditor(); const o = s.optiuni[i]; o.urmatoare = o.urmatoare.filter(x => x !== b.dataset.val); marcheaza('situatii.json'); deschide(id); }));
+    $$('.o-urm a[data-sare]', div).forEach(a => a.addEventListener('click', () => { citesteEditor(); deschide(a.dataset.sare); }));
+  });
+  $$('input, textarea, select', el).forEach(x => x.addEventListener('input', () => marcheaza('situatii.json')));
+}
+
+function optiuneHtml(o, i, s) {
+  const cer = o.cerinte || {};
+  const t = teme();
+  const optiuniSelect = sit().filter(x => x.id !== s.id).map(x => `<option value="${esc(x.id)}">${esc(x.titlu)} (${esc(x.id)})</option>`).join('');
+  return `<div class="optiune" data-i="${i}">
+    <div class="cap"><b>Opțiunea ${i + 1}</b><button class="mic o-sus" title="mută mai sus">↑</button><button class="mic pericol o-sterge">șterge</button></div>
+    <div class="rand"><div><label>Text</label><input type="text" class="o-text" value="${esc(o.text)}"></div></div>
+    <div class="rand r6">
+      ${RESURSE.map(r => `<div><label>${NUME_RESURSE[r]} ±</label><input type="number" class="o-ef" data-r="${r}" value="${o.ef?.[r] ?? 0}"></div>`).join('')}
+      <div><label>Profit (mii lei)</label><input type="number" class="o-profit" value="${o.profit ?? 0}"></div>
+      <div><label>Dă cartea</label><select class="o-carte"><option value="">—</option>${carti().map(c => `<option value="${esc(c.id)}" ${o.carte === c.id ? 'selected' : ''}>${esc(c.nume)}</option>`).join('')}</select></div>
+      <div><label>Pune flaguri (virgulă)</label><input type="text" class="o-flaguri" value="${esc((o.flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
+    </div>
+    <div class="rand"><div><label>Deschide situațiile (vin la rând imediat după, dacă îndeplinesc cerințele)</label>
+      <div class="etichete o-urm">${(o.urmatoare || []).map(u => eticheta(u, 'urm')).join('')}</div>
+      <select class="o-urm-adauga" style="margin-top:6px"><option value="">+ leagă o situație…</option>${optiuniSelect}</select></div></div>
+    <details class="detalii"><summary>Cerințe ca opțiunea să fie disponibilă${Object.keys(cer).length ? ' (setate)' : ''}</summary>
+      <div class="rand r3">
+        <div><label>Nivel minim</label><input type="number" class="oc-nivel-min" min="1" max="${niveluri().length}" value="${cer.nivel_min ?? ''}" placeholder="oricare"></div>
+        <div><label>Flaguri necesare</label><input type="text" class="oc-flaguri" value="${esc((cer.flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
+        <div><label>Flaguri care o exclud</label><input type="text" class="oc-fara-flaguri" value="${esc((cer.fara_flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
+      </div>
+      <div class="rand"><div><label>Cărți necesare</label>${cartiBife('oc-carti', cer.carti || [])}</div></div>
+    </details>
+    ${Object.keys(t).length ? `<details class="detalii"><summary>Teme (pentru „cu ce patron semeni”, -2..+2)${Object.keys(o.teme || {}).length ? ' (setate)' : ''}</summary>
+      <div class="rand r3">${Object.entries(t).map(([k, v]) => `<div><label>${esc(v.nume)}</label><input type="number" class="o-tema" data-t="${k}" min="-2" max="2" step="0.5" value="${o.teme?.[k] ?? ''}" placeholder="—"></div>`).join('')}</div>
+    </details>` : ''}
+  </div>`;
+}
+function cartiBife(clasa, alese) {
+  if (!carti().length) return '<span class="nota">nicio carte definită</span>';
+  return `<div>${carti().map(c => `<div class="bifa"><input type="checkbox" class="${clasa}" value="${esc(c.id)}" ${alese.includes(c.id) ? 'checked' : ''}> ${esc(c.nume)}</div>`).join('')}</div>`;
+}
+function eticheta(id, tip) {
+  const s = sit().find(x => x.id === id);
+  return `<span class="eticheta"><a data-sare="${esc(id)}" style="cursor:pointer">${esc(s ? s.titlu : id)}</a><button data-val="${esc(id)}" title="scoate">×</button></span>`;
+}
+function legaturiInapoi(id) {
+  const out = [];
+  for (const s of sit()) s.optiuni.forEach((o, i) => { if ((o.urmatoare || []).includes(id)) out.push({ id: s.id, titlu: s.titlu, optiune: i }); });
+  return out;
+}
+function flaguriCunoscute() {
+  const f = new Set();
+  for (const s of sit()) for (const o of s.optiuni) for (const x of o.flaguri || []) f.add(x);
+  return f;
+}
+const lista = v => v.split(',').map(x => x.trim()).filter(Boolean);
+const numar = (v, implicit = 0) => v === '' || v === null || v === undefined ? implicit : Number(v);
+
+function citesteEditor() {
+  if (!curent) return;
+  const s = sit().find(x => x.id === curent); if (!s) return;
+  const el = $('#editor-situatie'); if (!$('#s-id', el)) return;
+  const idNou = $('#s-id', el).value.trim().replace(/\s+/g, '-');
+  if (idNou && idNou !== s.id) {
+    if (sit().some(x => x.id === idNou)) { alert('Există deja o situație cu id-ul ' + idNou); }
+    else {
+      for (const x of sit()) for (const o of x.optiuni) if (o.urmatoare) o.urmatoare = o.urmatoare.map(u => u === s.id ? idNou : u);
+      for (const x of sit()) if (x.cerinte && x.cerinte.dupa) x.cerinte.dupa = x.cerinte.dupa.map(d => d === s.id ? idNou : d);
+      s.id = idNou; curent = idNou;
+    }
+  }
+  s.titlu = $('#s-titlu', el).value; s.text = $('#s-text', el).value;
+  s.an_min = numar($('#s-an-min', el).value, 1); s.an_max = numar($('#s-an-max', el).value, ani());
+  s.greutate = numar($('#s-greutate', el).value, 1);
+  s.doar_legata = $('#s-doar-legata', el).checked || undefined;
+  s.repetabila = $('#s-repetabila', el).checked || undefined;
+  const cer = {};
+  if ($('#c-nivel-min', el).value) cer.nivel_min = numar($('#c-nivel-min', el).value);
+  if ($('#c-nivel-max', el).value) cer.nivel_max = numar($('#c-nivel-max', el).value);
+  const fl = lista($('#c-flaguri', el).value); if (fl.length) cer.flaguri = fl;
+  const ffl = lista($('#c-fara-flaguri', el).value); if (ffl.length) cer.fara_flaguri = ffl;
+  const cc = $$('.c-carti:checked', el).map(x => x.value); if (cc.length) cer.carti = cc;
+  const fcc = $$('.c-fara-carti:checked', el).map(x => x.value); if (fcc.length) cer.fara_carti = fcc;
+  if (s.cerinte && s.cerinte.dupa && s.cerinte.dupa.length) cer.dupa = s.cerinte.dupa;
+  s.cerinte = cer;
+  s.optiuni = $$('.optiune', el).map((div, i) => {
+    const vechi = s.optiuni[i] || {};
+    const o = { text: $('.o-text', div).value, ef: {}, profit: numar($('.o-profit', div).value) };
+    for (const x of $$('.o-ef', div)) o.ef[x.dataset.r] = numar(x.value);
+    const carte = $('.o-carte', div).value; if (carte) o.carte = carte;
+    const f = lista($('.o-flaguri', div).value); if (f.length) o.flaguri = f;
+    if (vechi.urmatoare && vechi.urmatoare.length) o.urmatoare = vechi.urmatoare;
+    const oc = {};
+    if ($('.oc-nivel-min', div).value) oc.nivel_min = numar($('.oc-nivel-min', div).value);
+    const ofl = lista($('.oc-flaguri', div).value); if (ofl.length) oc.flaguri = ofl;
+    const offl = lista($('.oc-fara-flaguri', div).value); if (offl.length) oc.fara_flaguri = offl;
+    const occ = $$('.oc-carti:checked', div).map(x => x.value); if (occ.length) oc.carti = occ;
+    if (Object.keys(oc).length) o.cerinte = oc;
+    const t = {}; for (const x of $$('.o-tema', div)) if (x.value !== '') t[x.dataset.t] = Number(x.value);
+    if (Object.keys(t).length) o.teme = t;
+    return o;
+  });
+  randeazaLista();
+}
+
+// ------------------------------------------------------------------ harta
+function randeazaHarta() {
+  if (!C) return;
+  const el = $('#harta');
+  const coloane = {}; for (let a = 1; a <= ani(); a++) coloane[a] = [];
+  for (const s of sit()) { const a = Math.min(Math.max(s.an_min || 1, 1), ani()); coloane[a].push(s); }
+  const W = 230, H = 44, GX = 60, GY = 14, pad = 20;
+  const poz = {}; let maxRanduri = 0;
+  Object.entries(coloane).forEach(([a, ls]) => { ls.forEach((s, i) => { poz[s.id] = { x: pad + (a - 1) * (W + GX), y: pad + 30 + i * (H + GY), s }; }); maxRanduri = Math.max(maxRanduri, ls.length); });
+  const latime = pad * 2 + ani() * (W + GX), inaltime = pad * 2 + 30 + maxRanduri * (H + GY);
+  let svg = `<svg viewBox="0 0 ${latime} ${inaltime}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="sageata" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97b8"/></marker></defs>`;
+  for (let a = 1; a <= ani(); a++) svg += `<text x="${pad + (a - 1) * (W + GX)}" y="${pad + 12}" font-size="13" fill="#6b7280">Anul ${a}</text>`;
+  for (const s of sit()) for (const o of s.optiuni) for (const u of o.urmatoare || []) {
+    const A = poz[s.id], B = poz[u]; if (!A || !B) continue;
+    const x1 = A.x + W, y1 = A.y + H / 2, x2 = B.x, y2 = B.y + H / 2;
+    if (B.x <= A.x) svg += `<path d="M${A.x + W / 2},${A.y + H} C${A.x + W / 2},${A.y + H + 40} ${B.x + W / 2},${B.y - 40} ${B.x + W / 2},${B.y}" fill="none" stroke="#8a97b8" stroke-width="1.4" marker-end="url(#sageata)"/>`;
+    else svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+  }
+  for (const { x, y, s } of Object.values(poz)) {
+    svg += `<g class="nod ${s.doar_legata ? 'legata' : ''}" data-id="${esc(s.id)}"><rect x="${x}" y="${y}" width="${W}" height="${H}"/><text x="${x + 8}" y="${y + 18}" font-weight="600">${esc(s.titlu.slice(0, 32))}</text><text x="${x + 8}" y="${y + 34}" fill="#6b7280">${esc(s.id)} · ${s.optiuni.length} opț.${s.cerinte && s.cerinte.nivel_min ? ' · nivel ' + s.cerinte.nivel_min + '+' : ''}</text></g>`;
+  }
+  el.innerHTML = svg + '</svg>';
+  $$('.nod', el).forEach(n => n.addEventListener('click', () => deschide(n.dataset.id)));
+}
+
+// ------------------------------------------------------------------ cărți
+function randeazaCarti() {
+  const tb = $('#tabel-carti tbody'); tb.innerHTML = '';
+  carti().forEach((c, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><input type="text" data-k="id" value="${esc(c.id)}"></td><td><input type="text" data-k="nume" value="${esc(c.nume)}"></td><td><input type="text" data-k="desc" value="${esc(c.desc || '')}"></td>
+      ${RESURSE.map(r => `<td><input type="number" data-ef="${r}" value="${c.efect?.[r] ?? 0}" style="width:70px"></td>`).join('')}
+      <td><input type="number" data-ef="profit" value="${c.efect?.profit ?? 0}" style="width:70px"></td>
+      <td><button class="mic pericol">șterge</button></td>`;
+    $$('input', tr).forEach(x => x.addEventListener('input', () => {
+      if (x.dataset.k) { if (x.dataset.k === 'id') redenumesteCarte(c.id, x.value.trim()); else c[x.dataset.k] = x.value; }
+      else { c.efect = c.efect || {}; c.efect[x.dataset.ef] = numar(x.value); }
+      marcheaza('carti.json');
+    }));
+    $('button', tr).addEventListener('click', () => {
+      const folosita = sit().some(s => s.optiuni.some(o => o.carte === c.id || (o.cerinte?.carti || []).includes(c.id)) || (s.cerinte?.carti || []).includes(c.id) || (s.cerinte?.fara_carti || []).includes(c.id));
+      if (folosita && !confirm('Cartea e folosită de situații. O ștergi oricum? (salvarea va da eroare până scoți referințele)')) return;
+      carti().splice(i, 1); marcheaza('carti.json'); randeazaCarti();
+    });
+    tb.appendChild(tr);
+  });
+}
+function redenumesteCarte(vechi, nou) {
+  const c = carti().find(x => x.id === vechi); if (!c || !nou || vechi === nou) return;
+  c.id = nou;
+  for (const s of sit()) {
+    for (const o of s.optiuni) { if (o.carte === vechi) o.carte = nou; if (o.cerinte?.carti) o.cerinte.carti = o.cerinte.carti.map(x => x === vechi ? nou : x); }
+    for (const k of ['carti', 'fara_carti']) if (s.cerinte?.[k]) s.cerinte[k] = s.cerinte[k].map(x => x === vechi ? nou : x);
+  }
+  marcheaza('situatii.json');
+}
+$('#carte-noua').addEventListener('click', () => { let n = carti().length + 1, id = 'carte-' + n; while (carti().some(c => c.id === id)) id = 'carte-' + (++n); carti().push({ id, nume: 'Carte nouă', desc: '', efect: { buget: 0, bunastare: 0, legalitate: 0 } }); marcheaza('carti.json'); randeazaCarti(); });
+$('#salveaza-carti').addEventListener('click', async () => { await salveaza('carti.json'); if (nesalvat.has('situatii.json')) await salveaza('situatii.json'); });
+
+// ------------------------------------------------------------------ niveluri
+function randeazaNiveluri() {
+  const tb = $('#tabel-niveluri tbody'); tb.innerHTML = '';
+  niveluri().forEach(n => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${n.nivel}</td><td><input type="text" data-k="nume" value="${esc(n.nume)}"></td><td><input type="text" data-k="desc" value="${esc(n.desc || '')}"></td><td><input type="number" data-k="prag" value="${n.prag}" ${n.nivel === 1 ? 'disabled' : ''}></td>`;
+    $$('input', tr).forEach(x => x.addEventListener('input', () => { n[x.dataset.k] = x.dataset.k === 'prag' ? numar(x.value) : x.value; marcheaza('niveluri.json'); }));
+    tb.appendChild(tr);
+  });
+}
+$('#salveaza-niveluri').addEventListener('click', () => salveaza('niveluri.json'));
+
+// ------------------------------------------------------------------ reguli
+function randeazaReguli() {
+  const c = cfg();
+  $('#cfg-ani').value = c.ani; $('#cfg-trimestre').value = c.trimestre_pe_an; $('#cfg-decizii').value = c.decizii_pe_trimestru;
+  $('#cfg-resurse').innerHTML = RESURSE.map(r => `<div><label>${esc(c.resurse[r].nume)}</label><input type="number" min="1" max="100" data-r="${r}" value="${c.resurse[r].start}"></div>`).join('');
+  $('#cfg-finaluri').innerHTML = Object.entries(c.finaluri).map(([k, f]) => `<div class="rand r2"><div><label>${k} · titlu</label><input type="text" data-f="${k}" data-k="titlu" value="${esc(f.titlu)}"></div><div><label>text</label><input type="text" data-f="${k}" data-k="text" value="${esc(f.text || '')}"></div></div>`).join('');
+  $$('#tab-reguli input').forEach(x => x.addEventListener('input', () => {
+    if (x.id === 'cfg-ani') c.ani = numar(x.value, 4); else if (x.id === 'cfg-trimestre') c.trimestre_pe_an = numar(x.value, 4); else if (x.id === 'cfg-decizii') c.decizii_pe_trimestru = numar(x.value, 2);
+    else if (x.dataset.r) c.resurse[x.dataset.r].start = numar(x.value, 50);
+    else if (x.dataset.f) c.finaluri[x.dataset.f][x.dataset.k] = x.value;
+    marcheaza('config.json');
+  }));
+}
+$('#salveaza-reguli').addEventListener('click', () => salveaza('config.json'));
+
+// ------------------------------------------------------------------ arhetipuri
+function randeazaArhetipuri() { $('#json-arhetipuri').value = JSON.stringify(C['arhetipuri.json'], null, 2); }
+$('#json-arhetipuri').addEventListener('input', () => marcheaza('arhetipuri.json'));
+$('#salveaza-arhetipuri').addEventListener('click', () => {
+  try { C['arhetipuri.json'] = JSON.parse($('#json-arhetipuri').value); } catch (e) { return eroare('JSON invalid: ' + e.message); }
+  salveaza('arhetipuri.json');
+});
+
+// ------------------------------------------------------------------ verificare
+$('#verifica').addEventListener('click', verifica);
+async function verifica() {
+  const el = $('#avertismente'); el.innerHTML = 'se verifică…';
+  try {
+    const r = await api('GET', '/api/admin/verifica');
+    el.innerHTML = r.avertismente.length ? r.avertismente.map(a => `<div class="avert">${esc(a.mesaj)}${sit().some(s => s.id === a.id) ? ` <a data-sare="${esc(a.id)}" style="color:var(--accent);cursor:pointer">deschide</a>` : ''}</div>`).join('') : '<div class="avert ok">Niciun avertisment. ' + r.situatii + ' situații, ' + r.carti + ' cărți.</div>';
+    $$('[data-sare]', el).forEach(a => a.addEventListener('click', () => deschide(a.dataset.sare)));
+  } catch (e) { el.innerHTML = `<div class="eroare">${esc(e.message)}</div>`; }
+}
+
+// ------------------------------------------------------------------ start
+incarca().catch(e => eroare('Nu s-a putut încărca conținutul: ' + e.message));
+</script>
+</body>
+</html>

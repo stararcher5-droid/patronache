@@ -1,0 +1,29 @@
+# YAML pentru TrueNAS SCALE: Apps -> Discover Apps -> Custom App -> Install via YAML
+#
+# Verifică doar:
+#   - calea volumului: datasetul /mnt/PollaSSD/apps/patronache/data trebuie să existe
+#   - portul 9090, dacă e deja ocupat pe NAS
+#   - parola de admin, dacă vrei meniul /admin protejat
+#
+# În /srv/data stau baza SQLite și conținutul editat din admin (situații,
+# cărți, niveluri). La prima pornire, pe volum gol, se copiază din imagine.
+#
+# Imaginea e construită automat de GitHub Actions la fiecare push pe main. Ca
+# să poată fi trasă de NAS, pachetul de pe ghcr.io trebuie să fie public SAU
+# rulezi o singură dată pe NAS:  docker login ghcr.io -u stararcher5-droid
+# Pentru o versiune fixă, înlocuiește ":latest" cu un tag de commit, ex. ":sha-1a2b3c4".
+
+services:
+  patronache:
+    image: ghcr.io/stararcher5-droid/patronache:latest
+    # Fără asta, TrueNAS vede același nume de tag și crede că ești la zi.
+    pull_policy: always
+    container_name: patronache
+    restart: unless-stopped
+    ports:
+      - "9090:8000"
+    environment:
+      TZ: Europe/Bucharest
+      # PATRONACHE_ADMIN_PAROLA: "schimba-ma"
+    volumes:
+      - /mnt/PollaSSD/apps/patronache/data:/srv/data
