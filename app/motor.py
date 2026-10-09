@@ -177,14 +177,14 @@ def in_domeniu(stare: dict[str, Any], obiect: dict[str, Any]) -> bool:
     return not dom or stare["firma"].get("domeniu") in dom
 
 
-def _eligibila(c: Continut, stare: dict[str, Any], s: dict[str, Any], din_coada: bool) -> bool:
+def _eligibila(c: Continut, stare: dict[str, Any], s: dict[str, Any], din_coada: bool, nivel: int | None = None) -> bool:
     if s["id"] in stare["jucate"] and not s.get("repetabila"):
         return False
     if not in_domeniu(stare, s):
         return False
     if cerinte_indeplinite(stare, s.get("cerinte")) is not None:
         return False
-    if not din_coada and (s.get("doar_legata") or not _de_nivel(s, stare["nivel"])):
+    if not din_coada and (s.get("doar_legata") or not _de_nivel(s, nivel if nivel is not None else stare["nivel"])):
         return False
     # Trebuie să existe măcar o opțiune pe care o poate alege.
     return any(cerinte_indeplinite(stare, o.get("cerinte")) is None for o in s["optiuni"])
@@ -199,8 +199,13 @@ def _alege_situatia(c: Continut, stare: dict[str, Any]) -> bool:
             stare["coada"].remove(id_)
             stare["pas_id"] = id_
             return True
-    # 2. La întâmplare, ponderat, dintre cele libere pe anul curent.
+    # 2. La întâmplare, ponderat, dintre cele libere de nivelul firmei sau mai mic.
     libere = [s for s in c.situatii if _eligibila(c, stare, s, din_coada=False)]
+    # 3. S-au terminat: mai bine o situație de nivel imediat superior decât să se oprească povestea.
+    nivel_extins = stare["nivel"]
+    while not libere and nivel_extins < len(c.niveluri):
+        nivel_extins += 1
+        libere = [s for s in c.situatii if _eligibila(c, stare, s, din_coada=False, nivel=nivel_extins)]
     if not libere:
         return False
     rng = _rng(stare)

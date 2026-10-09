@@ -426,6 +426,16 @@ class Validare(unittest.TestCase):
                 "situatii.json": {"situatii": c.situatii}, "arhetipuri.json": {"arhetipuri": c.arhetipuri},
             })
 
+    def test_cand_se_termina_nivelul_ia_din_nivelul_urmator(self):
+        c = continut_de_test()
+        for id_ in ("b", "c", "d", "e", "f"):
+            c.situatie(id_)["nivel"] = 2   # la nivelul 1 e doar „a”, dar sunt 2 decizii pe an
+        s = motor.stare_noua(c, {}, seed=1)
+        self.assertEqual(s["pas_id"], "a")
+        motor.alege(c, s, 0)
+        self.assertEqual(s["pas"], motor.PAS_DECIZIE, "nu se termină povestea")
+        self.assertIn(s["pas_id"], {"b", "c", "d", "e", "f"}, "ia din nivelul 2")
+
     def test_avertismente(self):
         c = continut_de_test()
         c.situatie("f")["doar_legata"] = True

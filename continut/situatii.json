@@ -156,7 +156,8 @@
             "clienti": -2
           }
         }
-      ]
+      ],
+      "an_max": 2
     },
     {
       "id": "contabilul",
@@ -205,7 +206,8 @@
             "control": 2
           }
         }
-      ]
+      ],
+      "an_max": 2
     },
     {
       "id": "licitatia",
@@ -3813,6 +3815,332 @@
           }
         }
       }
+    },
+    {
+      "id": "contractul-cu-litere-mici",
+      "titlu": "Literele mici",
+      "text": "Un client mare îți trimite contractul lui: 40 de pagini. La pagina 31 scrie că penalitățile de întârziere sunt 2% pe zi.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Semnezi. Oricum nu întârzii niciodată.",
+          "ef": {
+            "parteneri": 3
+          },
+          "profit": 40,
+          "teme": {
+            "risc": 2,
+            "clienti": 0
+          }
+        },
+        {
+          "text": "Trimiți la avocat și negociezi pagina 31.",
+          "ef": {
+            "parteneri": 1,
+            "legalitate": 2
+          },
+          "profit": 25,
+          "teme": {
+            "risc": -1,
+            "control": 1
+          }
+        },
+        {
+          "text": "Refuzi contractul. Nu lucrezi cu condiții din astea.",
+          "ef": {
+            "parteneri": -3
+          },
+          "profit": -10,
+          "teme": {
+            "risc": -2,
+            "clienti": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "angajatul-cu-doua-joburi",
+      "titlu": "Al doilea job",
+      "text": "Afli că unul din oameni lucrează noaptea pentru concurență. „E al meu timp”, zice. Nu e în contract nimic despre asta.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îi ceri să aleagă. Până vineri.",
+          "ef": {
+            "parteneri": 1,
+            "bunastare": -4
+          },
+          "teme": {
+            "control": 2
+          }
+        },
+        {
+          "text": "Îl lași, dar îl rogi să nu ducă nimic de la voi. Îl crezi.",
+          "ef": {
+            "parteneri": -1,
+            "bunastare": 3
+          },
+          "teme": {
+            "control": -2
+          }
+        },
+        {
+          "text": "Pui clauză de exclusivitate în toate contractele, de luni.",
+          "ef": {
+            "bunastare": -3,
+            "legalitate": 2
+          },
+          "teme": {
+            "control": 1,
+            "salarii": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "clientul-care-tipa",
+      "titlu": "Clientul care țipă",
+      "text": "Un client te sună și țipă cinci minute la angajata de la telefon. Ea plânge în bucătărie. Clientul aduce bani buni.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Îl suni tu și îi spui că la voi nu se țipă. Oricât plătește.",
+          "ef": {
+            "parteneri": -4,
+            "bunastare": 8
+          },
+          "teme": {
+            "clienti": -1,
+            "control": 0
+          }
+        },
+        {
+          "text": "Îi ceri scuze clientului și îi dai angajatei o zi liberă.",
+          "ef": {
+            "parteneri": 2,
+            "bunastare": -2
+          },
+          "teme": {
+            "clienti": 1
+          }
+        },
+        {
+          "text": "Pui pe altcineva să-i răspundă de acum încolo. Problema dispare.",
+          "ef": {
+            "bunastare": 1
+          },
+          "teme": {
+            "clienti": 0,
+            "control": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "pontajul",
+      "titlu": "Pontajul",
+      "text": "Contabila îți arată pontajul: unii pleacă la 16, alții la 20. Toți sunt plătiți la fel.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Introduci ore suplimentare plătite, cu pontaj.",
+          "ef": {
+            "bunastare": 6,
+            "legalitate": 3
+          },
+          "profit": -20,
+          "teme": {
+            "salarii": 2,
+            "control": 1
+          }
+        },
+        {
+          "text": "Le spui celor care pleacă la 16 să rămână ca ceilalți.",
+          "ef": {
+            "bunastare": -5
+          },
+          "teme": {
+            "program": 2,
+            "salarii": -1
+          }
+        },
+        {
+          "text": "Lași cum e. Cine stă mai mult o face de bunăvoie.",
+          "ef": {
+            "bunastare": -2,
+            "legalitate": -2
+          },
+          "teme": {
+            "control": -1,
+            "program": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "sponsorizarea",
+      "titlu": "Echipa de fotbal",
+      "text": "Echipa de fotbal a comunei vrea sponsorizare: 5.000 de lei și numele firmei pe tricouri. Primarul e președintele clubului.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Sponsorizezi. E și deductibil, și te vede tot satul.",
+          "ef": {
+            "parteneri": 4
+          },
+          "profit": -5,
+          "teme": {
+            "stat": 1,
+            "imagine": 1
+          }
+        },
+        {
+          "text": "Dai jumătate, fără tricouri.",
+          "ef": {
+            "parteneri": 1
+          },
+          "profit": -3,
+          "teme": {
+            "stat": 0
+          }
+        },
+        {
+          "text": "Refuzi. Nu dai bani la primar prin ușa din spate.",
+          "ef": {
+            "parteneri": -2,
+            "legalitate": 1
+          },
+          "teme": {
+            "stat": -2,
+            "imagine": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "telefonul-de-la-banca",
+      "titlu": "Banca",
+      "text": "Banca te sună cu „o ofertă specială”: linie de credit de 200.000 de lei, pre-aprobată. Nu ai nevoie acum.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "O iei. Nu se știe când ai nevoie.",
+          "ef": {
+            "parteneri": 2
+          },
+          "profit": -5,
+          "teme": {
+            "risc": 2
+          }
+        },
+        {
+          "text": "Refuzi politicos.",
+          "teme": {
+            "risc": -2
+          }
+        },
+        {
+          "text": "O iei și o folosești să plătești furnizorii în avans, cu discount.",
+          "ef": {
+            "parteneri": 4
+          },
+          "profit": 15,
+          "teme": {
+            "risc": 1,
+            "clienti": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "parola-la-toti",
+      "titlu": "Parola",
+      "text": "Toată firma folosește aceeași parolă la tot: numele firmei și anul. Un fost angajat încă are acces la mail.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Schimbi tot, cu parole individuale și două etape. O săptămână de nervi.",
+          "ef": {
+            "bunastare": -2,
+            "legalitate": 3
+          },
+          "profit": -5,
+          "teme": {
+            "control": 1
+          }
+        },
+        {
+          "text": "Schimbi doar parola de la mail. Restul merge.",
+          "ef": {
+            "legalitate": -1
+          },
+          "teme": {
+            "control": -1
+          }
+        },
+        {
+          "text": "N-ai timp de asta acum.",
+          "ef": {
+            "parteneri": -1,
+            "legalitate": -3
+          },
+          "teme": {
+            "risc": 2,
+            "control": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "ora-de-la-primarie",
+      "titlu": "Ora de audiențe",
+      "text": "Ai nevoie de o aprobare de la Primărie. Dosarul e complet de trei luni. Funcționarul zice că „e la semnat”.",
+      "nivel": 1,
+      "greutate": 2,
+      "optiuni": [
+        {
+          "text": "Te duci în audiență la primar și aștepți cât trebuie.",
+          "ef": {
+            "parteneri": 1,
+            "legalitate": 1
+          },
+          "profit": -5,
+          "teme": {
+            "stat": 1,
+            "control": 1
+          }
+        },
+        {
+          "text": "Îi duci funcționarului „o atenție”.",
+          "ef": {
+            "parteneri": 2,
+            "legalitate": -6
+          },
+          "profit": 5,
+          "teme": {
+            "stat": 2,
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Faci plângere la prefectură. Aprobarea vine, dar ai un dușman.",
+          "ef": {
+            "parteneri": -3,
+            "legalitate": 2
+          },
+          "teme": {
+            "stat": -1,
+            "control": 2
+          }
+        }
+      ]
     }
   ]
 }

@@ -428,13 +428,13 @@ def verifica(c: Continut) -> list[dict[str, str]]:
         for niv in c.niveluri:
             n = sum(
                 1 for s in c.situatii
-                if not s.get("doar_legata") and int(s.get("nivel", 1)) <= niv["nivel"]
+                if not s.get("doar_legata") and not s.get("cerinte") and int(s.get("nivel", 1)) <= niv["nivel"]
                 and (not s.get("domenii") or dom["id"] in s["domenii"])
             )
             if n < total_necesar:
                 avertismente.append({
                     "tip": "putine", "id": f"nivel-{niv['nivel']}",
-                    "mesaj": f"{dom['nume']}, nivelul {niv['nivel']}: doar {n} situații de nivel {niv['nivel']} sau mai mic, sunt nevoie de {total_necesar} pentru o partidă întreagă (situațiile nu se repetă).",
+                    "mesaj": f"{dom['nume']}, nivelul {niv['nivel']}: doar {n} situații fără cerințe de nivel {niv['nivel']} sau mai mic, sunt nevoie de {total_necesar} pentru o partidă întreagă (situațiile nu se repetă, cele cu cerințe nu sunt garantate).",
                 })
 
     # Situații marcate 'doar_legata' pe care nu le deschide nimeni.
