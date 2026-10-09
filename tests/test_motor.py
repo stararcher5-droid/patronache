@@ -361,6 +361,13 @@ class Domenii(unittest.TestCase):
         self.assertEqual(s2["carti"], ["vin"])
         self.assertIn(s2["pas_id"], {"b", "c", "d", "e", "f"})
 
+    def test_busola_are_cinci_trepte(self):
+        c = continut_de_test()
+        c.config["axe"] = {"x": {"nume": "Corectitudine", "teme": ["fisc"], "minus": "Corect", "plus": "Descurcăreț"}}
+        et = lambda v: motor.busola(c, {"fisc": v})["x"]["eticheta"]
+        self.assertEqual(et(-0.8), "Clar corect"); self.assertEqual(et(-0.3), "Mai degrabă corect")
+        self.assertEqual(et(0.0), "La mijloc"); self.assertEqual(et(0.2), "Mai degrabă descurcăreț"); self.assertEqual(et(0.7), "Clar descurcăreț")
+
     def test_arhetipurile_respecta_domeniul(self):
         c = continut_de_test()
         c.config["domenii"] = [{"id": "it", "nume": "IT"}, {"id": "horeca", "nume": "Horeca"}]

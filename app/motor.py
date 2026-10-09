@@ -624,7 +624,17 @@ def busola(c: Continut, poz: dict[str, float]) -> dict[str, Any]:
         inv = set(ax.get("inverseaza", []))
         valori = [(-poz[t] if t in inv else poz[t]) for t in ax["teme"] if t in poz]
         val = round(sum(valori) / len(valori), 2) if valori else 0.0
-        eticheta = ax["minus"] if val <= -0.5 else ax["plus"] if val >= 0.5 else "La mijloc"
+        # pozițiile medii stau de obicei în ±0,5, așa că pragurile sunt strânse: cinci trepte
+        if val <= -0.5:
+            eticheta = "Clar " + ax["minus"].lower()
+        elif val <= -0.15:
+            eticheta = "Mai degrabă " + ax["minus"].lower()
+        elif val >= 0.5:
+            eticheta = "Clar " + ax["plus"].lower()
+        elif val >= 0.15:
+            eticheta = "Mai degrabă " + ax["plus"].lower()
+        else:
+            eticheta = "La mijloc"
         out[cheie] = {"nume": ax.get("nume", cheie), "valoare": val, "eticheta": eticheta}
     return out
 
