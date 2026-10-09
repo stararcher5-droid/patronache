@@ -194,11 +194,13 @@ class Legaturi(unittest.TestCase):
         s["pas_id"] = "a"
         pas = motor.pas_curent(c, s)
         self.assertIsNone(pas["optiuni"][0]["blocat"])
-        self.assertEqual(pas["optiuni"][1]["blocat"], "Nivel 3")
+        self.assertEqual(pas["optiuni"][1]["blocat"], "Cere nivelul 3")
         with self.assertRaises(motor.ActiuneInvalida):
             motor.alege(c, s, 1)
         s["nivel"] = 3
         self.assertIsNone(motor.pas_curent(c, s)["optiuni"][1]["blocat"])
+        self.assertEqual(motor.pas_curent(c, s)["optiuni"][1]["deblocat"], "Deblocată de nivelul firmei")
+        self.assertIsNone(motor.pas_curent(c, s)["optiuni"][0]["deblocat"], "fără cerințe, fără notă")
         motor.alege(c, s, 1)
 
     def test_cerinta_dupa_si_fara_flaguri(self):
@@ -207,7 +209,7 @@ class Legaturi(unittest.TestCase):
         c.situatie("c")["cerinte"] = {"fara_flaguri": ["x"]}
         s = motor.stare_noua(c, {}, seed=1)
         self.assertIsNone(motor.cerinte_indeplinite(s, c.situatie("c")["cerinte"]))
-        self.assertEqual(motor.cerinte_indeplinite(s, c.situatie("b")["cerinte"]), "Vine după altă situație")
+        self.assertEqual(motor.cerinte_indeplinite(s, c.situatie("b")["cerinte"]), "Venea după altă situație")
         s["jucate"].append("a")
         s["flaguri"].append("x")
         self.assertIsNone(motor.cerinte_indeplinite(s, c.situatie("b")["cerinte"]))

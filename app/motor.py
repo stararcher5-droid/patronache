@@ -92,29 +92,42 @@ def cerinte_indeplinite(stare: dict[str, Any], cer: dict[str, Any] | None) -> st
     if not cer:
         return None
     if "nivel_min" in cer and stare["nivel"] < cer["nivel_min"]:
-        return f"Nivel {cer['nivel_min']}"
+        return f"Cere nivelul {cer['nivel_min']}"
     if "nivel_max" in cer and stare["nivel"] > cer["nivel_max"]:
         return f"Doar până la nivelul {cer['nivel_max']}"
     carti = set(stare["carti"])
     lipsa = [x for x in cer.get("carti", []) if x not in carti]
     if lipsa:
-        return "Cere cartea: " + ", ".join(lipsa)
+        return "Cerea cartea: " + ", ".join(lipsa)
     if any(x in carti for x in cer.get("fara_carti", [])):
-        return "Nu se poate cu cartea asta"
+        return "Exclusă de o carte din inventar"
     flaguri = set(stare["flaguri"])
     if any(x not in flaguri for x in cer.get("flaguri", [])):
-        return "Depinde de o alegere anterioară"
+        return "Depindea de o alegere anterioară"
     if any(x in flaguri for x in cer.get("fara_flaguri", [])):
         return "Exclusă de o alegere anterioară"
     jucate = set(stare["jucate"])
     if any(x not in jucate for x in cer.get("dupa", [])):
-        return "Vine după altă situație"
+        return "Venea după altă situație"
     return None
 
 
 def _de_nivel(s: dict[str, Any], nivel: int) -> bool:
     """O situație de nivel N apare de la nivelul N în sus: la nivelul 3 primești din 1, 2 și 3."""
     return int(s.get("nivel", 1)) <= nivel
+
+
+def motiv_deblocare(cer: dict[str, Any] | None) -> str | None:
+    """Pentru o opțiune cu cerințe îndeplinite: ce anume a deblocat-o, ca jucătorul să vadă că alegerile de dinainte contează."""
+    if not cer:
+        return None
+    if cer.get("flaguri") or cer.get("dupa"):
+        return "Deblocată de o alegere anterioară"
+    if cer.get("carti"):
+        return "Deblocată de o carte din inventar"
+    if cer.get("nivel_min"):
+        return "Deblocată de nivelul firmei"
+    return None
 
 
 def in_domeniu(stare: dict[str, Any], obiect: dict[str, Any]) -> bool:
@@ -461,7 +474,8 @@ def pas_curent(c: Continut, stare: dict[str, Any]) -> dict[str, Any]:
         baza.update({
             "id": s["id"], "titlu": s["titlu"], "text": s["text"],
             "optiuni": [
-                {"text": o["text"], "blocat": cerinte_indeplinite(stare, o.get("cerinte"))}
+                {"text": o["text"], "blocat": (b := cerinte_indeplinite(stare, o.get("cerinte"))),
+                 "deblocat": None if b else motiv_deblocare(o.get("cerinte"))}
                 for o in s["optiuni"]
             ],
         })
