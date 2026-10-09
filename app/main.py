@@ -27,7 +27,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, Response
 from pydantic import BaseModel, Field
 
 from . import admin, continut as modul_continut, db, motor
@@ -148,10 +148,11 @@ def partida(id_: str) -> dict[str, Any]:
     return _raspuns(id_, _partida(id_))
 
 
-@app.delete("/api/partida/{id_}", status_code=204)
-def renunta(id_: str) -> None:
+@app.delete("/api/partida/{id_}", status_code=204, response_class=Response)
+def renunta(id_: str) -> Response:
     _partida(id_)
     db.sterge_partida(id_)
+    return Response(status_code=204)
 
 
 @app.post("/api/partida/{id_}/alege")
