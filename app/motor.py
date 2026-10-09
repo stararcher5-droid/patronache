@@ -125,9 +125,7 @@ def motiv_deblocare(cer: dict[str, Any] | None) -> str | None:
         return "Deblocată de o alegere anterioară"
     if cer.get("carti"):
         return "Deblocată de o carte din inventar"
-    if cer.get("nivel_min"):
-        return "Deblocată de nivelul firmei"
-    return None
+    return None   # nivelul nu primește notă: se vede deja în antet
 
 
 def in_domeniu(stare: dict[str, Any], obiect: dict[str, Any]) -> bool:

@@ -199,7 +199,9 @@ class Legaturi(unittest.TestCase):
             motor.alege(c, s, 1)
         s["nivel"] = 3
         self.assertIsNone(motor.pas_curent(c, s)["optiuni"][1]["blocat"])
-        self.assertEqual(motor.pas_curent(c, s)["optiuni"][1]["deblocat"], "Deblocată de nivelul firmei")
+        self.assertIsNone(motor.pas_curent(c, s)["optiuni"][1]["deblocat"], "nivelul nu primește notă")
+        c.situatie("a")["optiuni"][1]["cerinte"] = {"flaguri": ["x"]}; s["flaguri"] = ["x"]
+        self.assertEqual(motor.pas_curent(c, s)["optiuni"][1]["deblocat"], "Deblocată de o alegere anterioară")
         self.assertIsNone(motor.pas_curent(c, s)["optiuni"][0]["deblocat"], "fără cerințe, fără notă")
         motor.alege(c, s, 1)
 
