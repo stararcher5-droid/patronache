@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
 <title>Patronache · Admin</title>
 <style>
-  :root { --bg:#f4f5f8; --card:#fff; --text:#1c2130; --muted:#6b7280; --line:#e2e5ec; --accent:#2f6fed; --bad:#d64545; --ok:#1f9d55; --warn:#c77d00; }
+  :root { --bg:#15171d; --card:#1f222b; --text:#e6e8ee; --muted:#9aa1b4; --line:#333846; --accent:#5b8def; --bad:#f07a7a; --ok:#5fc9a8; --warn:#e2b23a; --input:#262a35; --soft:#2a3147; }
   * { box-sizing:border-box; }
   body { margin:0; font:14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--bg); color:var(--text); }
-  header { display:flex; align-items:center; gap:16px; padding:10px 18px; background:#1c2130; color:#fff; position:sticky; top:0; z-index:5; }
+  header { display:flex; align-items:center; gap:16px; padding:10px 18px; background:#0f1116; color:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
   header h1 { font-size:16px; margin:0 18px 0 0; }
   header nav button { background:none; border:0; color:#cbd2e0; padding:6px 10px; cursor:pointer; border-radius:6px; font-size:14px; }
-  header nav button.activ { background:#2f3650; color:#fff; }
+  header nav button.activ { background:#2a3147; color:#fff; }
   header .spatiu { flex:1; }
   #stare { font-size:13px; color:#cbd2e0; }
   #stare.nesalvat { color:#ffd166; }
@@ -24,55 +25,57 @@
   .lista li { padding:8px 12px; border-bottom:1px solid var(--line); cursor:pointer; display:flex; align-items:center; gap:8px; }
   .lista li > div { flex:1; min-width:0; }
   .lista li .sterge { opacity:.5; } .lista li:hover .sterge { opacity:1; }
-  .lista li:hover { background:#f0f3ff; }
-  .lista li.activ { background:#e4ebff; }
+  .lista li:hover { background:#262a35; }
+  .lista li.activ { background:var(--soft); }
   .lista li small { display:block; color:var(--muted); }
   .lista .jos { padding:10px 12px; display:flex; gap:8px; }
   .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; }
   .card h2 { margin:0 0 12px; font-size:16px; }
   .card h3 { margin:16px 0 8px; font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
   label { display:block; font-size:12px; color:var(--muted); margin-bottom:3px; }
-  input[type=text], input[type=number], textarea, select { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; background:#fff; }
+  input[type=text], input[type=number], textarea, select { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; background:var(--input); color:var(--text); }
+  input::placeholder, textarea::placeholder { color:#6b7183; }
+  select option { background:var(--input); }
   textarea { min-height:70px; resize:vertical; }
   .rand { display:grid; gap:10px; margin-bottom:10px; }
   .r2 { grid-template-columns:1fr 1fr; } .r3 { grid-template-columns:1fr 1fr 1fr; } .r4 { grid-template-columns:repeat(4,1fr); } .r6 { grid-template-columns:repeat(6,1fr); }
   .bifa { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text); margin:4px 0; }
   .bifa input { width:auto; }
-  button { font:inherit; padding:7px 12px; border-radius:6px; border:1px solid var(--line); background:#fff; cursor:pointer; }
+  button { font:inherit; padding:7px 12px; border-radius:6px; border:1px solid var(--line); background:var(--input); color:var(--text); cursor:pointer; }
   button.primar { background:var(--accent); color:#fff; border-color:var(--accent); }
-  button.pericol { color:var(--bad); border-color:#f3c3c3; }
+  button.pericol { color:var(--bad); border-color:#5a3434; }
   button.mic { padding:3px 8px; font-size:12px; }
-  .optiune { border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:10px; background:#fafbfd; }
+  .optiune { border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:10px; background:#1a1d25; }
   .optiune .cap { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
   .optiune .cap b { flex:1; }
   .etichete { display:flex; flex-wrap:wrap; gap:6px; }
-  .eticheta { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; background:#e4ebff; font-size:12px; }
+  .eticheta { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; background:var(--soft); font-size:12px; }
   .eticheta button { border:0; background:none; padding:0; color:var(--muted); cursor:pointer; font-size:14px; line-height:1; }
-  .eticheta.carte { background:#fff3d6; } .eticheta.flag { background:#e3f6ea; }
+  .eticheta.carte { background:#4a3c14; color:#f3d98a; } .eticheta.flag { background:#1f3a31; color:#a8e3c8; }
   .detalii summary { cursor:pointer; color:var(--muted); font-size:12px; margin:6px 0; }
-  .avert { padding:8px 10px; border-radius:6px; margin-bottom:6px; background:#fff6e5; border:1px solid #f3dcae; }
-  .avert.ok { background:#e8f7ee; border-color:#bfe6cf; }
-  .eroare { background:#fdecec; border:1px solid #f3c3c3; color:var(--bad); padding:8px 10px; border-radius:6px; margin-bottom:10px; white-space:pre-wrap; }
+  .avert { padding:8px 10px; border-radius:6px; margin-bottom:6px; background:#3d3214; border:1px solid #6b5720; }
+  .avert.ok { background:#1f3a31; border-color:#2f5a4a; }
+  .eroare { background:#4a2622; border:1px solid #7a3a34; color:var(--bad); padding:8px 10px; border-radius:6px; margin-bottom:10px; white-space:pre-wrap; }
   table { width:100%; border-collapse:collapse; } th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; } th { color:var(--muted); font-weight:500; font-size:12px; }
   td input { padding:5px 7px; }
   .inapoi { color:var(--muted); font-size:13px; }
   .inapoi a { color:var(--accent); cursor:pointer; }
-  #harta svg { width:100%; background:#fff; border:1px solid var(--line); border-radius:10px; }
+  #harta svg { width:100%; background:var(--card); border:1px solid var(--line); border-radius:10px; }
   #harta .nod { cursor:pointer; }
-  #harta .nod rect { fill:#e4ebff; stroke:#b9c7f5; rx:6; }
-  #harta .nod.legata rect { fill:#fff3d6; stroke:#f0d79a; }
-  #harta .nod text { font-size:11px; }
+  #harta .nod rect { fill:#2a3147; stroke:#4a5a8a; rx:6; }
+  #harta .nod.legata rect { fill:#4a3c14; stroke:#8a7030; }
+  #harta .nod text { font-size:11px; fill:var(--text); }
   #harta line, #harta path.leg { stroke:#8a97b8; stroke-width:1.4; marker-end:url(#sageata); fill:none; }
   #harta .nod .maner { fill:#2f6fed; cursor:crosshair; }
   #harta .nod .maner-text { fill:#fff; font-size:13px; font-weight:700; pointer-events:none; }
   #harta .nod.tinta rect { stroke:#2f6fed; stroke-width:2.5; }
   #harta .nod.sursa rect { stroke:#1f9d55; stroke-width:2.5; }
   #harta .sterge-leg { cursor:pointer; }
-  #harta .sterge-leg circle { fill:#fff; stroke:#d64545; }
+  #harta .sterge-leg circle { fill:var(--card); stroke:#f07a7a; }
   #harta .sterge-leg text { fill:#d64545; font-size:11px; font-weight:700; pointer-events:none; }
-  #harta .sterge-leg:hover circle { fill:#fdecec; }
+  #harta .sterge-leg:hover circle { fill:#4a2622; }
   #harta .temp { stroke:#2f6fed; stroke-width:2; stroke-dasharray:6 4; fill:none; pointer-events:none; }
-  #panou-legatura { position:fixed; z-index:20; background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; width:320px; box-shadow:0 8px 30px rgba(0,0,0,.15); }
+  #panou-legatura { position:fixed; z-index:20; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; width:320px; box-shadow:0 8px 30px rgba(0,0,0,.15); }
   #panou-legatura h4 { margin:0 0 8px; font-size:13px; }
   .nota { color:var(--muted); font-size:13px; }
   @media (max-width:900px) { .coloane { grid-template-columns:1fr; } .r4, .r6 { grid-template-columns:1fr 1fr; } }
@@ -485,7 +488,7 @@ function randeazaHarta() {
   Object.entries(coloane).forEach(([a, ls]) => { ls.forEach((s, i) => { poz[s.id] = { x: pad + (a - 1) * (W + GX), y: pad + 30 + i * (H + GY), s }; }); maxRanduri = Math.max(maxRanduri, ls.length); });
   const latime = pad * 2 + ani() * (W + GX), inaltime = pad * 2 + 30 + maxRanduri * (H + GY);
   let svg = `<svg viewBox="0 0 ${latime} ${inaltime}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="sageata" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97b8"/></marker></defs>`;
-  for (let a = 1; a <= ani(); a++) svg += `<text x="${pad + (a - 1) * (W + GX)}" y="${pad + 12}" font-size="13" fill="#6b7280">Anul ${a}</text>`;
+  for (let a = 1; a <= ani(); a++) svg += `<text x="${pad + (a - 1) * (W + GX)}" y="${pad + 12}" font-size="13" fill="#9aa1b4">Anul ${a}</text>`;
   // legăturile; butoanele × se adună separat și se desenează la urmă, peste căsuțe
   let butoane = '';
   for (const s of sit()) s.optiuni.forEach((o, oi) => { for (const u of o.urmatoare || []) {
@@ -503,7 +506,7 @@ function randeazaHarta() {
     butoane += `<g class="sterge-leg" data-sursa="${esc(s.id)}" data-opt="${oi}" data-tinta="${esc(u)}"><title>Opțiunea ${oi + 1}: „${esc(o.text)}” deschide „${esc(poz[u].s.titlu)}”. Clic ca să scoți legătura.</title><circle cx="${mx}" cy="${my}" r="8"/><text x="${mx}" y="${my + 4}" text-anchor="middle">×</text></g>`;
   } });
   for (const { x, y, s } of Object.values(poz)) {
-    svg += `<g class="nod ${s.doar_legata ? 'legata' : ''}" data-id="${esc(s.id)}"><rect x="${x}" y="${y}" width="${W}" height="${H}"/><text x="${x + 8}" y="${y + 18}" font-weight="600">${esc(s.titlu.slice(0, 30))}</text><text x="${x + 8}" y="${y + 34}" fill="#6b7280">${esc(s.id)} · ${s.optiuni.length} opț.${s.cerinte && s.cerinte.nivel_min ? ' · nivel ' + s.cerinte.nivel_min + '+' : ''}</text>
+    svg += `<g class="nod ${s.doar_legata ? 'legata' : ''}" data-id="${esc(s.id)}"><rect x="${x}" y="${y}" width="${W}" height="${H}"/><text x="${x + 8}" y="${y + 18}" font-weight="600">${esc(s.titlu.slice(0, 30))}</text><text x="${x + 8}" y="${y + 34}" fill="#9aa1b4">${esc(s.id)} · ${s.optiuni.length} opț.${s.cerinte && s.cerinte.nivel_min ? ' · nivel ' + s.cerinte.nivel_min + '+' : ''}</text>
       <circle class="maner" cx="${x + W - 12}" cy="${y + H / 2}" r="9"><title>Trage de aici peste altă situație ca să o legi</title></circle><text class="maner-text" x="${x + W - 12}" y="${y + H / 2 + 4.5}" text-anchor="middle">+</text></g>`;
   }
   el.innerHTML = svg + butoane + '</svg>';
