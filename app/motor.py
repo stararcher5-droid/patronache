@@ -476,8 +476,11 @@ def _pregateste_minijoc(c: Continut, stare: dict[str, Any], mj: dict[str, Any]) 
     date: dict[str, Any] = {}
     if mj["id"] == "pretul":
         lista = c.produse.get(stare["firma"].get("domeniu"), []) or [x for l in c.produse.values() for x in l]
-        if lista:
-            nume, pret = _rng(stare).choice(lista)
+        folosite = stare.setdefault("produse_folosite", [])
+        libere = [x for x in lista if x[0] not in folosite] or lista   # nu repetăm un produs în aceeași partidă
+        if libere:
+            nume, pret = random.Random(f"{stare['seed']}:produs:{len(stare['istoric'])}").choice(libere)
+            folosite.append(nume)
             date = {"produs": nume, "pret": pret}
     stare["minijoc"] = {"id": mj["id"], "date": date}
 

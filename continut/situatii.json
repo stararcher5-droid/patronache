@@ -156,8 +156,7 @@
             "clienti": -2
           }
         }
-      ],
-      "an_max": 2
+      ]
     },
     {
       "id": "contabilul",
@@ -206,8 +205,7 @@
             "control": 2
           }
         }
-      ],
-      "an_max": 2
+      ]
     },
     {
       "id": "licitatia",

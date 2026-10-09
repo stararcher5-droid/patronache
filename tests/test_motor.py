@@ -144,6 +144,19 @@ class Reguli(unittest.TestCase):
         self.assertEqual((r["scor"], r["pret_real"], r["profit"]), (90, 6000, 26))
         self.assertEqual(motor.scor_pret(100, 150), 0); self.assertEqual(motor.scor_pret(100, 135), 30); self.assertEqual(motor.scor_pret(100, 100), 100)
 
+    def test_produsele_nu_se_repeta_in_aceeasi_partida(self):
+        c = continut_de_test()
+        c.config.update({"ani": 4, "domenii": [{"id": "it", "nume": "IT"}]})
+        c.produse = {"it": [["A", 10], ["B", 20], ["C", 30]]}
+        c.config["minijocuri"] = {"activ": True, "lista": [{"id": "pretul", "nume": "Prețul", "efect_max": {}}]}
+        for id_ in "abcdef": c.situatie(id_)["repetabila"] = True
+        for seed in range(5):
+            s = motor.stare_noua(c, {"domeniu": "it"}, seed=seed); vazute = []
+            for an in range(3):
+                motor.alege(c, s, 0); motor.alege(c, s, 0); motor.bilant(c, s)
+                vazute.append(s["minijoc"]["date"]["produs"]); motor.minijoc(c, s, 50)
+            self.assertEqual(len(set(vazute)), 3, f"seed {seed}: {vazute}")
+
     def test_minijocul_se_alege_dupa_nivel(self):
         c = continut_de_test()
         c.config["minijocuri"] = {"activ": True, "lista": [{"id": "pizza", "nume": "Pizza", "nivel": 1, "efect_max": {}}, {"id": "negocierea", "nume": "Negocierea", "nivel": 3, "efect_max": {}}]}
