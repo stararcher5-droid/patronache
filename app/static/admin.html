@@ -123,13 +123,16 @@
   </section>
 
   <!-- ===================== CĂRȚI ===================== -->
-  <section id="tab-carti" class="ascuns">
-    <div class="card">
-      <h2>Cărți speciale</h2>
-      <p class="nota">Jucătorul primește o carte când alege o opțiune care o dă. O folosește când vrea în timpul unei decizii; se consumă și efectul se aplică pe loc.</p>
-      <table id="tabel-carti"><thead><tr><th>Id</th><th>Nume</th><th>Descriere</th><th>Buget</th><th>Bunăstare</th><th>Legalitate</th><th>Profit</th><th></th></tr></thead><tbody></tbody></table>
-      <div style="margin-top:10px; display:flex; gap:8px"><button id="carte-noua">+ Carte nouă</button><button class="primar" id="salveaza-carti">Salvează cărțile</button></div>
+  <section id="tab-carti" class="ascuns coloane">
+    <div class="lista">
+      <input type="search" id="cauta-carte" placeholder="Caută carte…">
+      <ul id="lista-carti"></ul>
+      <div class="jos">
+        <button class="primar" id="carte-noua">+ Carte nouă</button>
+        <button id="salveaza-carti">Salvează</button>
+      </div>
     </div>
+    <div id="editor-carte"><div class="card nota">Cărțile de inventar: jucătorul primește o carte când alege o opțiune care o dă („Dă cartea” la opțiune), o folosește când vrea în timpul unei decizii, se consumă și efectul se aplică pe loc. Alege o carte din stânga sau creează una nouă.</div></div>
   </section>
 
   <!-- ===================== NIVELURI ===================== -->
@@ -572,26 +575,112 @@ function panouLegatura(sursaId, tintaId, x, y) {
 $('#salveaza-harta').addEventListener('click', () => { citesteEditor(); salveaza('situatii.json'); });
 
 // ------------------------------------------------------------------ cărți
+let carteCurenta = null;
+$('#cauta-carte').addEventListener('input', randeazaCarti);
 function randeazaCarti() {
-  const tb = $('#tabel-carti tbody'); tb.innerHTML = '';
-  carti().forEach((c, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td><input type="text" data-k="id" value="${esc(c.id)}"></td><td><input type="text" data-k="nume" value="${esc(c.nume)}"></td><td><input type="text" data-k="desc" value="${esc(c.desc || '')}"></td>
-      ${RESURSE.map(r => `<td><input type="number" data-ef="${r}" value="${c.efect?.[r] ?? 0}" style="width:70px"></td>`).join('')}
-      <td><input type="number" data-ef="profit" value="${c.efect?.profit ?? 0}" style="width:70px"></td>
-      <td><button class="mic pericol">șterge</button></td>`;
-    $$('input', tr).forEach(x => x.addEventListener('input', () => {
-      if (x.dataset.k) { if (x.dataset.k === 'id') redenumesteCarte(c.id, x.value.trim()); else c[x.dataset.k] = x.value; }
-      else { c.efect = c.efect || {}; c.efect[x.dataset.ef] = numar(x.value); }
-      marcheaza('carti.json');
-    }));
-    $('button', tr).addEventListener('click', () => {
-      const folosita = sit().some(s => s.optiuni.some(o => o.carte === c.id || (o.cerinte?.carti || []).includes(c.id)) || (s.cerinte?.carti || []).includes(c.id) || (s.cerinte?.fara_carti || []).includes(c.id));
-      if (folosita && !confirm('Cartea e folosită de situații. O ștergi oricum? (salvarea va da eroare până scoți referințele)')) return;
-      carti().splice(i, 1); marcheaza('carti.json'); randeazaCarti();
-    });
-    tb.appendChild(tr);
+  const q = $('#cauta-carte').value.toLowerCase();
+  const ul = $('#lista-carti'); ul.innerHTML = '';
+  for (const c of carti()) {
+    if (q && !(c.id + ' ' + c.nume + ' ' + (c.desc || '')).toLowerCase().includes(q)) continue;
+    const ef = c.efect || {};
+    const rezumat = [...RESURSE.map(r => ef[r] ? `${NUME_RESURSE[r]} ${ef[r] > 0 ? '+' : ''}${ef[r]}` : ''), ef.profit ? `profit ${ef.profit > 0 ? '+' : ''}${ef.profit}` : ''].filter(Boolean).join(', ') || 'fără efect';
+    const li = document.createElement('li');
+    li.className = c.id === carteCurenta ? 'activ' : '';
+    li.innerHTML = `<div><b>${esc(c.icon ? c.icon + ' ' : '')}${esc(c.nume)}</b><small>${esc(c.id)} · ${esc(rezumat)} · dată de ${undeSePrimeste(c.id).length} opțiuni</small></div><button class="mic pericol sterge" title="Șterge cartea">×</button>`;
+    li.addEventListener('click', () => deschideCarte(c.id));
+    $('.sterge', li).addEventListener('click', e => { e.stopPropagation(); stergeCarte(c.id); });
+    ul.appendChild(li);
+  }
+}
+function undeSePrimeste(id) {
+  const out = [];
+  for (const s of sit()) s.optiuni.forEach((o, i) => { if (o.carte === id) out.push({ id: s.id, titlu: s.titlu, optiune: i, text: o.text }); });
+  return out;
+}
+function undeECeruta(id) {
+  const out = [];
+  for (const s of sit()) {
+    if ((s.cerinte?.carti || []).includes(id)) out.push({ id: s.id, titlu: s.titlu, cum: 'cere cartea' });
+    if ((s.cerinte?.fara_carti || []).includes(id)) out.push({ id: s.id, titlu: s.titlu, cum: 'exclusă de carte' });
+    s.optiuni.forEach((o, i) => { if ((o.cerinte?.carti || []).includes(id)) out.push({ id: s.id, titlu: s.titlu, cum: `opțiunea ${i + 1} cere cartea` }); });
+  }
+  return out;
+}
+function deschideCarte(id) {
+  carteCurenta = id; randeazaCarti(); arataTab('carti');
+  const c = carti().find(x => x.id === id); if (!c) return;
+  const ef = c.efect || {};
+  const primita = undeSePrimeste(id), ceruta = undeECeruta(id);
+  const el = $('#editor-carte');
+  el.innerHTML = `
+    <div class="card">
+      <h2>${esc(c.icon ? c.icon + ' ' : '')}${esc(c.nume)} <span class="nota">· ${esc(c.id)}</span></h2>
+      <div class="rand r3">
+        <div><label>Id (fără spații; e folosit la opțiuni)</label><input type="text" id="k-id" value="${esc(c.id)}"></div>
+        <div><label>Nume</label><input type="text" id="k-nume" value="${esc(c.nume)}"></div>
+        <div><label>Iconiță (emoji, opțional)</label><input type="text" id="k-icon" value="${esc(c.icon || '')}" placeholder="🍕"></div>
+      </div>
+      <div class="rand"><div><label>Descriere (ce vede jucătorul)</label><textarea id="k-desc">${esc(c.desc || '')}</textarea></div></div>
+
+      <h3>Efect când e folosită</h3>
+      <div class="rand r4">
+        ${RESURSE.map(r => `<div><label>${NUME_RESURSE[r]} ±</label><input type="number" class="k-ef" data-r="${r}" value="${ef[r] ?? 0}"></div>`).join('')}
+        <div><label>Profit (mii lei, intră în bilanțul anului)</label><input type="number" class="k-ef" data-r="profit" value="${ef.profit ?? 0}"></div>
+      </div>
+
+      <h3>Unde se primește</h3>
+      ${primita.length ? `<ul class="nota" style="margin:0; padding-left:18px">${primita.map(l => `<li><a data-sare="${esc(l.id)}" style="color:var(--accent);cursor:pointer">${esc(l.titlu)}</a>, opțiunea ${l.optiune + 1}: „${esc(l.text)}”</li>`).join('')}</ul>`
+        : '<p class="nota">Nicio opțiune nu dă cartea asta încă. O setezi la o situație, la opțiune, în câmpul „Dă cartea”.</p>'}
+      ${ceruta.length ? `<h3>Unde e cerută</h3><ul class="nota" style="margin:0; padding-left:18px">${ceruta.map(l => `<li><a data-sare="${esc(l.id)}" style="color:var(--accent);cursor:pointer">${esc(l.titlu)}</a>: ${esc(l.cum)}</li>`).join('')}</ul>` : ''}
+
+      <div style="display:flex; gap:8px; margin-top:16px">
+        <div style="flex:1"></div>
+        <button id="k-dubleaza">Dublează cartea</button>
+        <button class="pericol" id="k-sterge">Șterge cartea</button>
+        <button class="primar" id="k-salveaza">Salvează</button>
+      </div>
+    </div>`;
+  $$('[data-sare]', el).forEach(a => a.addEventListener('click', () => { citesteEditorCarte(); deschide(a.dataset.sare); }));
+  $$('input, textarea', el).forEach(x => x.addEventListener('input', () => { citesteEditorCarte(); marcheaza('carti.json'); }));
+  $('#k-salveaza', el).addEventListener('click', salveazaCarti);
+  $('#k-sterge', el).addEventListener('click', () => stergeCarte(c.id));
+  $('#k-dubleaza', el).addEventListener('click', () => {
+    citesteEditorCarte();
+    const copie = JSON.parse(JSON.stringify(c)); copie.id = c.id + '-copie'; copie.nume += ' (copie)';
+    while (carti().some(x => x.id === copie.id)) copie.id += '-2';
+    carti().push(copie); marcheaza('carti.json'); deschideCarte(copie.id);
   });
+}
+function citesteEditorCarte() {
+  if (!carteCurenta) return;
+  const c = carti().find(x => x.id === carteCurenta); if (!c) return;
+  const el = $('#editor-carte'); if (!$('#k-id', el)) return;
+  const idNou = $('#k-id', el).value.trim().replace(/\s+/g, '-');
+  if (idNou && idNou !== c.id) {
+    if (carti().some(x => x.id === idNou)) alert('Există deja o carte cu id-ul ' + idNou);
+    else { redenumesteCarte(c.id, idNou); carteCurenta = idNou; }
+  }
+  c.nume = $('#k-nume', el).value;
+  const icon = $('#k-icon', el).value.trim(); if (icon) c.icon = icon; else delete c.icon;
+  c.desc = $('#k-desc', el).value;
+  c.efect = {};
+  for (const x of $$('.k-ef', el)) { const v = numar(x.value); if (v) c.efect[x.dataset.r] = v; }
+  randeazaCarti();
+}
+function stergeCarte(id) {
+  const c = carti().find(x => x.id === id); if (!c) return;
+  const primita = undeSePrimeste(id), ceruta = undeECeruta(id);
+  let mesaj = `Ștergi cartea „${c.nume}”?`;
+  if (primita.length || ceruta.length) mesaj += `\n\nE folosită în ${primita.length + ceruta.length} locuri; referințele vor fi scoase de la situații.`;
+  if (!confirm(mesaj)) return;
+  for (const s of sit()) {
+    for (const o of s.optiuni) { if (o.carte === id) delete o.carte; if (o.cerinte?.carti) { o.cerinte.carti = o.cerinte.carti.filter(x => x !== id); if (!o.cerinte.carti.length) delete o.cerinte.carti; if (!Object.keys(o.cerinte).length) delete o.cerinte; } }
+    for (const k of ['carti', 'fara_carti']) if (s.cerinte?.[k]) { s.cerinte[k] = s.cerinte[k].filter(x => x !== id); if (!s.cerinte[k].length) delete s.cerinte[k]; }
+  }
+  if (primita.length || ceruta.length) marcheaza('situatii.json');
+  C['carti.json'].carti = carti().filter(x => x.id !== id);
+  if (carteCurenta === id) { carteCurenta = null; $('#editor-carte').innerHTML = '<div class="card nota">Cartea a fost ștearsă (nesalvat încă). Apasă „Salvează” ca să rămână așa.</div>'; }
+  marcheaza('carti.json'); randeazaCarti();
 }
 function redenumesteCarte(vechi, nou) {
   const c = carti().find(x => x.id === vechi); if (!c || !nou || vechi === nou) return;
@@ -602,8 +691,19 @@ function redenumesteCarte(vechi, nou) {
   }
   marcheaza('situatii.json');
 }
-$('#carte-noua').addEventListener('click', () => { let n = carti().length + 1, id = 'carte-' + n; while (carti().some(c => c.id === id)) id = 'carte-' + (++n); carti().push({ id, nume: 'Carte nouă', desc: '', efect: { buget: 0, bunastare: 0, legalitate: 0 } }); marcheaza('carti.json'); randeazaCarti(); });
-$('#salveaza-carti').addEventListener('click', async () => { await salveaza('carti.json'); if (nesalvat.has('situatii.json')) await salveaza('situatii.json'); });
+async function salveazaCarti() {
+  citesteEditorCarte(); citesteEditor();
+  // situațiile se salvează primele când o carte a fost ștearsă sau redenumită, ca validarea să nu găsească referințe moarte
+  if (nesalvat.has('situatii.json')) await salveaza('situatii.json');
+  await salveaza('carti.json');
+}
+$('#carte-noua').addEventListener('click', () => {
+  citesteEditorCarte();
+  let n = carti().length + 1, id = 'carte-' + n; while (carti().some(c => c.id === id)) id = 'carte-' + (++n);
+  carti().push({ id, nume: 'Carte nouă', desc: '', efect: { bunastare: 5 } });
+  marcheaza('carti.json'); deschideCarte(id);
+});
+$('#salveaza-carti').addEventListener('click', salveazaCarti);
 
 // ------------------------------------------------------------------ niveluri
 function randeazaNiveluri() {

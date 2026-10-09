@@ -5,13 +5,70 @@
       "id": "primul-angajat",
       "titlu": "Primul angajat",
       "text": "Ai prea mult de lucru pentru un singur om. Mama zice că nepotul tău „e băiat bun și n-are serviciu”.",
-      "an_min": 1, "an_max": 1, "greutate": 3,
+      "an_min": 1,
+      "an_max": 1,
+      "greutate": 3,
       "cerinte": {},
       "optiuni": [
-        { "text": "Angajezi nepotul.", "ef": { "buget": 4, "bunastare": -3, "legalitate": 0 }, "profit": 10, "flaguri": ["nepot-angajat"], "urmatoare": ["nepotul-greseste"], "teme": { "angajari": 2, "salarii": -1 } },
-        { "text": "Anunț, interviuri serioase, salariu peste piață.", "ef": { "buget": -8, "bunastare": 6, "legalitate": 2 }, "profit": 20, "carte": "petrecere-cu-pizza", "teme": { "angajari": -2, "salarii": 2 } },
-        { "text": "Un junior pe minim, îl înveți tu.", "ef": { "buget": 5, "bunastare": -2, "legalitate": 0 }, "profit": 15, "teme": { "angajari": -1, "salarii": -2 } },
-        { "text": "Un fost coleg de facultate, salariu corect.", "ef": { "buget": -4, "bunastare": 3, "legalitate": 0 }, "profit": 15, "teme": { "angajari": 1, "salarii": 1 } }
+        {
+          "text": "Angajezi nepotul.",
+          "ef": {
+            "buget": 4,
+            "bunastare": -3,
+            "legalitate": 0
+          },
+          "profit": 10,
+          "flaguri": [
+            "nepot-angajat"
+          ],
+          "urmatoare": [
+            "nepotul-greseste"
+          ],
+          "teme": {
+            "angajari": 2,
+            "salarii": -1
+          }
+        },
+        {
+          "text": "Anunț, interviuri serioase, salariu peste piață.",
+          "ef": {
+            "buget": -8,
+            "bunastare": 6,
+            "legalitate": 2
+          },
+          "profit": 20,
+          "carte": "petrecere-cu-pizza",
+          "teme": {
+            "angajari": -2,
+            "salarii": 2
+          }
+        },
+        {
+          "text": "Un junior pe minim, îl înveți tu.",
+          "ef": {
+            "buget": 5,
+            "bunastare": -2,
+            "legalitate": 0
+          },
+          "profit": 15,
+          "teme": {
+            "angajari": -1,
+            "salarii": -2
+          }
+        },
+        {
+          "text": "Un fost coleg de facultate, salariu corect.",
+          "ef": {
+            "buget": -4,
+            "bunastare": 3,
+            "legalitate": 0
+          },
+          "profit": 15,
+          "teme": {
+            "angajari": 1,
+            "salarii": 1
+          }
+        }
       ]
     },
     {
@@ -19,85 +76,403 @@
       "titlu": "Nepotul a greșit comanda",
       "text": "Nepotul a trimis marfa la adresa greșită. Clientul e furios, iar mama te-a sunat deja să nu te superi pe el.",
       "doar_legata": true,
-      "cerinte": { "flaguri": ["nepot-angajat"] },
+      "cerinte": {
+        "flaguri": [
+          "nepot-angajat"
+        ]
+      },
       "optiuni": [
-        { "text": "Îl ții, dar îl muți la depozit.", "ef": { "buget": -3, "bunastare": 0, "legalitate": 0 }, "profit": -5, "teme": { "angajari": 1 } },
-        { "text": "Îl dai afară. Familia e familie, firma e firmă.", "ef": { "buget": 0, "bunastare": 4, "legalitate": 0 }, "profit": 0, "flaguri": ["nepot-concediat"], "teme": { "angajari": -2 } },
-        { "text": "Plătești tu paguba și nu zici nimic.", "ef": { "buget": -6, "bunastare": -2, "legalitate": 0 }, "profit": -10, "teme": { "angajari": 2, "control": -1 } }
+        {
+          "text": "Îl ții, dar îl muți la depozit.",
+          "ef": {
+            "buget": -3,
+            "bunastare": 0,
+            "legalitate": 0
+          },
+          "profit": -5,
+          "teme": {
+            "angajari": 1
+          }
+        },
+        {
+          "text": "Îl dai afară. Familia e familie, firma e firmă.",
+          "ef": {
+            "buget": 0,
+            "bunastare": 4,
+            "legalitate": 0
+          },
+          "profit": 0,
+          "flaguri": [
+            "nepot-concediat"
+          ],
+          "teme": {
+            "angajari": -2
+          }
+        },
+        {
+          "text": "Plătești tu paguba și nu zici nimic.",
+          "ef": {
+            "buget": -6,
+            "bunastare": -2,
+            "legalitate": 0
+          },
+          "profit": -10,
+          "teme": {
+            "angajari": 2,
+            "control": -1
+          }
+        }
       ]
     },
     {
       "id": "fara-factura",
       "titlu": "Fără factură?",
       "text": "Clientul se uită în stânga și-n dreapta: „Nu se poate și fără TVA? Cash, acum.”",
-      "an_min": 1, "an_max": 2, "greutate": 2,
+      "an_min": 1,
+      "an_max": 2,
+      "greutate": 2,
       "cerinte": {},
       "optiuni": [
-        { "text": "Accepți. E început.", "ef": { "buget": 7, "bunastare": 0, "legalitate": -8 }, "profit": 25, "teme": { "fisc": 2, "clienti": 1 } },
-        { "text": "Doar cu factură.", "ef": { "buget": -3, "bunastare": 2, "legalitate": 4 }, "profit": 5, "teme": { "fisc": -2, "clienti": -1 } },
-        { "text": "Îi explici că TVA-ul îl deduce și el. Semnați contract.", "ef": { "buget": 1, "bunastare": 1, "legalitate": 3 }, "profit": 15, "carte": "team-building", "teme": { "fisc": -1, "clienti": -2 } }
+        {
+          "text": "Accepți. E început.",
+          "ef": {
+            "buget": 7,
+            "bunastare": 0,
+            "legalitate": -8
+          },
+          "profit": 25,
+          "teme": {
+            "fisc": 2,
+            "clienti": 1
+          }
+        },
+        {
+          "text": "Doar cu factură.",
+          "ef": {
+            "buget": -3,
+            "bunastare": 2,
+            "legalitate": 4
+          },
+          "profit": 5,
+          "teme": {
+            "fisc": -2,
+            "clienti": -1
+          }
+        },
+        {
+          "text": "Îi explici că TVA-ul îl deduce și el. Semnați contract.",
+          "ef": {
+            "buget": 1,
+            "bunastare": 1,
+            "legalitate": 3
+          },
+          "profit": 15,
+          "carte": "team-building",
+          "teme": {
+            "fisc": -1,
+            "clienti": -2
+          }
+        }
       ]
     },
     {
       "id": "contabilul",
       "titlu": "Contabilul",
       "text": "Primul decont de TVA bate la ușă. Vecinul zice că are „o doamnă care face contabilitate, 300 de lei și e în regulă”.",
-      "an_min": 1, "an_max": 2, "greutate": 2,
+      "an_min": 1,
+      "an_max": 2,
+      "greutate": 2,
       "cerinte": {},
       "optiuni": [
-        { "text": "O iei pe doamna de la vecinul.", "ef": { "buget": 3, "bunastare": 0, "legalitate": -3 }, "profit": 5, "teme": { "fisc": 1, "control": -1 } },
-        { "text": "Firmă de contabilitate serioasă. Scump, dar dormi noaptea.", "ef": { "buget": -6, "bunastare": 1, "legalitate": 6 }, "profit": 0, "carte": "petrecere-cu-standup", "flaguri": ["contabil-serios"], "teme": { "fisc": -2, "control": -1 } },
-        { "text": "Îți faci singur contabilitatea, în Excel.", "ef": { "buget": 2, "bunastare": -2, "legalitate": -5 }, "profit": 5, "teme": { "fisc": 0, "control": 2 } }
+        {
+          "text": "O iei pe doamna de la vecinul.",
+          "ef": {
+            "buget": 3,
+            "bunastare": 0,
+            "legalitate": -3
+          },
+          "profit": 5,
+          "teme": {
+            "fisc": 1,
+            "control": -1
+          }
+        },
+        {
+          "text": "Firmă de contabilitate serioasă. Scump, dar dormi noaptea.",
+          "ef": {
+            "buget": -6,
+            "bunastare": 1,
+            "legalitate": 6
+          },
+          "profit": 0,
+          "carte": "petrecere-cu-standup",
+          "flaguri": [
+            "contabil-serios"
+          ],
+          "teme": {
+            "fisc": -2,
+            "control": -1
+          }
+        },
+        {
+          "text": "Îți faci singur contabilitatea, în Excel.",
+          "ef": {
+            "buget": 2,
+            "bunastare": -2,
+            "legalitate": -5
+          },
+          "profit": 5,
+          "teme": {
+            "fisc": 0,
+            "control": 2
+          }
+        }
       ]
     },
     {
       "id": "licitatia",
       "titlu": "Licitația de la Primărie",
       "text": "Primăria scoate la licitație exact ce faci tu. Un cunoscut îți șoptește că viceprimarul „bea cafeaua la 10 la Ambasador”.",
-      "an_min": 2, "an_max": 4, "greutate": 2,
-      "cerinte": { "nivel_min": 3 },
+      "an_min": 2,
+      "an_max": 4,
+      "greutate": 2,
+      "cerinte": {
+        "nivel_min": 3
+      },
       "optiuni": [
-        { "text": "Participi corect, cu oferta cea mai bună.", "ef": { "buget": 5, "bunastare": 1, "legalitate": 2 }, "profit": 40, "teme": { "stat": 1, "fisc": -2 } },
-        { "text": "Participi, după cafea.", "ef": { "buget": 15, "bunastare": 0, "legalitate": -12 }, "profit": 90, "carte": "petrecere-concert", "flaguri": ["cafea-la-primarie"], "teme": { "stat": 2, "fisc": 2 } },
-        { "text": "Nu lucrezi cu statul.", "ef": { "buget": 0, "bunastare": 0, "legalitate": 1 }, "profit": 0, "teme": { "stat": -2, "fisc": 0 } },
-        { "text": "Contract-cadru direct cu ministerul, fără licitație.", "ef": { "buget": 25, "bunastare": 0, "legalitate": -6 }, "profit": 200, "cerinte": { "nivel_min": 10 }, "teme": { "stat": 2, "fisc": 1 } }
+        {
+          "text": "Participi corect, cu oferta cea mai bună.",
+          "ef": {
+            "buget": 5,
+            "bunastare": 1,
+            "legalitate": 2
+          },
+          "profit": 40,
+          "teme": {
+            "stat": 1,
+            "fisc": -2
+          }
+        },
+        {
+          "text": "Participi, după cafea.",
+          "ef": {
+            "buget": 15,
+            "bunastare": 0,
+            "legalitate": -12
+          },
+          "profit": 90,
+          "carte": "petrecere-concert",
+          "flaguri": [
+            "cafea-la-primarie"
+          ],
+          "teme": {
+            "stat": 2,
+            "fisc": 2
+          }
+        },
+        {
+          "text": "Nu lucrezi cu statul.",
+          "ef": {
+            "buget": 0,
+            "bunastare": 0,
+            "legalitate": 1
+          },
+          "profit": 0,
+          "teme": {
+            "stat": -2,
+            "fisc": 0
+          }
+        },
+        {
+          "text": "Contract-cadru direct cu ministerul, fără licitație.",
+          "ef": {
+            "buget": 25,
+            "bunastare": 0,
+            "legalitate": -6
+          },
+          "profit": 200,
+          "cerinte": {
+            "nivel_min": 10
+          },
+          "teme": {
+            "stat": 2,
+            "fisc": 1
+          }
+        }
       ]
     },
     {
       "id": "controlul-anaf",
       "titlu": "Controlul ANAF",
       "text": "Doi inspectori la ușă, cu mapă. „Avem o sesizare.”",
-      "an_min": 2, "an_max": 4, "greutate": 2,
-      "cerinte": { "fara_flaguri": ["contabil-serios"] },
+      "an_min": 2,
+      "an_max": 4,
+      "greutate": 2,
+      "cerinte": {
+        "fara_flaguri": [
+          "contabil-serios"
+        ]
+      },
       "optiuni": [
-        { "text": "Le dai toate actele.", "ef": { "buget": -2, "bunastare": 1, "legalitate": 5 }, "profit": -5, "teme": { "fisc": -2, "control": -1 } },
-        { "text": "Suni „pe cineva”.", "ef": { "buget": -6, "bunastare": 0, "legalitate": -8 }, "profit": 0, "cerinte": { "flaguri": ["cafea-la-primarie"] }, "teme": { "fisc": 2, "control": 0 } },
-        { "text": "Plătești amenda și mergi mai departe.", "ef": { "buget": -8, "bunastare": 0, "legalitate": 0 }, "profit": -20, "teme": { "fisc": 0, "control": 0 } }
+        {
+          "text": "Le dai toate actele.",
+          "ef": {
+            "buget": -2,
+            "bunastare": 1,
+            "legalitate": 5
+          },
+          "profit": -5,
+          "teme": {
+            "fisc": -2,
+            "control": -1
+          }
+        },
+        {
+          "text": "Suni „pe cineva”.",
+          "ef": {
+            "buget": -6,
+            "bunastare": 0,
+            "legalitate": -8
+          },
+          "profit": 0,
+          "cerinte": {
+            "flaguri": [
+              "cafea-la-primarie"
+            ]
+          },
+          "teme": {
+            "fisc": 2,
+            "control": 0
+          }
+        },
+        {
+          "text": "Plătești amenda și mergi mai departe.",
+          "ef": {
+            "buget": -8,
+            "bunastare": 0,
+            "legalitate": 0
+          },
+          "profit": -20,
+          "teme": {
+            "fisc": 0,
+            "control": 0
+          }
+        }
       ]
     },
     {
       "id": "mariri",
       "titlu": "Măriri",
       "text": "Inflația a mâncat 10% și trei oameni au trecut „întâmplător” pe lângă biroul tău cu o față anume.",
-      "an_min": 2, "an_max": 4, "greutate": 2,
+      "an_min": 2,
+      "an_max": 4,
+      "greutate": 2,
       "cerinte": {},
       "optiuni": [
-        { "text": "Mărești tuturor cu 15%.", "ef": { "buget": -10, "bunastare": 10, "legalitate": 0 }, "profit": -30, "teme": { "salarii": 2, "control": -1 } },
-        { "text": "Doar celor care vin să ceară, „între noi”.", "ef": { "buget": -4, "bunastare": -3, "legalitate": 0 }, "profit": -10, "teme": { "salarii": 0, "control": 2 } },
-        { "text": "Nicio mărire, „e un an greu”.", "ef": { "buget": 0, "bunastare": -8, "legalitate": 0 }, "profit": 10, "teme": { "salarii": -2, "control": 1 } },
-        { "text": "Bonus pe performanță, cu criterii scrise.", "ef": { "buget": -6, "bunastare": 5, "legalitate": 1 }, "profit": -15, "teme": { "salarii": 1, "control": -1 } }
+        {
+          "text": "Mărești tuturor cu 15%.",
+          "ef": {
+            "buget": -10,
+            "bunastare": 10,
+            "legalitate": 0
+          },
+          "profit": -30,
+          "teme": {
+            "salarii": 2,
+            "control": -1
+          }
+        },
+        {
+          "text": "Doar celor care vin să ceară, „între noi”.",
+          "ef": {
+            "buget": -4,
+            "bunastare": -3,
+            "legalitate": 0
+          },
+          "profit": -10,
+          "teme": {
+            "salarii": 0,
+            "control": 2
+          }
+        },
+        {
+          "text": "Nicio mărire, „e un an greu”.",
+          "ef": {
+            "buget": 0,
+            "bunastare": -8,
+            "legalitate": 0
+          },
+          "profit": 10,
+          "teme": {
+            "salarii": -2,
+            "control": 1
+          }
+        },
+        {
+          "text": "Bonus pe performanță, cu criterii scrise.",
+          "ef": {
+            "buget": -6,
+            "bunastare": 5,
+            "legalitate": 1
+          },
+          "profit": -15,
+          "teme": {
+            "salarii": 1,
+            "control": -1
+          }
+        }
       ]
     },
     {
       "id": "sediul-nou",
       "titlu": "Sediul nou",
       "text": "Ați crescut și nu mai încăpeți. Banca îți oferă credit pe 15 ani, agentul imobiliar îți arată o clădire de sticlă „cu vizibilitate”.",
-      "an_min": 2, "an_max": 4, "greutate": 1,
-      "cerinte": { "nivel_min": 2 },
+      "an_min": 2,
+      "an_max": 4,
+      "greutate": 1,
+      "cerinte": {
+        "nivel_min": 2
+      },
       "optiuni": [
-        { "text": "Cumperi clădire cu credit pe 15 ani.", "ef": { "buget": -15, "bunastare": 2, "legalitate": 0 }, "profit": -60, "teme": { "risc": 2, "imagine": 1 } },
-        { "text": "Rămâi în chirie.", "ef": { "buget": 0, "bunastare": 0, "legalitate": 0 }, "profit": 0, "teme": { "risc": -2, "imagine": -1 } },
-        { "text": "Închiriezi ceva mai mare, cu opțiune de cumpărare.", "ef": { "buget": -5, "bunastare": 2, "legalitate": 0 }, "profit": -20, "teme": { "risc": 0, "imagine": 0 } }
+        {
+          "text": "Cumperi clădire cu credit pe 15 ani.",
+          "ef": {
+            "buget": -15,
+            "bunastare": 2,
+            "legalitate": 0
+          },
+          "profit": -60,
+          "teme": {
+            "risc": 2,
+            "imagine": 1
+          }
+        },
+        {
+          "text": "Rămâi în chirie.",
+          "ef": {
+            "buget": 0,
+            "bunastare": 0,
+            "legalitate": 0
+          },
+          "profit": 0,
+          "teme": {
+            "risc": -2,
+            "imagine": -1
+          }
+        },
+        {
+          "text": "Închiriezi ceva mai mare, cu opțiune de cumpărare.",
+          "ef": {
+            "buget": -5,
+            "bunastare": 2,
+            "legalitate": 0
+          },
+          "profit": -20,
+          "teme": {
+            "risc": 0,
+            "imagine": 0
+          }
+        }
       ]
     }
   ]
