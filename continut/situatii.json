@@ -3729,7 +3729,10 @@
             "bunastare": 6
           },
           "profit": -20,
-          "carte": "team-building",
+          "carte": [
+            "seara-cu-casa-inchisa",
+            "team-building"
+          ],
           "teme": {
             "salarii": 2
           }
