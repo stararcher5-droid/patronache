@@ -402,13 +402,18 @@ function ecranBilant() {
 
 function ecranBilantRezultat(b) {
   const nivelNou = CONT.niveluri[b.nivel - 1];
-  const dir = b.nivel > b.nivel_vechi ? 'Firma a crescut' : b.nivel < b.nivel_vechi ? 'Firma a scăzut' : 'Firma a rămas la același nivel';
-  const urmator = CONT.niveluri[b.nivel] ? `Pentru nivelul ${b.nivel + 1} (${esc(CONT.niveluri[b.nivel].nume)}) îți trebuie ${CONT.niveluri[b.nivel].prag} mii lei profit total.` : 'Ești la nivelul maxim.';
+  const urcat = b.nivel > b.nivel_vechi, coborat = b.nivel < b.nivel_vechi;
+  const dir = urcat ? 'Firma a crescut' : coborat ? 'Firma a scăzut' : `Rămâi la nivelul ${b.nivel}`;
+  const urm = CONT.niveluri[b.nivel];
+  const urmator = urm ? `Pentru nivelul ${b.nivel + 1} (${esc(urm.nume)}) îți trebuie ${urm.prag} mii lei profit total; mai ai de făcut ${Math.max(0, urm.prag - b.profit_total)} mii.` : 'Ești la nivelul maxim.';
+  const plachete = urcat || coborat
+    ? `<div class="n">${b.nivel_vechi}</div><span>→</span><div class="n nou">${b.nivel}</div>`
+    : `<div class="n nou">${b.nivel}</div>`;
   return antet() + `
     <div class="card intra">
       <div class="cand">Anul ${b.an} s-a încheiat</div>
       <h1>${dir}</h1>
-      <div class="nivel-salt"><div class="n">${b.nivel_vechi}</div><span>→</span><div class="n nou">${b.nivel}</div><div><b>${esc(nivelNou.nume)}</b><br><span class="gol">${esc(nivelNou.desc || '')}</span></div></div>
+      <div class="nivel-salt">${plachete}<div><b>${esc(nivelNou.nume)}</b><br><span class="gol">${esc(nivelNou.desc || '')}</span></div></div>
       <table class="tabel">
         ${b.profit_baza ? `<tr><td>Activitatea curentă a firmei${b.profit_baza !== CONT.profit_de_baza_pe_an ? ` <span class="gol">(de bază ${semn(CONT.profit_de_baza_pe_an)}, modificată de alegerile tale)</span>` : ''}</td><td>${semn(b.profit_baza)} mii</td></tr><tr><td>Efectul alegerilor tale</td><td style="color:${b.profit_alegeri >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(b.profit_alegeri)} mii</td></tr>` : ''}
         <tr><td>Profitul anului</td><td style="color:${b.profit_an >= 0 ? 'var(--ok)' : 'var(--rau)'}">${semn(b.profit_an)} mii</td></tr>
