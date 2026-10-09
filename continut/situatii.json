@@ -1901,7 +1901,8 @@
           "teme": {
             "control": 1,
             "angajari": 2
-          }
+          },
+          "ia_carte": "oricare"
         }
       ]
     },
@@ -3193,7 +3194,8 @@
           "teme": {
             "program": 2,
             "control": 2
-          }
+          },
+          "ia_carte": "oricare"
         }
       ]
     },
@@ -3344,7 +3346,8 @@
           "teme": {
             "salarii": -2,
             "control": 2
-          }
+          },
+          "ia_carte": "oricare"
         },
         {
           "text": "Angajezi pe altcineva pe perioadă determinată și aștepți.",
