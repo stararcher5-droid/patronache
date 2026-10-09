@@ -517,13 +517,13 @@ function randeazaHarta() {
     if (B.x > A.x) {
       // coloană mai la dreapta: curbă în S între marginea dreaptă a sursei și marginea stângă a țintei
       const x2 = B.x, y2 = B.y + H / 2, cx = (x1 + x2) / 2;
-      svg += `<path class="leg" d="M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}"/>`;
-      mx = x1 + 26; my = y1 + (y2 - y1) * 0.06;
+      svg += `<path class="leg" data-leg="${esc(s.id)}|${oi}|${esc(u)}" d="M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}"/>`;
+      mx = x1 + 26; my = y1;
     } else {
       // aceeași coloană sau la stânga: ocolim pe dreapta, pe canalul dintre coloane, și intrăm tot pe dreapta țintei
       const x2 = B.x + W, y2 = B.y + H / 2, ocol = Math.max(x1, x2) + 24;
-      svg += `<path class="leg" d="M${x1},${y1} C${ocol},${y1} ${ocol},${y2} ${x2},${y2}"/>`;
-      mx = x1 + 18; my = y1 + (y2 > y1 ? 10 : -10);
+      svg += `<path class="leg" data-leg="${esc(s.id)}|${oi}|${esc(u)}" d="M${x1},${y1} C${ocol},${y1} ${ocol},${y2} ${x2},${y2}"/>`;
+      mx = x1 + 18; my = y1;
     }
     butoane += `<g class="sterge-leg" data-sursa="${esc(s.id)}" data-opt="${oi}" data-tinta="${esc(u)}"><title>Opțiunea ${oi + 1}: „${esc(o.text)}” deschide „${esc(poz[u].s.titlu)}”. Clic ca să scoți legătura.</title><circle cx="${mx}" cy="${my}" r="8"/><text x="${mx}" y="${my + 4}" text-anchor="middle">×</text></g>`;
   } });
@@ -533,6 +533,14 @@ function randeazaHarta() {
   }
   el.innerHTML = svg + butoane + '</svg>';
   const svgEl = $('svg', el);
+  // × stă exact pe curbă, la 30px de la ieșirea din căsuța-sursă
+  $$('.sterge-leg', el).forEach(g => {
+    const cale = svgEl.querySelector(`path[data-leg="${CSS.escape(g.dataset.sursa + '|' + g.dataset.opt + '|' + g.dataset.tinta)}"]`);
+    if (!cale) return;
+    const pt = cale.getPointAtLength(Math.min(30, cale.getTotalLength() / 2));
+    $('circle', g).setAttribute('cx', pt.x); $('circle', g).setAttribute('cy', pt.y);
+    $('text', g).setAttribute('x', pt.x); $('text', g).setAttribute('y', pt.y + 4);
+  });
   $('#harta-stare').textContent = nesalvat.has('situatii.json') ? 'legături nesalvate' : '';
 
   // clic pe situație = editor (dar nu când tragem); tragere cu căsuța = mutare în altă coloană (alt nivel)
