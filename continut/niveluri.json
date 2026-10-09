@@ -11,19 +11,19 @@
       "nivel": 2,
       "nume": "Sediu bun",
       "desc": "Un birou adevărat, cu firmă pe ușă și cafea la capsule.",
-      "prag": 150
+      "prag": 100
     },
     {
       "nivel": 3,
       "nume": "Firmă regională",
       "desc": "Două sedii, un depozit și un director de vânzări.",
-      "prag": 500
+      "prag": 300
     },
     {
       "nivel": 4,
       "nume": "Imperiu",
       "desc": "Ai număr direct la minister. Statul vrea să lucreze cu tine.",
-      "prag": 1200
+      "prag": 650
     }
   ]
 }
