@@ -14,8 +14,7 @@
           "text": "Angajezi nepotul.",
           "ef": {
             "buget": 4,
-            "bunastare": -3,
-            "legalitate": 0
+            "bunastare": -3
           },
           "profit": 10,
           "flaguri": [
@@ -47,8 +46,7 @@
           "text": "Un junior pe minim, îl înveți tu.",
           "ef": {
             "buget": 5,
-            "bunastare": -2,
-            "legalitate": 0
+            "bunastare": -2
           },
           "profit": 15,
           "teme": {
@@ -60,8 +58,7 @@
           "text": "Un fost coleg de facultate, salariu corect.",
           "ef": {
             "buget": -4,
-            "bunastare": 3,
-            "legalitate": 0
+            "bunastare": 3
           },
           "profit": 15,
           "teme": {
@@ -85,9 +82,7 @@
         {
           "text": "Îl ții, dar îl muți la depozit.",
           "ef": {
-            "buget": -3,
-            "bunastare": 0,
-            "legalitate": 0
+            "buget": -3
           },
           "profit": -5,
           "teme": {
@@ -97,11 +92,8 @@
         {
           "text": "Îl dai afară. Familia e familie, firma e firmă.",
           "ef": {
-            "buget": 0,
-            "bunastare": 4,
-            "legalitate": 0
+            "bunastare": 4
           },
-          "profit": 0,
           "flaguri": [
             "nepot-concediat"
           ],
@@ -113,8 +105,7 @@
           "text": "Plătești tu paguba și nu zici nimic.",
           "ef": {
             "buget": -6,
-            "bunastare": -2,
-            "legalitate": 0
+            "bunastare": -2
           },
           "profit": -10,
           "teme": {
@@ -137,7 +128,6 @@
           "text": "Accepți. E început.",
           "ef": {
             "buget": 7,
-            "bunastare": 0,
             "legalitate": -8
           },
           "profit": 25,
@@ -188,7 +178,6 @@
           "text": "O iei pe doamna de la vecinul.",
           "ef": {
             "buget": 3,
-            "bunastare": 0,
             "legalitate": -3
           },
           "profit": 5,
@@ -204,7 +193,6 @@
             "bunastare": 1,
             "legalitate": 6
           },
-          "profit": 0,
           "carte": "petrecere-cu-standup",
           "flaguri": [
             "contabil-serios"
@@ -257,7 +245,6 @@
           "text": "Participi, după cafea.",
           "ef": {
             "buget": 15,
-            "bunastare": 0,
             "legalitate": -12
           },
           "profit": 90,
@@ -273,11 +260,8 @@
         {
           "text": "Nu lucrezi cu statul.",
           "ef": {
-            "buget": 0,
-            "bunastare": 0,
             "legalitate": 1
           },
-          "profit": 0,
           "teme": {
             "stat": -2,
             "fisc": 0
@@ -287,7 +271,6 @@
           "text": "Contract-cadru direct cu ministerul, fără licitație.",
           "ef": {
             "buget": 25,
-            "bunastare": 0,
             "legalitate": -6
           },
           "profit": 200,
@@ -331,10 +314,8 @@
           "text": "Suni „pe cineva”.",
           "ef": {
             "buget": -6,
-            "bunastare": 0,
             "legalitate": -8
           },
-          "profit": 0,
           "cerinte": {
             "flaguri": [
               "cafea-la-primarie"
@@ -348,9 +329,7 @@
         {
           "text": "Plătești amenda și mergi mai departe.",
           "ef": {
-            "buget": -8,
-            "bunastare": 0,
-            "legalitate": 0
+            "buget": -8
           },
           "profit": -20,
           "teme": {
@@ -373,8 +352,7 @@
           "text": "Mărești tuturor cu 15%.",
           "ef": {
             "buget": -10,
-            "bunastare": 10,
-            "legalitate": 0
+            "bunastare": 10
           },
           "profit": -30,
           "teme": {
@@ -386,8 +364,7 @@
           "text": "Doar celor care vin să ceară, „între noi”.",
           "ef": {
             "buget": -4,
-            "bunastare": -3,
-            "legalitate": 0
+            "bunastare": -3
           },
           "profit": -10,
           "teme": {
@@ -398,9 +375,7 @@
         {
           "text": "Nicio mărire, „e un an greu”.",
           "ef": {
-            "buget": 0,
-            "bunastare": -8,
-            "legalitate": 0
+            "bunastare": -8
           },
           "profit": 10,
           "teme": {
@@ -438,8 +413,7 @@
           "text": "Cumperi clădire cu credit pe 15 ani.",
           "ef": {
             "buget": -15,
-            "bunastare": 2,
-            "legalitate": 0
+            "bunastare": 2
           },
           "profit": -60,
           "teme": {
@@ -449,12 +423,6 @@
         },
         {
           "text": "Rămâi în chirie.",
-          "ef": {
-            "buget": 0,
-            "bunastare": 0,
-            "legalitate": 0
-          },
-          "profit": 0,
           "teme": {
             "risc": -2,
             "imagine": -1
@@ -464,8 +432,7 @@
           "text": "Închiriezi ceva mai mare, cu opțiune de cumpărare.",
           "ef": {
             "buget": -5,
-            "bunastare": 2,
-            "legalitate": 0
+            "bunastare": 2
           },
           "profit": -20,
           "teme": {

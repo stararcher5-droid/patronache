@@ -366,8 +366,8 @@ function optiuneHtml(o, i, s) {
     <div class="cap"><b>Opțiunea ${i + 1}</b><button class="mic o-sus" title="mută mai sus">↑</button><button class="mic pericol o-sterge">șterge</button></div>
     <div class="rand"><div><label>Text</label><input type="text" class="o-text" value="${esc(o.text)}"></div></div>
     <div class="rand r6">
-      ${RESURSE.map(r => `<div><label>${NUME_RESURSE[r]} ±</label><input type="number" class="o-ef" data-r="${r}" value="${o.ef?.[r] ?? 0}"></div>`).join('')}
-      <div><label>Profit (mii lei)</label><input type="number" class="o-profit" value="${o.profit ?? 0}"></div>
+      ${RESURSE.map(r => `<div><label>${NUME_RESURSE[r]} ±</label><input type="number" class="o-ef" data-r="${r}" value="${o.ef?.[r] || ''}" placeholder="0"></div>`).join('')}
+      <div><label>Profit (mii lei)</label><input type="number" class="o-profit" value="${o.profit || ''}" placeholder="0"></div>
       <div><label>Dă cartea</label><select class="o-carte"><option value="">—</option>${carti().map(c => `<option value="${esc(c.id)}" ${o.carte === c.id ? 'selected' : ''}>${esc(c.nume)}</option>`).join('')}</select></div>
       <div><label>Pune flaguri (virgulă)</label><input type="text" class="o-flaguri" value="${esc((o.flaguri || []).join(', '))}" list="flaguri-cunoscute"></div>
     </div>
@@ -448,7 +448,8 @@ function citesteEditor() {
   s.optiuni = $$('.optiune', el).map((div, i) => {
     const vechi = s.optiuni[i] || {};
     const o = { text: $('.o-text', div).value, ef: {}, profit: numar($('.o-profit', div).value) };
-    for (const x of $$('.o-ef', div)) o.ef[x.dataset.r] = numar(x.value);
+    for (const x of $$('.o-ef', div)) { const v = numar(x.value); if (v) o.ef[x.dataset.r] = v; }   // doar ce se schimbă; o opțiune poate mișca o singură resursă sau niciuna
+    if (!o.profit) delete o.profit;
     const carte = $('.o-carte', div).value; if (carte) o.carte = carte;
     const f = lista($('.o-flaguri', div).value); if (f.length) o.flaguri = f;
     if (vechi.urmatoare && vechi.urmatoare.length) o.urmatoare = vechi.urmatoare;
