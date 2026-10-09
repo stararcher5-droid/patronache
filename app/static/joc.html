@@ -15,7 +15,8 @@
   html, body { margin:0; min-height:100%; }
   body { font:16px/1.5 Georgia, "Times New Roman", serif; color:var(--cerneala); background:var(--hartie);
     background-image:radial-gradient(circle at 20% 0%, #fff8e8 0, transparent 50%), radial-gradient(circle at 100% 100%, #efe3cc 0, transparent 45%); }
-  .pagina { max-width:760px; margin:0 auto; padding:16px 16px 60px; }
+  .pagina { max-width:760px; margin:0 auto; padding:16px 16px 60px; transition:max-width .2s; }
+  .pagina.larg { max-width:940px; }
   header.top { display:flex; align-items:center; gap:12px; padding:6px 0 14px; }
   header.top .sigla { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:24px; background:var(--accent); color:#fff; box-shadow:var(--umbra); }
   header.top .firma { flex:1; min-width:0; }
@@ -92,19 +93,32 @@
   .dezvaluire .btn { margin-top:6px; }
   .gol { color:var(--mut); font-family:system-ui, sans-serif; font-size:13px; }
   /* start */
-  .start h1 { font-size:34px; }
-  .camp { margin-bottom:14px; }
-  label { display:block; font-family:system-ui, sans-serif; font-size:12px; color:var(--mut); margin-bottom:4px; }
-  input[type=text] { width:100%; font:inherit; font-size:17px; padding:10px 12px; border:1.5px solid var(--linie); border-radius:10px; background:#fff; }
-  .domenii { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-  .domenii button { font:inherit; font-size:14px; display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; border:2px solid transparent; background:var(--hartie2); cursor:pointer; text-align:left; }
-  .domenii button .ic { font-size:22px; }
-  .domenii button.activ { border-color:var(--cerneala); background:#fff; }
-  @media (max-width:520px) { .domenii { grid-template-columns:1fr 1fr; } }
-  .alegeri { display:flex; flex-wrap:wrap; gap:8px; }
-  .alegeri button { font-size:22px; width:46px; height:46px; border-radius:10px; border:2px solid transparent; background:var(--hartie2); cursor:pointer; }
-  .alegeri button.activ { border-color:var(--cerneala); background:#fff; }
-  .alegeri .culoare { width:34px; height:34px; border-radius:99px; }
+  .start { padding:28px; }
+  .start-grid { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:10px 32px; align-items:start; }
+  .start-stanga, .start-dreapta, .start-jos { min-width:0; }
+  .start-stanga { grid-column:1; grid-row:1; } .start-dreapta { grid-column:2; grid-row:1 / span 2; } .start-jos { grid-column:1; grid-row:2; }
+  .start h1 { font-size:40px; line-height:1.05; margin:4px 0 12px; }
+  .start .text { font-size:16px; color:#4a3f30; }
+  .start-dreapta { background:var(--hartie); border:1px solid var(--linie); border-radius:14px; padding:18px; }
+  .camp { margin-bottom:16px; } .start-dreapta .camp:last-child { margin-bottom:0; }
+  label { display:block; font-family:system-ui, sans-serif; font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--mut); margin-bottom:6px; }
+  input[type=text] { width:100%; font:inherit; font-size:17px; padding:11px 13px; border:1.5px solid var(--linie); border-radius:10px; background:#fff; }
+  input[type=text]:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .domenii { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+  .domenii button { font:inherit; font-family:system-ui, sans-serif; font-size:12.5px; line-height:1.2; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-height:74px; padding:8px 6px; border-radius:10px; border:2px solid transparent; background:#fff; cursor:pointer; text-align:center; color:var(--cerneala); min-width:0; overflow-wrap:anywhere; }
+  .domenii button .ic { font-size:24px; line-height:1; }
+  .domenii button:hover { border-color:var(--linie); }
+  .domenii button.activ { border-color:var(--accent); background:#fff; box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .domeniu-desc { margin-top:8px; min-height:2.6em; }
+  .alegeri { display:grid; gap:8px; }
+  .alegeri.sigle { grid-template-columns:repeat(8,minmax(0,1fr)); }
+  .alegeri.culori { grid-template-columns:repeat(8,minmax(0,1fr)); }
+  .alegeri button { aspect-ratio:1; width:100%; font-size:22px; display:grid; place-items:center; border-radius:10px; border:2px solid transparent; background:#fff; cursor:pointer; padding:0; }
+  .alegeri button:hover { border-color:var(--linie); }
+  .alegeri button.activ { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .alegeri .culoare { width:60%; height:60%; border-radius:99px; background:var(--c); }
+  .mare-cta { width:100%; padding:16px 20px; font-size:18px; margin-top:6px; text-align:center; }
+  @media (max-width:760px) { .start { padding:18px; } .start-grid { grid-template-columns:minmax(0,1fr); gap:18px; } .start-stanga, .start-dreapta, .start-jos { grid-column:1; grid-row:auto; } .start h1 { font-size:30px; } .domenii { grid-template-columns:repeat(3,minmax(0,1fr)); } .domenii button { font-size:11.5px; min-height:68px; } .alegeri.sigle, .alegeri.culori { grid-template-columns:repeat(8,minmax(0,1fr)); } .alegeri button { font-size:18px; border-radius:8px; } }
   .tine { position:relative; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; transition:transform .15s, box-shadow .15s; }
   .tine i { position:absolute; left:0; top:0; bottom:0; width:0; background:linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,.15)); box-shadow:4px 0 14px rgba(255,255,255,.45); }
   .tine span { position:relative; }
@@ -112,7 +126,7 @@
   .tine.gata { animation:tremur .35s ease; }
   @keyframes tremur { 25% { transform:translateX(-3px) rotate(-1deg); } 75% { transform:translateX(3px) rotate(1deg); } }
   .start { position:relative; overflow:hidden; }
-  .stampila { position:absolute; left:50%; top:42%; transform:translate(-50%,-50%) rotate(-14deg) scale(3); opacity:0; pointer-events:none;
+  .stampila { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate(-14deg) scale(3); opacity:0; pointer-events:none;
     font-family:system-ui, sans-serif; font-weight:900; font-size:52px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent);
     border:6px solid var(--accent); border-radius:14px; padding:6px 22px; mix-blend-mode:multiply; -webkit-mask:radial-gradient(circle at 30% 40%, #000 55%, transparent 56%) 0 0/9px 9px, linear-gradient(#000, #000); -webkit-mask-composite:source-over; }
   .stampila.cade { animation:stampila .55s cubic-bezier(.2,1.4,.4,1) forwards; }
@@ -195,19 +209,31 @@ async function porneste() {
 function ecranStart() {
   joc = null; pas = null; salveazaLocal();
   $('#l-renunta').classList.add('ascuns');
+  $('.pagina').classList.add('larg');
   const el = $('#ecran');
   el.innerHTML = `
     <div class="card intra start">
-      <div class="cand">Registrul Comerțului · formular de înființare</div>
-      <h1>Ești patron. Ai ${CONT.ani} ani.</h1>
-      <p class="text">Ține partenerii aproape, oamenii mulțumiți și ANAF-ul departe. Fiecare alegere mișcă relația cu partenerii, bunăstarea angajaților și legalitatea, și aduce sau pierde bani. Dacă una din cele trei ajunge la zero, s-a terminat.</p>
-      <div class="camp"><label>Numele firmei</label><input type="text" id="f-nume" maxlength="40" placeholder="Patronache SRL"></div>
-      <div class="camp"><label>Slogan (opțional)</label><input type="text" id="f-slogan" maxlength="80" placeholder="Ieftin, rapid, aproape legal"></div>
-      <div class="camp"><label>Domeniul firmei</label><div class="domenii" id="f-domenii">${(CONT.domenii || []).map((d, i) => `<button type="button" data-v="${esc(d.id)}" class="${i === 0 ? 'activ' : ''}" title="${esc(d.desc || '')}"><span class="ic">${esc(d.icon || '🏢')}</span><span>${esc(d.nume)}</span></button>`).join('')}</div><div class="gol" id="f-domeniu-desc" style="margin-top:6px">${esc((CONT.domenii[0] || {}).desc || '')}</div></div>
-      <div class="camp"><label>Sigla</label><div class="alegeri" id="f-sigle">${SIGLE.map((s, i) => `<button type="button" data-v="${s}" class="${i === 0 ? 'activ' : ''}">${s}</button>`).join('')}</div></div>
-      <div class="camp"><label>Culoarea</label><div class="alegeri" id="f-culori">${CULORI.map((c, i) => `<button type="button" data-v="${c}" class="${i === 0 ? 'activ' : ''}"><span class="culoare" style="background:${c}; display:block"></span></button>`).join('')}</div></div>
-      <div class="actiuni"><button class="btn tine" id="f-start"><i></i><span>Ține apăsat: semnezi actele</span></button></div>
-      ${CONT.situatii < CONT.ani * CONT.trimestre_pe_an * CONT.decizii_pe_trimestru ? '<p class="gol" style="margin-top:12px">Conținutul e încă în lucru: partida se poate termina înainte de ' + CONT.ani + ' ani dacă nu mai sunt situații.</p>' : ''}
+      <div class="start-grid">
+        <div class="start-stanga">
+          <div class="cand">Registrul Comerțului · formular de înființare</div>
+          <h1>Ești patron.<br>Ai ${CONT.ani} ani.</h1>
+          <p class="text">Ține partenerii aproape, oamenii mulțumiți și ANAF-ul departe. Fiecare alegere mișcă relația cu partenerii, bunăstarea angajaților și legalitatea, și aduce sau pierde bani. Dacă una din cele trei ajunge la zero, s-a terminat.</p>
+          <div class="camp"><label>Numele firmei</label><input type="text" id="f-nume" maxlength="40" placeholder="Patronache SRL"></div>
+          <div class="camp"><label>Slogan (opțional)</label><input type="text" id="f-slogan" maxlength="80" placeholder="Ieftin, rapid, aproape legal"></div>
+        </div>
+        <div class="start-dreapta">
+          <div class="camp"><label>Domeniul firmei</label>
+            <div class="domenii" id="f-domenii">${(CONT.domenii || []).map((d, i) => `<button type="button" data-v="${esc(d.id)}" class="${i === 0 ? 'activ' : ''}"><span class="ic">${esc(d.icon || '🏢')}</span><span class="nm">${esc(d.nume)}</span></button>`).join('')}</div>
+            <div class="gol domeniu-desc" id="f-domeniu-desc">${esc((CONT.domenii[0] || {}).desc || '')}</div>
+          </div>
+          <div class="camp"><label>Sigla</label><div class="alegeri sigle" id="f-sigle">${SIGLE.map((s, i) => `<button type="button" data-v="${s}" class="${i === 0 ? 'activ' : ''}">${s}</button>`).join('')}</div></div>
+          <div class="camp"><label>Culoarea</label><div class="alegeri culori" id="f-culori">${CULORI.map((c, i) => `<button type="button" data-v="${c}" class="${i === 0 ? 'activ' : ''}" style="--c:${c}"><span class="culoare"></span></button>`).join('')}</div></div>
+        </div>
+        <div class="start-jos">
+          <button class="btn tine mare-cta" id="f-start"><i></i><span>Ține apăsat: semnezi actele</span></button>
+          ${CONT.situatii < CONT.ani * CONT.trimestre_pe_an * CONT.decizii_pe_trimestru ? '<p class="gol" style="margin-top:12px">Conținutul e încă în lucru: partida se poate termina înainte de ' + CONT.ani + ' ani dacă nu mai sunt situații.</p>' : ''}
+        </div>
+      </div>
     </div>`;
   for (const g of ['#f-sigle', '#f-culori', '#f-domenii']) $(g, el).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $$(g + ' button').forEach(x => x.classList.remove('activ')); b.classList.add('activ'); if (g === '#f-domenii') $('#f-domeniu-desc').textContent = (CONT.domenii.find(d => d.id === b.dataset.v) || {}).desc || ''; });
   tineApasat($('#f-start', el), 1200, incepePartida);
@@ -258,6 +284,7 @@ async function incepePartida() {
 // ------------------------------------------------------------------ afișare
 function arata() {
   eroare(null);
+  $('.pagina').classList.remove('larg');
   document.documentElement.style.setProperty('--accent', joc.firma.culoare || '#c9472b');
   $('#l-renunta').classList.toggle('ascuns', !joc);
   const el = $('#ecran');
