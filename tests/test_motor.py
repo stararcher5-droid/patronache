@@ -236,6 +236,7 @@ class Legaturi(unittest.TestCase):
         c = continut_de_test()
         c.situatie("a")["optiuni"][0]["flaguri"] = ["cafea"]; c.situatie("a")["nivel"] = 3
         c.situatie("b")["optiuni"][1]["cerinte"] = {"flaguri": ["cafea"]}
+        c.situatie("b")["optiuni"].append({"text": "a treia", "ef": {"parteneri": 1}})   # rămân două vizibile
         for id_ in ("c", "d", "e", "f"):
             c.situatie(id_)["nivel"] = 3
         s = motor.stare_noua(c, {}, seed=1)
