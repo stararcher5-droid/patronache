@@ -98,6 +98,7 @@
     <button data-tab="carti">Cărți</button>
     <button data-tab="niveluri">Niveluri</button>
     <button data-tab="reguli">Reguli</button>
+    <button data-tab="minijocuri">Mini-jocuri</button>
     <button data-tab="arhetipuri">Arhetipuri</button>
     <button data-tab="produse">Produse</button>
     <button data-tab="verificare">Verificare</button>
@@ -172,11 +173,6 @@
       <div class="rand r3" id="cfg-resurse"></div>
       <h3>Uzura pe an (cât scade fiecare resursă la bilanț dacă nu e întreținută)</h3>
       <div class="rand r3" id="cfg-uzura"></div>
-      <h3>Mini-jocurile de final de an</h3>
-      <p class="nota">După bilanțul fiecărui an (în afară de ultimul) vine un mini-joc ales la întâmplare dintre cele de nivelul firmei sau mai mic („de la nivelul”). Scorul (0..100) dă un efect proporțional cu maximul de mai jos: 30 = nimic, 100 = maxim, sub 30 = puțin în minus. Jocurile sunt implementate în pagina jocului: ștampila, telefoanele, pizza, negocierea, mă fură angajații?, inventarul, semnătura, cafeaua, contabilul, dublează profitul. „Testează” deschide jocul singur, fără partidă.</p>
-      <div class="rand r3"><div class="bifa" style="align-self:end"><input type="checkbox" id="cfg-minijocuri-activ"> Mini-jocurile sunt active</div><div><label>Când vin</label><select id="cfg-minijocuri-cand"><option value="trimestru">după fiecare trimestru</option><option value="an">doar după bilanțul anual</option></select></div></div>
-      <table id="tabel-minijocuri"><thead><tr><th>Joc</th><th>Nume afișat</th><th>Descriere</th><th>De la nivelul</th><th>Parteneri max</th><th>Bunăstare max</th><th>Legalitate max</th><th>Profit max</th><th></th></tr></thead><tbody></tbody></table>
-      <div style="margin-top:8px"><button id="minijoc-adauga">+ Mini-joc</button></div>
       <h3>Garanția de carte</h3>
       <p class="nota">Dacă atâtea decizii la rând nu dau nicio carte, următoarea dă sigur o carte surpriză. Cartea se alege după felul alegerii: prima regulă de mai jos care se potrivește cu efectul opțiunii alese; „oricând” e rezerva. Doar cărțile surpriză intră aici.</p>
       <div class="rand r3"><div><label>După câte decizii fără carte (0 = oprit)</label><input type="number" id="cfg-garantie-dupa" min="0"></div></div>
@@ -188,6 +184,18 @@
       <h3>Finaluri</h3>
       <div id="cfg-finaluri"></div>
       <div style="margin-top:10px; display:flex; gap:8px"><button class="primar" id="salveaza-reguli">Salvează regulile</button><button data-reset="config.json">Revino la regulile implicite</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== MINI-JOCURI ===================== -->
+  <section id="tab-minijocuri" class="ascuns">
+    <div class="card">
+      <h2>Mini-jocuri</h2>
+      <p class="nota">După bilanțul fiecărui an (în afară de ultimul) vine un mini-joc ales la întâmplare dintre cele de nivelul firmei sau mai mic („de la nivelul”). Scorul (0..100) dă un efect proporțional cu maximul de mai jos: 30 = nimic, 100 = maxim, sub 30 = puțin în minus. Jocurile sunt implementate în pagina jocului: ștampila, telefoanele, pizza, negocierea, mă fură angajații?, inventarul, semnătura, cafeaua, contabilul, dublează profitul. „Testează” deschide jocul singur, fără partidă.</p>
+      <div class="rand r3"><div class="bifa" style="align-self:end"><input type="checkbox" id="cfg-minijocuri-activ"> Mini-jocurile sunt active</div><div><label>Când vin</label><select id="cfg-minijocuri-cand"><option value="trimestru">după fiecare trimestru</option><option value="an">doar după bilanțul anual</option></select></div></div>
+      <table id="tabel-minijocuri"><thead><tr><th>Joc</th><th>Nume afișat</th><th>Descriere</th><th>De la nivelul</th><th>Parteneri max</th><th>Bunăstare max</th><th>Legalitate max</th><th>Profit max</th><th></th></tr></thead><tbody></tbody></table>
+      <div style="margin-top:8px"><button id="minijoc-adauga">+ Mini-joc</button></div>
+      <div style="margin-top:12px; display:flex; gap:8px"><button class="primar" id="salveaza-minijocuri">Salvează mini-jocurile</button><button data-reset="config.json">Revino la implicit (toate regulile)</button></div>
     </div>
   </section>
 
@@ -908,6 +916,7 @@ function randeazaReguli() {
   $('#cfg-garantie-dupa').value = (c.garantie_carte || {}).dupa ?? 0;
   c.minijocuri = c.minijocuri || { activ: true, lista: [] };
   $('#cfg-minijocuri-activ').checked = c.minijocuri.activ !== false;
+  $('#cfg-minijocuri-activ').onchange = e => { c.minijocuri.activ = e.target.checked; marcheaza('config.json'); };
   $('#cfg-minijocuri-cand').value = c.minijocuri.cand || 'trimestru';
   $('#cfg-minijocuri-cand').onchange = e => { c.minijocuri.cand = e.target.value; marcheaza('config.json'); };
   randeazaMinijocuri();
@@ -987,6 +996,7 @@ function randeazaDomenii() {
   });
 }
 $('#domeniu-adauga').addEventListener('click', () => { cfg().domenii = cfg().domenii || []; let n = cfg().domenii.length + 1, id = 'domeniu-' + n; while (domenii().some(d => d.id === id)) id = 'domeniu-' + (++n); cfg().domenii.push({ id, nume: 'Domeniu nou', icon: '🏢', desc: '' }); marcheaza('config.json'); randeazaDomenii(); });
+$('#salveaza-minijocuri').addEventListener('click', () => salveaza('config.json'));
 $('#salveaza-reguli').addEventListener('click', async () => {
   // situațiile și cărțile pleacă primele dacă au fost atinse de redenumiri de domenii
   if (nesalvat.has('situatii.json')) { citesteEditor(); await salveaza('situatii.json'); }
