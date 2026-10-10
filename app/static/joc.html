@@ -158,6 +158,10 @@
   .mj-produs { font-size:24px; font-weight:bold; margin:6px 0 10px; }
   .mj-raspunsuri { display:flex; flex-direction:column; gap:6px; align-items:flex-start; font-family:system-ui, sans-serif; font-size:14px; }
   .mj-gata { font-size:24px; text-align:center; padding:30px 0; font-family:system-ui, sans-serif; }
+  .mj-grila { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:10px auto; max-width:340px; touch-action:none; user-select:none; }
+  .mj-celula { aspect-ratio:1; border-radius:10px; background:var(--hartie2); display:grid; place-items:center; font-family:system-ui, sans-serif; font-weight:800; font-size:22px; transition:background .15s; }
+  .mj-sageti { display:flex; flex-direction:column; align-items:center; gap:4px; margin:6px 0; } .mj-sageti div { display:flex; gap:4px; }
+  .mj-sageti button { width:48px; height:40px; border-radius:8px; border:1px solid var(--linie); background:var(--hartie2); color:var(--cerneala); font-size:16px; cursor:pointer; }
   .mj-raft { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px 0; }
   .mj-cutie { font-size:34px; height:80px; border-radius:12px; border:2px solid var(--linie); background:var(--hartie2); cursor:pointer; }
   .mj-cutie.inchisa { background:#3a3326; } .mj-cutie.ok { border-color:var(--ok); } .mj-cutie.rau { border-color:var(--rau); }
@@ -248,8 +252,11 @@ function salveazaLocal() { try { joc ? localStorage.setItem('patronache-joc', JS
 function citesteLocal() { try { return JSON.parse(localStorage.getItem('patronache-joc') || 'null'); } catch (e) { return null; } }
 
 // ------------------------------------------------------------------ pornire
+let modTest = null;   // id-ul mini-jocului testat din admin (/?minijoc=id), fără partidă
 async function porneste() {
   try { CONT = await api('GET', '/api/continut'); } catch (e) { return eroare('Serverul nu răspunde: ' + e.message); }
+  const idTest = new URLSearchParams(location.search).get('minijoc');
+  if (idTest) return ecranTestMinijoc(idTest);
   const salvat = citesteLocal();
   if (salvat && salvat.id) {
     try { const d = await api('GET', '/api/partida/' + salvat.id); joc = salvat; pas = d.pas; return arata(); }
@@ -502,7 +509,27 @@ function ecranMinijoc() {
       <div class="actiuni" id="mj-actiuni"><button class="btn" id="mj-start">Începe</button><button class="btn secundar" id="mj-sari">Sari peste</button></div>
     </div>`;
 }
+function ecranTestMinijoc(id) {
+  modTest = id;
+  const m = (CONT.minijocuri?.lista || []).find(j => j.id === id) || { id, nume: id, desc: '', efect_max: {} };
+  joc = { id: 'test', firma: { nume: 'Firmă de test', sigla: '🧪', culoare: '#5b8def', domeniu: (CONT.domenii[0] || {}).id } };
+  pas = { pas: 'minijoc', an: 1, trimestru: 1, decizia: 1, nr_decizie: 1, resurse: { parteneri: 40, bunastare: 40, legalitate: 40 }, profit_an: 0, profit_total: 0, profit_baza: CONT.profit_de_baza_pe_an || 0,
+          nivel: { nivel: 1, nume: (CONT.niveluri[0] || {}).nume || '' }, carti: [], scuturi: [], minijoc: { ...m, apoi: 'trimestru', produs: 'Produs de test (prețul nu se verifică în test)' } };
+  document.documentElement.style.setProperty('--accent', joc.firma.culoare);
+  $('.pagina').classList.remove('larg');
+  $('#ecran').innerHTML = `<div class="eroare" style="background:#26324f; color:#bcc9f2; border:1px solid #3b4a7a">Mod de test din admin: scorul nu se trimite nicăieri. <a href="/admin" style="color:#fff">Înapoi la admin</a></div>` + antet() + ecranMinijoc();
+  leagaEvenimente();
+}
+
 async function trimiteScor(scor, raspuns = null) {
+  if (modTest) {
+    const sc = scor === null ? (raspuns !== null ? '(prețul se verifică doar în joc)' : 'sărit') : scor;
+    $('#ecran').innerHTML = antet() + `<div class="card intra"><div class="cand">Test · ${esc(pas.minijoc.nume)}</div><h1>Scor: ${sc}${typeof sc === 'number' ? ' din 100' : ''}</h1>
+      <p class="text">Efectul maxim configurat: ${esc(Object.entries(pas.minijoc.efect_max || {}).map(([k, v]) => (k === 'profit' ? 'Profit' : numeRes(k)) + ' +' + v).join(', ') || 'niciunul')}. În joc, 30 = nimic, 100 = maxim, sub 30 = puțin în minus.</p>
+      <div class="actiuni"><button class="btn" onclick="location.reload()">Joacă din nou</button><a class="btn secundar" href="/admin" style="text-decoration:none; display:inline-block">Înapoi la admin</a></div></div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
   if (ocupat) return; ocupat = true;
   try {
     const d = await api('POST', '/api/partida/' + joc.id + '/minijoc', raspuns === null ? { scor } : { raspuns });
@@ -522,7 +549,7 @@ async function trimiteScor(scor, raspuns = null) {
 function porneste_minijoc(id) {
   const arena = $('#mj-arena'); arena.classList.remove('ascuns'); $('#mj-actiuni').classList.add('ascuns');
   const gata = scor => { arena.innerHTML = `<div class="mj-gata">Scor: <b>${scor}</b> din 100</div>`; setTimeout(() => trimiteScor(Math.max(0, Math.min(100, Math.round(scor)))), 900); };
-  const jocuri = { stampila: mjStampila, telefoanele: mjTelefoanele, pizza: mjPizza, negocierea: mjNegocierea, pretul: mjPretul, inventarul: mjInventarul, semnatura: mjSemnatura, cafeaua: mjCafeaua, contabilul: mjContabilul };
+  const jocuri = { stampila: mjStampila, telefoanele: mjTelefoanele, pizza: mjPizza, negocierea: mjNegocierea, pretul: mjPretul, inventarul: mjInventarul, semnatura: mjSemnatura, cafeaua: mjCafeaua, contabilul: mjContabilul, dubleaza: mjDubleaza };
   (jocuri[id] || (() => gata(30)))(arena, gata);
 }
 // 1. Ștampila: dosarele apar și dispar; apeși pe ele cât sunt pe masă.
@@ -685,6 +712,41 @@ function mjContabilul(arena, gata) {
   $('#mj-ok').addEventListener('click', raspunde); $('#mj-rasp').addEventListener('keydown', e => { if (e.key === 'Enter') raspunde(); });
   const t = setInterval(() => { if (!document.contains(arena) || !activ) { clearInterval(t); return; } timp--; $('#mj-timp').textContent = timp; if (timp <= 0) { activ = false; clearInterval(t); gata(corecte / 5 * 100); } }, 1000);
   arata();
+}
+
+// 10. Dublează profitul: grilă 4×4 cu bancnote; tragi într-o direcție, bancnotele egale se unesc și se dublează. 25 de mutări.
+function mjDubleaza(arena, gata) {
+  const N = 4, MUTARI = 25; let grila = Array.from({ length: N }, () => Array(N).fill(0)), mutari = 0, activ = true;
+  const SCOR = { 10: 0, 20: 10, 40: 25, 80: 40, 160: 60, 320: 80, 640: 95, 1280: 100 };
+  arena.innerHTML = `<div class="mj-sus">Mutări rămase: <b id="mj-mut">${MUTARI}</b> · cea mai mare bancnotă: <b id="mj-max">10</b> lei</div><div class="mj-grila" id="mj-grila"></div>
+    <div class="mj-sageti"><button data-d="sus">▲</button><div><button data-d="stanga">◀</button><button data-d="jos">▼</button><button data-d="dreapta">▶</button></div></div>
+    <p class="gol" style="text-align:center">Trage cu degetul pe grilă, apasă săgețile sau folosește tastele. Două bancnote egale se unesc.</p>`;
+  const el = $('#mj-grila');
+  const culoare = v => ({ 10: '#8a7a55', 20: '#9c8a2e', 40: '#b0953a', 80: '#c49a2b', 160: '#d9a62b', 320: '#e2b23a', 640: '#f0c24f', 1280: '#ffd166' }[v] || '#ffe08a');
+  const deseneaza = () => { el.innerHTML = grila.flat().map(v => `<div class="mj-celula" style="${v ? 'background:' + culoare(v) + '; color:#1a1c22' : ''}">${v ? v : ''}</div>`).join(''); $('#mj-max').textContent = Math.max(10, ...grila.flat()); $('#mj-mut').textContent = MUTARI - mutari; };
+  const libere = () => { const l = []; grila.forEach((r, i) => r.forEach((v, j) => { if (!v) l.push([i, j]); })); return l; };
+  const adauga = () => { const l = libere(); if (!l.length) return; const [i, j] = l[Math.floor(Math.random() * l.length)]; grila[i][j] = Math.random() < 0.85 ? 10 : 20; };
+  const strange = linie => { const a = linie.filter(Boolean); const b = []; for (let i = 0; i < a.length; i++) { if (a[i] === a[i + 1]) { b.push(a[i] * 2); i++; } else b.push(a[i]); } while (b.length < N) b.push(0); return b; };
+  const muta = d => {
+    if (!activ) return;
+    const vechi = JSON.stringify(grila); let g = grila.map(r => r.slice());
+    const rot = m => m[0].map((_, j) => m.map(r => r[j]));          // transpune
+    if (d === 'stanga') g = g.map(strange);
+    if (d === 'dreapta') g = g.map(r => strange(r.slice().reverse()).reverse());
+    if (d === 'sus') g = rot(rot(g).map(strange));
+    if (d === 'jos') g = rot(rot(g).map(r => strange(r.slice().reverse()).reverse()));
+    if (JSON.stringify(g) === vechi) return;                          // mutare fără efect nu se numără
+    grila = g; mutari++; adauga(); deseneaza();
+    const poate = libere().length > 0 || grila.some((r, i) => r.some((v, j) => (j < N - 1 && v === r[j + 1]) || (i < N - 1 && v === grila[i + 1][j])));
+    if (mutari >= MUTARI || !poate) { activ = false; document.removeEventListener('keydown', tasta); const max = Math.max(...grila.flat()); gata(SCOR[max] ?? 100); }
+  };
+  const tasta = e => { const d = { ArrowLeft: 'stanga', ArrowRight: 'dreapta', ArrowUp: 'sus', ArrowDown: 'jos' }[e.key]; if (d) { e.preventDefault(); muta(d); } };
+  document.addEventListener('keydown', tasta);
+  $$('.mj-sageti button', arena).forEach(b => b.addEventListener('click', () => muta(b.dataset.d)));
+  let p0 = null;
+  el.addEventListener('pointerdown', e => { p0 = [e.clientX, e.clientY]; });
+  el.addEventListener('pointerup', e => { if (!p0) return; const dx = e.clientX - p0[0], dy = e.clientY - p0[1]; p0 = null; if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return; muta(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'dreapta' : 'stanga') : (dy > 0 ? 'jos' : 'sus')); });
+  adauga(); adauga(); deseneaza();
 }
 
 function ecranFinal() {

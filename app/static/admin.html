@@ -173,7 +173,7 @@
       <h3>Uzura pe an (cât scade fiecare resursă la bilanț dacă nu e întreținută)</h3>
       <div class="rand r3" id="cfg-uzura"></div>
       <h3>Mini-jocurile de final de an</h3>
-      <p class="nota">După bilanțul fiecărui an (în afară de ultimul) vine un mini-joc ales la întâmplare dintre cele de nivelul firmei sau mai mic („de la nivelul”). Scorul (0..100) dă un efect proporțional cu maximul de mai jos: 30 = nimic, 100 = maxim, sub 30 = puțin în minus. Jocurile sunt implementate în pagina jocului: ștampila, telefoanele, pizza, negocierea, mă fură angajații?, inventarul, semnătura, cafeaua, contabilul.</p>
+      <p class="nota">După bilanțul fiecărui an (în afară de ultimul) vine un mini-joc ales la întâmplare dintre cele de nivelul firmei sau mai mic („de la nivelul”). Scorul (0..100) dă un efect proporțional cu maximul de mai jos: 30 = nimic, 100 = maxim, sub 30 = puțin în minus. Jocurile sunt implementate în pagina jocului: ștampila, telefoanele, pizza, negocierea, mă fură angajații?, inventarul, semnătura, cafeaua, contabilul, dublează profitul. „Testează” deschide jocul singur, fără partidă.</p>
       <div class="rand r3"><div class="bifa" style="align-self:end"><input type="checkbox" id="cfg-minijocuri-activ"> Mini-jocurile sunt active</div><div><label>Când vin</label><select id="cfg-minijocuri-cand"><option value="trimestru">după fiecare trimestru</option><option value="an">doar după bilanțul anual</option></select></div></div>
       <table id="tabel-minijocuri"><thead><tr><th>Joc</th><th>Nume afișat</th><th>Descriere</th><th>De la nivelul</th><th>Parteneri max</th><th>Bunăstare max</th><th>Legalitate max</th><th>Profit max</th><th></th></tr></thead><tbody></tbody></table>
       <div style="margin-top:8px"><button id="minijoc-adauga">+ Mini-joc</button></div>
@@ -930,7 +930,7 @@ function randeazaReguli() {
     marcheaza('config.json');
   }));
 }
-const MINIJOCURI_CUNOSCUTE = { stampila: 'Ștampila (reflex)', telefoanele: 'Telefoanele (prinde apelurile)', pizza: 'Pizza (moment potrivit)', negocierea: 'Negocierea (ghicești prețul clientului)', pretul: 'Mă fură angajații? (prețul unui produs din domeniu)', inventarul: 'Inventarul (memorie)', semnatura: 'Semnătura (ține apăsat exact 2 s)', cafeaua: 'Cafeaua (reflex)', contabilul: 'Contabilul (calcule rapide)' };
+const MINIJOCURI_CUNOSCUTE = { stampila: 'Ștampila (reflex)', telefoanele: 'Telefoanele (prinde apelurile)', pizza: 'Pizza (moment potrivit)', negocierea: 'Negocierea (ghicești prețul clientului)', pretul: 'Mă fură angajații? (prețul unui produs din domeniu)', inventarul: 'Inventarul (memorie)', semnatura: 'Semnătura (ține apăsat exact 2 s)', cafeaua: 'Cafeaua (reflex)', contabilul: 'Contabilul (calcule rapide)', dubleaza: 'Dublează profitul (unește bancnotele egale)' };
 function randeazaMinijocuri() {
   const m = cfg().minijocuri; m.lista = m.lista || [];
   const tb = $('#tabel-minijocuri tbody'); tb.innerHTML = '';
@@ -940,10 +940,11 @@ function randeazaMinijocuri() {
       <td><input type="text" data-k="nume" value="${esc(j.nume || '')}"></td><td><input type="text" data-k="desc" value="${esc(j.desc || '')}"></td>
       <td><input type="number" data-n="1" min="1" max="${niveluri().length}" value="${j.nivel || 1}" style="width:60px"></td>
       ${['parteneri', 'bunastare', 'legalitate', 'profit'].map(k => `<td><input type="number" data-e="${k}" value="${j.efect_max[k] ?? ''}" placeholder="0" style="width:70px"></td>`).join('')}
-      <td><button class="mic pericol">șterge</button></td>`;
+      <td style="white-space:nowrap"><button class="mic" data-test="1" title="Deschide jocul singur, fără partidă, într-un tab nou">Testează</button> <button class="mic pericol">șterge</button></td>`;
+    $('[data-test]', tr).addEventListener('click', () => window.open('/?minijoc=' + encodeURIComponent(j.id), '_blank'));
     $('select', tr).addEventListener('change', e => { j.id = e.target.value; marcheaza('config.json'); });
     $$('input', tr).forEach(x => x.addEventListener('input', () => { if (x.dataset.k) j[x.dataset.k] = x.value; else if (x.dataset.n) j.nivel = Math.max(1, numar(x.value, 1)); else { const v = numar(x.value, 0); if (v) j.efect_max[x.dataset.e] = v; else delete j.efect_max[x.dataset.e]; } marcheaza('config.json'); }));
-    $('button', tr).addEventListener('click', () => { m.lista.splice(i, 1); marcheaza('config.json'); randeazaMinijocuri(); });
+    $('.pericol', tr).addEventListener('click', () => { m.lista.splice(i, 1); marcheaza('config.json'); randeazaMinijocuri(); });
     tb.appendChild(tr);
   });
 }

@@ -310,6 +310,15 @@
           "legalitate": 4,
           "profit": 12
         }
+      },
+      {
+        "id": "dubleaza",
+        "nume": "Dublează profitul",
+        "nivel": 1,
+        "desc": "Bancnotele din seif se unesc două câte două când le tragi în aceeași direcție. Ai 25 de mutări: cu cât ajungi la o bancnotă mai mare, cu atât iese mai mult profit.",
+        "efect_max": {
+          "profit": 15
+        }
       }
     ],
     "cand": "trimestru"
