@@ -178,6 +178,17 @@ class Reguli(unittest.TestCase):
         motor.alege(c, s, 0)
         self.assertEqual(s["pas"], motor.PAS_BILANT, "ultimul trimestru merge la bilanț")
 
+    def test_minijocurile_nu_se_repeta_pana_nu_trec_toate(self):
+        c = continut_de_test()
+        c.config.update({"ani": 1, "trimestre_pe_an": 4, "decizii_pe_trimestru": 1})
+        for id_ in "abcdef": c.situatie(id_)["repetabila"] = True
+        c.config["minijocuri"] = {"activ": True, "cand": "trimestru", "lista": [{"id": "pizza", "nume": "P", "efect_max": {}}, {"id": "cafeaua", "nume": "C", "efect_max": {}}, {"id": "stampila", "nume": "S", "efect_max": {}}]}
+        for seed in range(6):
+            s = motor.stare_noua(c, {}, seed=seed); vazute = []
+            for _ in range(3):
+                motor.alege(c, s, 0); vazute.append(s["minijoc"]["id"]); motor.minijoc(c, s, 50)
+            self.assertEqual(len(set(vazute)), 3, f"seed {seed}: {vazute}")
+
     def test_minijoc_sarit_sau_slab(self):
         c = continut_de_test()
         c.config["minijocuri"] = {"activ": True, "cand": "an", "lista": [{"id": "pizza", "nume": "Pizza", "efect_max": {"bunastare": 10}}]}

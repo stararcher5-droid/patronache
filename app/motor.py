@@ -483,7 +483,16 @@ def minijocul_anului(c: Continut, stare: dict[str, Any]) -> dict[str, Any] | Non
     lista = [j for j in (cfg.get("lista") or []) if int(j.get("nivel", 1)) <= stare["nivel"]]
     if not cfg.get("activ", True) or not lista:
         return None
-    return _rng(stare).choice(lista)
+    # Fără repetiții plictisitoare: întâi cele nejucate în partida asta; după un ciclu complet, orice în afară de ultimul.
+    jucate = stare.setdefault("minijocuri_jucate", [])
+    nejucate = [j for j in lista if j["id"] not in jucate]
+    if not nejucate:
+        jucate.clear()
+        ultim = stare["istoric"][-1]["id"] if stare["istoric"] and stare["istoric"][-1].get("tip") == PAS_MINIJOC else None
+        nejucate = [j for j in lista if j["id"] != ultim] or lista
+    ales = random.Random(f"{stare['seed']}:minijoc:{len(stare['istoric'])}").choice(nejucate)
+    jucate.append(ales["id"])
+    return ales
 
 
 def _pregateste_minijoc(c: Continut, stare: dict[str, Any], mj: dict[str, Any]) -> None:
