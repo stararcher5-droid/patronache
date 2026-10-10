@@ -161,6 +161,9 @@
   .mj-raft { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px 0; }
   .mj-cutie { font-size:34px; height:80px; border-radius:12px; border:2px solid var(--linie); background:var(--hartie2); cursor:pointer; }
   .mj-cutie.inchisa { background:#3a3326; } .mj-cutie.ok { border-color:var(--ok); } .mj-cutie.rau { border-color:var(--rau); }
+  .mj-intrebare-mare { text-align:center; font-family:system-ui, sans-serif; font-size:22px; color:var(--cerneala); padding:14px 0 4px; }
+  .mj-obiect { display:inline-block; font-size:56px; line-height:1; vertical-align:middle; margin:0 6px; animation:mj-pulse 1s ease-in-out infinite; filter:drop-shadow(0 4px 10px rgba(0,0,0,.45)); }
+  @keyframes mj-pulse { 0%, 100% { transform:scale(1) rotate(-6deg); } 50% { transform:scale(1.18) rotate(6deg); } }
   .mj-semn, .mj-cafea { width:100%; min-height:90px; font-size:20px; margin:10px 0; user-select:none; -webkit-user-select:none; touch-action:none; }
   .mj-semn.apasat { transform:scale(.98); filter:brightness(1.15); }
   /* bilanț & final */
@@ -624,7 +627,7 @@ function mjInventarul(arena, gata) {
   const intreaba = ob => {
     $$('.mj-cont').forEach(x => { x.textContent = '📦'; }); $$('.mj-cutie').forEach(b => b.classList.add('inchisa'));
     const tinta = Math.floor(Math.random() * 8);
-    $('#mj-intrebare').innerHTML = `Unde era <b style="font-size:22px">${ob[tinta]}</b>?`;
+    $('#mj-intrebare').innerHTML = `<div class="mj-intrebare-mare">Unde era <span class="mj-obiect">${ob[tinta]}</span>?</div>`;
     $$('.mj-cutie').forEach(b => b.addEventListener('click', () => {
       const ok = +b.dataset.i === tinta; if (ok) corecte++;
       $$('.mj-cont').forEach((x, i) => { x.textContent = ob[i]; }); b.classList.add(ok ? 'ok' : 'rau');
