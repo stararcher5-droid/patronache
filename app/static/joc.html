@@ -669,10 +669,18 @@ function mjCafeaua(arena, gata) {
 }
 // 9. Contabilul: cinci calcule cu facturi, 25 de secunde în total.
 function mjContabilul(arena, gata) {
-  const intrebari = []; for (let i = 0; i < 5; i++) { const a = 100 + Math.floor(Math.random() * 90) * 10, b = 50 + Math.floor(Math.random() * 45) * 10; const tip = Math.random() < 0.5 ? '+' : '−'; intrebari.push({ a, b, tip, r: tip === '+' ? a + b : a - b }); }
+  const rnd = (lo, hi, pas = 1) => lo + Math.floor(Math.random() * ((hi - lo) / pas + 1)) * pas;
+  const intrebari = [];
+  for (let i = 0; i < 5; i++) {
+    const tip = ['transport', 'discount', 'cantitate', 'tva'][i % 4];
+    if (tip === 'transport') { const a = rnd(200, 2000, 10), b = rnd(20, 150, 5); intrebari.push({ text: `Factura: ${a} lei + transport ${b} lei = ?`, r: a + b }); }
+    else if (tip === 'discount') { const a = rnd(300, 2000, 10), b = Math.round(a * rnd(10, 40, 10) / 100 / 10) * 10; intrebari.push({ text: `Factura: ${a} lei − discount ${b} lei = ?`, r: a - b }); }
+    else if (tip === 'cantitate') { const n = rnd(2, 9), pu = rnd(15, 250, 5); intrebari.push({ text: `${n} bucăți × ${pu} lei = ?`, r: n * pu }); }
+    else { const a = rnd(100, 1500, 100); intrebari.push({ text: `Factura: ${a} lei + TVA 19% = ?`, r: Math.round(a * 1.19) }); }
+  }
   let i = 0, corecte = 0, timp = 25, activ = true;
   arena.innerHTML = '<div class="mj-sus"><span id="mj-timp">25</span>s · factura <b id="mj-n">1</b> din 5 · corecte: <b id="mj-scor">0</b></div><div class="mj-produs" id="mj-calc"></div><div class="mj-neg"><input type="number" id="mj-rasp" placeholder="rezultatul, în lei"><button class="btn" id="mj-ok">Trec în registru</button></div>';
-  const arata = () => { const q = intrebari[i]; $('#mj-calc').textContent = `Factura: ${q.a} lei ${q.tip} ${q.tip === '+' ? 'TVA' : 'discount'} ${q.b} lei = ?`; $('#mj-rasp').value = ''; $('#mj-rasp').focus(); };
+  const arata = () => { $('#mj-calc').textContent = intrebari[i].text; $('#mj-rasp').value = ''; $('#mj-rasp').focus(); };
   const raspunde = () => { if (!activ) return; if (+$('#mj-rasp').value === intrebari[i].r) { corecte++; $('#mj-scor').textContent = corecte; } i++; if (i >= 5) { activ = false; clearInterval(t); gata(corecte / 5 * 100); return; } $('#mj-n').textContent = i + 1; arata(); };
   $('#mj-ok').addEventListener('click', raspunde); $('#mj-rasp').addEventListener('keydown', e => { if (e.key === 'Enter') raspunde(); });
   const t = setInterval(() => { if (!document.contains(arena) || !activ) { clearInterval(t); return; } timp--; $('#mj-timp').textContent = timp; if (timp <= 0) { activ = false; clearInterval(t); gata(corecte / 5 * 100); } }, 1000);
