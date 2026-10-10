@@ -319,6 +319,16 @@
         "efect_max": {
           "profit": 15
         }
+      },
+      {
+        "id": "ascunde",
+        "nume": "Ascunde actele",
+        "nivel": 1,
+        "desc": "Vine controlul și biroul e plin de hârtii. Trage un act peste altul la fel: hârtiile fac un teanc, teancurile un dosar, dosarele o cutie, cutiile un dulap, dulapurile arhiva. Când nu mai ai loc pe masă, ANAF-ul a intrat.",
+        "efect_max": {
+          "legalitate": 5,
+          "profit": 8
+        }
       }
     ],
     "cand": "trimestru"

@@ -162,6 +162,11 @@
   .mj-celula { aspect-ratio:1; border-radius:10px; background:var(--hartie2); display:grid; place-items:center; font-family:system-ui, sans-serif; font-weight:800; font-size:22px; transition:background .15s; }
   .mj-sageti { display:flex; flex-direction:column; align-items:center; gap:4px; margin:6px 0; } .mj-sageti div { display:flex; gap:4px; }
   .mj-sageti button { width:48px; height:40px; border-radius:8px; border:1px solid var(--linie); background:var(--hartie2); color:var(--cerneala); font-size:16px; cursor:pointer; }
+  .mj-tabla { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin:10px auto; max-width:420px; touch-action:none; user-select:none; }
+  .mj-loc { aspect-ratio:1; border-radius:10px; background:var(--hartie2); border:1px dashed var(--linie); display:grid; place-items:center; }
+  .mj-act { font-size:34px; line-height:1; cursor:grab; touch-action:none; user-select:none; }
+  .mj-act.tras { opacity:.3; }
+  .mj-fantoma { position:fixed; font-size:40px; transform:translate(-50%, -60%); pointer-events:none; z-index:30; filter:drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
   .mj-raft { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px 0; }
   .mj-cutie { font-size:34px; height:80px; border-radius:12px; border:2px solid var(--linie); background:var(--hartie2); cursor:pointer; }
   .mj-cutie.inchisa { background:#3a3326; } .mj-cutie.ok { border-color:var(--ok); } .mj-cutie.rau { border-color:var(--rau); }
@@ -549,7 +554,7 @@ async function trimiteScor(scor, raspuns = null) {
 function porneste_minijoc(id) {
   const arena = $('#mj-arena'); arena.classList.remove('ascuns'); $('#mj-actiuni').classList.add('ascuns');
   const gata = scor => { arena.innerHTML = `<div class="mj-gata">Scor: <b>${scor}</b> din 100</div>`; setTimeout(() => trimiteScor(Math.max(0, Math.min(100, Math.round(scor)))), 900); };
-  const jocuri = { stampila: mjStampila, telefoanele: mjTelefoanele, pizza: mjPizza, negocierea: mjNegocierea, pretul: mjPretul, inventarul: mjInventarul, semnatura: mjSemnatura, cafeaua: mjCafeaua, contabilul: mjContabilul, dubleaza: mjDubleaza };
+  const jocuri = { stampila: mjStampila, telefoanele: mjTelefoanele, pizza: mjPizza, negocierea: mjNegocierea, pretul: mjPretul, inventarul: mjInventarul, semnatura: mjSemnatura, cafeaua: mjCafeaua, contabilul: mjContabilul, dubleaza: mjDubleaza, ascunde: mjAscunde };
   (jocuri[id] || (() => gata(30)))(arena, gata);
 }
 // 1. Ștampila: dosarele apar și dispar; apeși pe ele cât sunt pe masă.
@@ -747,6 +752,46 @@ function mjDubleaza(arena, gata) {
   el.addEventListener('pointerdown', e => { p0 = [e.clientX, e.clientY]; });
   el.addEventListener('pointerup', e => { if (!p0) return; const dx = e.clientX - p0[0], dy = e.clientY - p0[1]; p0 = null; if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return; muta(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'dreapta' : 'stanga') : (dy > 0 ? 'jos' : 'sus')); });
   adauga(); adauga(); deseneaza();
+}
+
+// 11. Ascunde actele: tragi un act peste altul de același fel și se unesc: hârtie → teanc → dosar → cutie → dulap → arhivă.
+function mjAscunde(arena, gata) {
+  const NIV = [['📄', 'hârtie'], ['📑', 'teanc'], ['📁', 'dosar'], ['📦', 'cutie'], ['🗄️', 'dulap'], ['🏛️', 'arhivă']];
+  const SCOR = [0, 20, 45, 70, 90, 100];
+  const COL = 5, RND = 4, N = COL * RND; let celule = Array(N).fill(-1), timp = 45, activ = true, maxNiv = 0;
+  arena.innerHTML = `<div class="mj-sus"><span id="mj-timp">${timp}</span>s · cel mai mare: <b id="mj-max">hârtie</b> · ANAF-ul vine când tabla e plină</div><div class="mj-tabla" id="mj-tabla"></div><p class="gol" style="text-align:center">Trage un act peste altul la fel ca să le unești. Actele noi vin singure.</p>`;
+  const tabla = $('#mj-tabla');
+  const deseneaza = () => { tabla.innerHTML = celule.map((n, i) => `<div class="mj-loc" data-i="${i}">${n >= 0 ? `<div class="mj-act" data-i="${i}" title="${NIV[n][1]}">${NIV[n][0]}</div>` : ''}</div>`).join(''); $('#mj-max').textContent = NIV[maxNiv][1]; leaga(); };
+  const libere = () => celule.map((n, i) => n < 0 ? i : -1).filter(i => i >= 0);
+  const poateUni = () => { const c = {}; celule.forEach(n => { if (n >= 0) c[n] = (c[n] || 0) + 1; }); return Object.values(c).some(x => x >= 2); };
+  const termina = () => { if (!activ) return; activ = false; clearInterval(tTimp); clearInterval(tSpawn); gata(SCOR[maxNiv]); };
+  const spawn = () => { if (!activ || !document.contains(tabla)) return; const l = libere(); if (!l.length) { if (!poateUni()) termina(); return; } celule[l[Math.floor(Math.random() * l.length)]] = Math.random() < 0.2 ? 1 : 0; deseneaza(); };
+  // tragere cu pointer: funcționează și cu degetul
+  let tras = null, fantoma = null;
+  const leaga = () => {
+    $$('.mj-act', tabla).forEach(a => a.addEventListener('pointerdown', e => {
+      e.preventDefault(); tras = +a.dataset.i; a.classList.add('tras');
+      fantoma = document.createElement('div'); fantoma.className = 'mj-fantoma'; fantoma.textContent = a.textContent; document.body.appendChild(fantoma); mutaFantoma(e);
+    }));
+  };
+  const mutaFantoma = e => { if (fantoma) { fantoma.style.left = e.clientX + 'px'; fantoma.style.top = e.clientY + 'px'; } };
+  document.addEventListener('pointermove', mutaFantoma);
+  document.addEventListener('pointerup', e => {
+    if (tras === null) return;
+    const loc = document.elementFromPoint(e.clientX, e.clientY)?.closest('.mj-loc');
+    const de = tras; tras = null; fantoma?.remove(); fantoma = null;
+    if (!activ || !loc) { deseneaza(); return; }
+    const la = +loc.dataset.i;
+    if (la !== de) {
+      if (celule[la] < 0) { celule[la] = celule[de]; celule[de] = -1; }
+      else if (celule[la] === celule[de] && celule[la] < NIV.length - 1) { celule[la]++; celule[de] = -1; maxNiv = Math.max(maxNiv, celule[la]); if (maxNiv === NIV.length - 1) { deseneaza(); termina(); return; } }
+    }
+    deseneaza();
+  });
+  const tTimp = setInterval(() => { if (!document.contains(tabla)) { clearInterval(tTimp); clearInterval(tSpawn); activ = false; return; } timp--; $('#mj-timp').textContent = timp; if (timp <= 0) termina(); }, 1000);
+  const tSpawn = setInterval(spawn, 1500);
+  for (let k = 0; k < 5; k++) spawn();
+  deseneaza();
 }
 
 function ecranFinal() {
